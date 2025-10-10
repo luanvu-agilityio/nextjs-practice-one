@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Header - Snapshot matches snapshot 1`] = `
+<div>
+  <header
+    class="bg-white w-full"
+  >
+    <div
+      class="max-w-[1296px] mx-auto py-4 px-0 flex items-center gap-14"
+    >
+      <a
+        href="/"
+      >
+        <svg
+          class="w-8 h-8"
+          data-testid="logo-icon"
+        />
+        <div
+          class="hidden sm:block"
+        >
+          <h1>
+            <span
+              class="font-secondary text-primary text-3xl font-light"
+            >
+              SaaS
+              <span
+                class="font-medium"
+              >
+                Candy
+              </span>
+            </span>
+          </h1>
+        </div>
+      </a>
+      <nav
+        data-testid="navbar"
+      >
+        Navbar
+      </nav>
+      <div
+        class="ml-auto flex items-center justify-between gap-4"
+      >
+        <svg
+          class="w-10 h-10"
+          data-testid="theme-switcher-icon"
+        />
+        <div
+          class="hidden sm:flex items-center gap-4"
+        >
+          <div
+            class="w-20 h-8 bg-gray-200 rounded animate-pulse"
+          />
+          <div
+            class="w-20 h-8 bg-gray-200 rounded animate-pulse"
+          />
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+`;

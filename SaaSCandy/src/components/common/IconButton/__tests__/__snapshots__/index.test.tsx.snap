@@ -1,0 +1,152 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`IconButton Snapshot Tests should match snapshot with disabled variant 1`] = `
+<div>
+  <button
+    class="inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation border border-gray-foreground text-gray-foreground cursor-not-allowed w-6 h-6 p-4"
+    data-testid="icon-button"
+    disabled=""
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-plus"
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14"
+      />
+      <path
+        d="M12 5v14"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton Snapshot Tests should match snapshot with ghost variant 1`] = `
+<div>
+  <button
+    class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border-none text-primary hover:opacity-90 w-6 h-6 p-4"
+    data-testid="icon-button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-plus"
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14"
+      />
+      <path
+        d="M12 5v14"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton Snapshot Tests should match snapshot with large size 1`] = `
+<div>
+  <button
+    class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-white text-white hover:opacity-90 border-none w-8 h-8 font-secondary"
+    data-testid="icon-button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-plus"
+      fill="none"
+      height="20"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14"
+      />
+      <path
+        d="M12 5v14"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton Snapshot Tests should match snapshot with outline variant 1`] = `
+<div>
+  <button
+    class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border border-orange-background text-orange-background hover:bg-white-background hover:text-white w-6 h-6 p-4"
+    data-testid="icon-button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-plus"
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14"
+      />
+      <path
+        d="M12 5v14"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton Snapshot Tests should match snapshot with primary variant and md size 1`] = `
+<div>
+  <button
+    class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-white text-white hover:opacity-90 border-none w-6 h-6 p-4"
+    data-testid="icon-button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-plus"
+      fill="none"
+      height="16"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 12h14"
+      />
+      <path
+        d="M12 5v14"
+      />
+    </svg>
+  </button>
+</div>
+`;

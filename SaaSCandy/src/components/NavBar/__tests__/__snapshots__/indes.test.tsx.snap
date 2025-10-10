@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Navbar - Snapshot matches snapshot 1`] = `
+<div>
+  <nav
+    class="flex-1"
+  >
+    <ul
+      class="hidden md:flex items-center justify-start gap-10 text-primary w-full"
+    >
+      <li>
+        <a
+          href="/home"
+        >
+          Home
+        </a>
+      </li>
+      <li>
+        <a
+          href="/about"
+        >
+          About
+        </a>
+      </li>
+      <li>
+        <a
+          href="/contact"
+        >
+          Contact
+        </a>
+      </li>
+    </ul>
+    <div
+      class="md:hidden flex items-center"
+    >
+      <button
+        aria-label="Toggle menu"
+        class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border-none text-primary hover:opacity-90 w-6 h-6 p-4"
+        data-testid="icon-button"
+      >
+        <svg
+          class="text-gray-700"
+          fill="none"
+          height="18"
+          viewBox="0 0 24 24"
+          width="18"
+        >
+          <path
+            d="M3 12h18M3 6h18M3 18h18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.6"
+          />
+        </svg>
+      </button>
+    </div>
+  </nav>
+</div>
+`;

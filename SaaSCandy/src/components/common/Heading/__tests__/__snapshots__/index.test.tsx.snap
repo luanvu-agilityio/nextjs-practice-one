@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Heading renders match snapshot 1`] = `
+<div>
+  <h1
+    aria-level="1"
+    class=""
+    role="heading"
+  >
+    Test Heading
+  </h1>
+</div>
+`;

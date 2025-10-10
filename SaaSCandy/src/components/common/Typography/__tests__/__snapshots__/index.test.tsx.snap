@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Typography renders match snapshot 1`] = `
+<div>
+  <p
+    class="text-md"
+    role="paragraph"
+  >
+    Typography
+  </p>
+</div>
+`;

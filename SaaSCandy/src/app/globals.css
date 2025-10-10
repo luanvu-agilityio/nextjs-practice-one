@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #000000;
+  --orange-background: #ee7b11;
+  --orange-foreground: #ffdfaf;
+  --blue-background: #1642b9;
+  --blue-foreground: #92acf2;
+  --dark-blue: #001c68;
+  --yellow-background: #ffd245;
+  --light-yellow: #ffe486;
+  --yellow-foreground: #fff4ce;
+  --gray-background: #7a8496;
+  --gray-foreground: rgba(99, 99, 99, 0.2);
+  --light-gray: #f1f1f5;
+  --slate-blue: #526fa3;
+  --sky-blue: #46c4ff;
+  --teal-blue: #3c86ad;
+  --forest-green: #37a05b;
+  --gradient-primary: linear-gradient(91.72deg, #4c52ff 0%, #f74c5f 100%);
+  --inactive-background: #f9f9fb;
+
+  --destructive-background: #ff3b30;
+  --success-background: #1ec26d;
+  --info-background: #3a86ff;
+  --warning-background: #ff9500;
+
+  --form-border-color: #dfebfc;
+  --form-shadow-color: 0px 8px 32px 0px #11111a0d, 0px 4px 16px 0px #11111a0d;
+  --blue-border-color: #2753c9;
+}
+
+.dark {
+  --primary: #ffffff;
+  --orange-background: #ff8c3a;
+  --orange-foreground: #2d1a0f;
+  --blue-background: #4a6bff;
+  --blue-foreground: #0a0f2d;
+  --dark-blue: #7ba3ff;
+  --yellow-background: #ffdd66;
+  --light-yellow: #2d2511;
+  --yellow-foreground: #2a1f0a;
+  --gray-background: #4a525e;
+  --gray-foreground: rgba(200, 200, 200, 0.3);
+  --slate-blue: #7c9bd4;
+  --sky-blue: #2ba8ff;
+  --teal-blue: #66b3d9;
+  --forest-green: #5cc274;
+  --gradient-primary: linear-gradient(91.72deg, #6c72ff 0%, #ff6c7f 100%);
+
+  /* Status colors for dark theme */
+  --destructive-background: #ff5555;
+  --success-background: #4ade80;
+  --info-background: #60a5fa;
+  --warning-background: #fbbf24;
+
+  /* Dark theme specific colors */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --surface: #1a1a1a;
+  --border: #333333;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+body {
+  background-color: #ffffff;
+  color: var(--primary);
+  font-family: var(--font-primary);
+  overflow-y: auto;
+  min-height: 100vh;
+  width: 100%;
+}
+
+[data-radix-popper-content-wrapper] {
+  max-width: calc(100vw - 32px) !important;
+}
+
+/* Ensure dropdown menus don't overflow viewport */
+[data-radix-dropdown-menu-content] {
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+}
+
+/* Container constraint for dropdowns near viewport edge */
+.dropdown-container {
+  position: relative;
+  z-index: 50;
+}

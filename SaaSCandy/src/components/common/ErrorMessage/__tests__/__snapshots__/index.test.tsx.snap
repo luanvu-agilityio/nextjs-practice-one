@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ErrorMessage Component matches snapshot with default error 1`] = `
+<div>
+  <p
+    class="text-destructive-background text-lg"
+    role="paragraph"
+  >
+    Something went wrong. Please try again.
+  </p>
+</div>
+`;

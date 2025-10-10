@@ -1,0 +1,230 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Footer - Snapshot matches snapshot 1`] = `
+<div>
+  <footer
+    class="bg-dark-blue w-full "
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-0 py-17.5 flex justify-between gap-33"
+    >
+      <div
+        class="w-76.5 flex flex-col gap-13.5"
+      >
+        <a
+          href="/"
+        >
+          <svg
+            class="w-8 h-8"
+            data-testid="logo-icon"
+          />
+          <div
+            class="hidden sm:block"
+          >
+            <h1>
+              <span
+                class="font-secondary text-white text-3xl font-light"
+              >
+                SaaS
+                <span
+                  class="font-medium"
+                >
+                  Candy
+                </span>
+              </span>
+            </h1>
+          </div>
+        </a>
+        <div
+          class="flex flex-col gap-6.5"
+        >
+          <p
+            class="text-lg text-white opacity-50 font-medium"
+          >
+            Rakon is a simple, elegant, and secure way to build your bitcoin and crypto portfolio.
+          </p>
+          <p
+            class="text-white text-lg font-medium"
+          >
+            1989 Don Jackson Lane
+            <br />
+            <span
+              class="text-lg text-blue-foreground font-medium"
+            >
+              Call us:
+               
+              <span
+                class="text-orange-background"
+              >
+                808-956-9599
+              </span>
+            </span>
+          </p>
+        </div>
+      </div>
+      <div
+        class="flex justify-between  gap-6 text-lg "
+      >
+        <div
+          class="w-48"
+        >
+          <h4
+            class="text-white mb-10 font-medium text-lg"
+          >
+            Services
+          </h4>
+          <ul
+            class="space-y-6 text-lg font-medium text-white hover:text-white opacity-50"
+          >
+            <li>
+              <a
+                href="/services/edtech"
+              >
+                EdTech Apps
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services/ecommerce"
+              >
+                eCommerce Apps
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services/crm"
+              >
+                CRM Apps
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services/health"
+              >
+                Health Apps
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services/analytics"
+              >
+                Web Analytics Apps
+              </a>
+            </li>
+            <li>
+              <a
+                href="/services/banking"
+              >
+                Banking Apps
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="w-48"
+        >
+          <h4
+            class="text-white text-lg mb-10 font-medium "
+          >
+            Company
+          </h4>
+          <ul
+            class="space-y-6 text-lg font-medium text-white opacity-50 hover:text-white"
+          >
+            <li>
+              <a
+                href="/about"
+              >
+                About
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="w-104"
+        >
+          <h4
+            class="text-white mb-10 font-medium text-lg"
+          >
+            Subscribe
+          </h4>
+          <p
+            class="text-lg font-medium text-white opacity-50 mb-4"
+          >
+            Subscribe to get the latest news from us
+          </p>
+          <form
+            class="flex gap-2.5"
+          >
+            <input
+              aria-label="Email"
+              class="flex-1 rounded-lg bg-transparent border border-gray-700 px-3 py-2 text-sm placeholder-gray-400"
+              placeholder="Enter email address"
+              type="email"
+            />
+            <button
+              variant="primary"
+            >
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div
+      class="relative max-w-[1296px] mx-auto pb-17.5"
+    >
+      <div
+        class="text-lg font-medium text-white flex items-center justify-between"
+      >
+        <span
+          class="opacity-50"
+        >
+          ©
+          2025
+           - All Rights Reserved by GetNextJs
+        </span>
+        <div
+          aria-label="Social media links"
+          class="flex gap-6"
+        >
+          <button
+            variant="ghost"
+          >
+            <a
+              href="https://facebook.com"
+            >
+              <svg
+                data-testid="facebook-icon"
+              />
+            </a>
+          </button>
+          <button
+            variant="ghost"
+          >
+            <a
+              href="https://twitter.com"
+            >
+              <svg
+                data-testid="twitter-icon"
+              />
+            </a>
+          </button>
+        </div>
+      </div>
+    </div>
+    <a
+      href="#"
+    >
+      Get This Template
+    </a>
+  </footer>
+</div>
+`;

@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`InputController Component matches snapshot 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 w-full"
+  >
+    <label
+      class="text-sm font-medium text-placeholder"
+      for="input-«r0»"
+    >
+      Test Input
+    </label>
+    <div
+      class="flex items-center h-11 w-full min-w-0 rounded-lg border text-md transition-colors bg-transparent px-4 py-2.5 focus-within:border-white border-gray-background"
+    >
+      <input
+        aria-invalid="false"
+        class="w-full bg-transparent outline-none placeholder:text-placeholder disabled:pointer-events-none disabled:cursor-not-allowed"
+        id="input-«r0»"
+        name="testField"
+        type="text"
+        value=""
+      />
+    </div>
+  </div>
+</div>
+`;
