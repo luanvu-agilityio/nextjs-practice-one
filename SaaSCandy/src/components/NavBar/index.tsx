@@ -19,7 +19,7 @@ function Navbar(): JSX.Element {
           <li key={l.href}>
             <Link
               href={l.href}
-              className='font-regular hover:text-orange-background hover:font-semibold transition-colors'
+              className='font-regular hover:text-orange-background transition-colors'
             >
               {l.label}
             </Link>

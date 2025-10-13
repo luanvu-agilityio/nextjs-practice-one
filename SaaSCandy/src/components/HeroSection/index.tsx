@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -15,8 +16,15 @@ import ThemeSwitcherIcon from '../icons/ThemeSwitcherIcon';
 import AuthSectionSkeleton from '../layout/Header/AuthSectionSkeleton';
 import UserMenu from '../UserMenu';
 
+// Constants
+import { ROUTES } from '@/constants';
+
 function HeroSection() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+  const handleNavigation = () => {
+    router.push(ROUTES.SERVICES);
+  };
   const renderAuthSection = () => {
     if (status === 'loading') {
       return <AuthSectionSkeleton />;
@@ -28,12 +36,12 @@ function HeroSection() {
 
     return (
       <div className='hidden sm:flex items-center gap-4'>
-        <Link href='/signin' className='no-underline'>
+        <Link href={ROUTES.SIGN_IN} className='no-underline'>
           <Button variant='secondary' size='small'>
             Sign In
           </Button>
         </Link>
-        <Link href='/signup' className='no-underline'>
+        <Link href={ROUTES.SIGN_UP} className='no-underline'>
           <Button variant='primary' size='small'>
             Sign Up
           </Button>
@@ -52,7 +60,10 @@ function HeroSection() {
     >
       <header className='w-full relative z-10'>
         <div className='max-w-[1296px] mx-auto py-4 px-6 flex items-center gap-14'>
-          <Link href='/' className='flex items-center gap-2 no-underline'>
+          <Link
+            href={ROUTES.HOME}
+            className='flex items-center gap-2 no-underline'
+          >
             <LogoIcon className='w-8 h-8' />
             <div className='hidden sm:block'>
               <Heading
@@ -89,7 +100,9 @@ function HeroSection() {
             designed to support your business every step of the way.
           </Typography>
 
-          <Button variant='primary'>Browse our services</Button>
+          <Button variant='primary' onClick={handleNavigation}>
+            Browse our services
+          </Button>
         </div>
 
         <div className='flex justify-end'>

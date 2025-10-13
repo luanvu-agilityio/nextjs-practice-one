@@ -24,17 +24,16 @@ import SocialButton from '@/components/SocialButton';
 import LogoIcon from '@/components/icons/Logo';
 import GoogleIcon from '@/components/icons/GoogleIcon';
 import GitHubIcon from '@/components/icons/GitHubIcon';
-
 // Constants
 import {
   AUTH_MESSAGES,
-  AUTH_ROUTES,
+  ROUTES,
   SOCIAL_PROVIDERS,
   TOAST_MESSAGES,
 } from '@/constants';
 
 // Types
-import { AuthState } from '@/types';
+import { AuthState, TOAST_VARIANTS } from '@/types';
 
 // Utils
 import { extractBreadcrumbs, handleSocialAuth } from '@/utils/auth';
@@ -81,7 +80,7 @@ function SignInForm() {
       showToast({
         title: TOAST_MESSAGES.SIGN_IN.SUCCESS.title,
         description: TOAST_MESSAGES.SIGN_IN.SUCCESS.description,
-        variant: 'success',
+        variant: TOAST_VARIANTS.SUCCESS,
         duration: 3000,
       });
 
@@ -89,12 +88,12 @@ function SignInForm() {
       signIn('credentials', {
         email: serverState.credentials.email,
         password: serverState.credentials.password,
-        callbackUrl: AUTH_ROUTES.HOME,
+        callbackUrl: ROUTES.HOME,
       }).catch(() => {
         showToast({
           title: TOAST_MESSAGES.SIGN_IN.AUTH_ERROR.title,
           description: TOAST_MESSAGES.SIGN_IN.AUTH_ERROR.description,
-          variant: 'error',
+          variant: TOAST_VARIANTS.ERROR,
           duration: 5000,
         });
       });
@@ -108,7 +107,7 @@ function SignInForm() {
           typeof serverState.error === 'string'
             ? serverState.error
             : TOAST_MESSAGES.SIGN_IN.ERROR.description,
-        variant: 'error',
+        variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
     }
@@ -126,7 +125,7 @@ function SignInForm() {
           '{provider}',
           provider
         ),
-        variant: 'info',
+        variant: TOAST_VARIANTS.INFO,
         duration: 3000,
       });
     } catch (error) {
@@ -137,7 +136,7 @@ function SignInForm() {
           '{provider}',
           provider
         ),
-        variant: 'error',
+        variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
     }
@@ -147,7 +146,7 @@ function SignInForm() {
     showToast({
       title: TOAST_MESSAGES.FEATURES.FORGOT_PASSWORD.title,
       description: TOAST_MESSAGES.FEATURES.FORGOT_PASSWORD.description,
-      variant: 'info',
+      variant: TOAST_VARIANTS.INFO,
       duration: 4000,
     });
   };
@@ -184,7 +183,7 @@ function SignInForm() {
         <div className='flex flex-col gap-10'>
           {/* Logo */}
           <div className='flex justify-center'>
-            <Link href={AUTH_ROUTES.HOME} className='flex items-center gap-3'>
+            <Link href={ROUTES.HOME} className='flex items-center gap-3'>
               <LogoIcon className='w-10 h-10' />
               <span className='text-3xl font-secondary text-primary'>
                 SaaS<span className='font-medium'>Candy</span>
@@ -274,7 +273,7 @@ function SignInForm() {
               <div className='text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_IN.notMember}{' '}
                 <Link
-                  href={AUTH_ROUTES.SIGN_UP}
+                  href={ROUTES.SIGN_UP}
                   className='text-primary font-medium hover:underline'
                 >
                   {AUTH_MESSAGES.SIGN_IN.signUpLink}

@@ -25,7 +25,7 @@ function BlogCard({ slug, title, image, date }: Readonly<BlogCardProps>) {
           {image ? (
             <Image
               alt={title}
-              className='object-cover w-full h-full group-hover:scale-105 transition-transform duration-300'
+              className='object-cover w-full h-71 group-hover:scale-105 transition-transform duration-300'
               src={image}
               width={416}
               height={284}

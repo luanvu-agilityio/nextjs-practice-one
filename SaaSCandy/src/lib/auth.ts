@@ -6,7 +6,7 @@ import { signIn } from 'next-auth/react';
 import { authApi } from '@/api';
 
 // Constants
-import { AUTH_ROUTES } from '@/constants/auth-routes';
+import { ROUTES } from '@/constants/auth-routes';
 
 // Server Action for Sign In
 export async function signInAction(formData: FormData) {
@@ -67,7 +67,7 @@ export async function signUpAction(formData: FormData) {
 // Server Action for Social Sign In
 export async function socialSignInAction(provider: string) {
   try {
-    await signIn(provider, { callbackUrl: AUTH_ROUTES.HOME });
+    await signIn(provider, { callbackUrl: ROUTES.HOME });
   } catch (error) {
     console.error(`Social sign in error (${provider}):`, error);
     return { error: `Failed to sign in with ${provider}` };

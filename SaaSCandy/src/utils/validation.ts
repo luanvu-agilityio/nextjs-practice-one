@@ -15,37 +15,62 @@ export const signInSchema = z.object({
 export const signUpSchema = z.object({
   name: z
     .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name is too long'),
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+    .min(2, VALIDATION_MESSAGES.NAME_MIN)
+    .max(50, VALIDATION_MESSAGES.NAME_MAX),
+  email: z
+    .string()
+    .min(1, VALIDATION_MESSAGES.EMAIL_REQUIRED)
+    .email(VALIDATION_MESSAGES.EMAIL_INVALID),
   password: z
     .string()
-    .min(6, 'Password must be at least 6 characters')
-    .max(100, 'Password is too long')
+    .min(6, VALIDATION_MESSAGES.NEW_PASSWORD_MIN)
+    .max(100, VALIDATION_MESSAGES.PASSWORD_MAX)
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      VALIDATION_MESSAGES.PASSWORD_REGEX
     ),
 });
 
 export const joinUsSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  firstName: z.string().min(2, VALIDATION_MESSAGES.FIRST_NAME_MIN),
+  lastName: z.string().min(2, VALIDATION_MESSAGES.LAST_NAME_MIN),
+  email: z.string().email(VALIDATION_MESSAGES.EMAIL_INVALID),
+  password: z.string().min(6, VALIDATION_MESSAGES.NEW_PASSWORD_MIN),
   agreeTerms: z.boolean().refine(val => val === true, {
-    message: 'You must agree to the terms and conditions',
+    message: VALIDATION_MESSAGES.AGREE_TERMS_REQUIRED,
   }),
 });
-
 export const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  projectName: z.string().min(2, 'Project name is required'),
-  projectType: z.string().min(1, 'Please select a project type'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().min(2, VALIDATION_MESSAGES.NAME_MIN),
+  email: z.string().email(VALIDATION_MESSAGES.EMAIL_INVALID),
+  projectName: z.string().min(2, VALIDATION_MESSAGES.PROJECT_NAME_REQUIRED),
+  projectType: z.string().min(1, VALIDATION_MESSAGES.PROJECT_TYPE_REQUIRED),
+  message: z.string().min(10, VALIDATION_MESSAGES.MESSAGE_MIN_LENGTH),
 });
 
+export const editProfileSchema = z.object({
+  firstName: z.string().min(2, VALIDATION_MESSAGES.FIRST_NAME_MIN).optional(),
+  lastName: z.string().min(2, VALIDATION_MESSAGES.LAST_NAME_MIN).optional(),
+  email: z.string().email(VALIDATION_MESSAGES.EMAIL_INVALID),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, VALIDATION_MESSAGES.CURRENT_PASSWORD_REQUIRED),
+    newPassword: z.string().min(6, VALIDATION_MESSAGES.NEW_PASSWORD_MIN),
+    confirmPassword: z
+      .string()
+      .min(1, VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: VALIDATION_MESSAGES.PASSWORDS_DONT_MATCH,
+    path: ['confirmPassword'],
+  });
+
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type EditProfileFormData = z.infer<typeof editProfileSchema>;
 export type ContactFormData = z.infer<typeof contactSchema>;
 export type JoinUsFormData = z.infer<typeof joinUsSchema>;
 export type SignInFormValues = z.infer<typeof signInSchema>;

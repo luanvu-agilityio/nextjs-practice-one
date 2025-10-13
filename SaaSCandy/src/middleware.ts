@@ -1,18 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-
-// Define your routes
-const PUBLIC_ROUTES = [
-  '/',
-  '/signin',
-  '/signup',
-  '/about',
-  '/contact',
-  '/pricing',
-];
-
-const PROTECTED_ROUTES = ['/dashboard', '/profile', '/account'];
+import { PROTECTED_ROUTES, PUBLIC_ROUTES } from './constants';
 
 export const runtime = 'nodejs';
 

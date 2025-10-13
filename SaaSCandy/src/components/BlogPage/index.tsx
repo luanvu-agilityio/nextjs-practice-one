@@ -5,8 +5,8 @@ import { BlogCard } from '../BlogCard';
 // Helper
 import { getAllPosts } from '@/helpers';
 
-function BlogPage() {
-  const posts = getAllPosts();
+async function BlogPage() {
+  const posts = await getAllPosts();
 
   return (
     <Section className='bg-white'>

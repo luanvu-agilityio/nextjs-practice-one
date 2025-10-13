@@ -7,22 +7,17 @@ interface ContentRendererProps {
   className?: string;
 }
 
-function ContentRenderer({ blocks, className = '' }: ContentRendererProps) {
+function ContentRenderer({
+  blocks,
+  className = '',
+}: Readonly<ContentRendererProps>) {
   const renderBlock = (block: ContentBlock) => {
     switch (block.type) {
       case 'heading':
         return (
           <Heading
             key={block.id}
-            as={
-              `h${block.content.level}` as
-                | 'h1'
-                | 'h2'
-                | 'h3'
-                | 'h4'
-                | 'h5'
-                | 'h6'
-            }
+            as={`h${block.content.level}`}
             size={block.content.level === 2 ? 'xl' : 'lg'}
             content={block.content.text}
             className='text-gray-900 font-bold mb-4'
@@ -38,7 +33,7 @@ function ContentRenderer({ blocks, className = '' }: ContentRendererProps) {
           />
         );
 
-      case 'list':
+      case 'list': {
         const ListTag = block.content.ordered ? 'ol' : 'ul';
         return (
           <ListTag key={block.id} className='mb-4 pl-6 space-y-2'>
@@ -49,6 +44,7 @@ function ContentRenderer({ blocks, className = '' }: ContentRendererProps) {
             ))}
           </ListTag>
         );
+      }
 
       case 'quote':
         return (

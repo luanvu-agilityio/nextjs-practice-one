@@ -12,13 +12,14 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components';
 
 // Components
 import { Typography } from '@/components/common';
 
 // Utils & Constants
-import { AUTH_ROUTES } from '@/constants';
+import { ROUTES } from '@/constants';
+import Image from 'next/image';
 
 interface UserMenuProps {
   className?: string;
@@ -38,7 +39,7 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
   const handleSignOut = async () => {
     try {
       await signOut({
-        callbackUrl: AUTH_ROUTES.HOME,
+        callbackUrl: ROUTES.HOME,
       });
     } catch (error) {
       console.error('Sign out error:', error);
@@ -66,7 +67,7 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
           >
             {/* User Avatar */}
             {image ? (
-              <img
+              <Image
                 src={image}
                 alt='Profile'
                 className='w-8 h-8 rounded-full border border-form-border-color object-cover'
@@ -78,17 +79,17 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
             )}
 
             {/* User Name */}
-            <span className='text-md font-semibold text-orange-background hidden sm:block'>
+            <span className='text-lg font-semibold text-orange-background hidden sm:block'>
               Welcome, {firstName}
             </span>
 
             {/* Dropdown Arrow */}
-            <ChevronDown className='w-4 h-4 text-gray-500' />
+            <ChevronDown className='w-4 h-4 text-gray-background' />
           </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
-          className='w-64 bg-white shadow-lg border border-gray-200 rounded-lg'
+          className='w-80 bg-white shadow-lg border border-gray-background rounded-lg'
           align='end'
           side='bottom'
           sideOffset={8}
@@ -100,7 +101,7 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
           <DropdownMenuLabel className='p-4'>
             <div className='flex items-center gap-3'>
               {image ? (
-                <img
+                <Image
                   src={image}
                   alt='Profile'
                   className='w-10 h-10 rounded-full border border-gray-300 object-cover'
@@ -111,10 +112,10 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
                 </div>
               )}
               <div className='min-w-0 flex-1'>
-                <Typography className='text-sm font-medium text-gray-900 truncate'>
+                <Typography className='text-lg font-medium text-primary truncate'>
                   {displayName}
                 </Typography>
-                <Typography className='text-xs text-gray-500 truncate'>
+                <Typography className='text-md text-gray-background truncate'>
                   {email}
                 </Typography>
               </div>
@@ -124,33 +125,33 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
           {/* Menu Items */}
           <DropdownMenuItem
             asChild
-            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground'
+            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground text-lg'
           >
             <Link
-              href='/account'
-              className='flex items-center gap-3 cursor-pointer'
+              href={ROUTES.ACCOUNT}
+              className='flex items-center gap-3 cursor-pointer '
             >
-              <CircleUserRound className='w-5 h-5' />
+              <CircleUserRound className='w-6 h-6' />
               <span>Account Details</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem
             disabled
-            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground'
+            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground text-lg'
           >
             <div className='flex items-center gap-3'>
-              <Settings className='w-5 h-5' />
+              <Settings className='w-6 h-6' />
               <span>Settings (Coming Soon)</span>
             </div>
           </DropdownMenuItem>
 
           <DropdownMenuItem
             onClick={handleSignOut}
-            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground'
+            className='text-orange-background focus:text-orange-background focus:bg-orange-foreground text-lg'
           >
             <div className='flex items-center gap-3 cursor-pointer'>
-              <LogOut className='w-5 h-5' />
+              <LogOut className='w-6 h-6' />
               <span>Sign Out</span>
             </div>
           </DropdownMenuItem>

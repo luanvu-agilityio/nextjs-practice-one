@@ -9,7 +9,7 @@ import ArrowIcon from '../icons/Arrow';
 import Section from '../common/Section';
 import { Heading, Typography } from '@/components/common';
 import PricingPlanCard from '../PricingPlanCard';
-import { Switch } from '../ui/switch';
+import { Switch } from '@/components';
 import { pricingPlans } from '@/constants/pricing-plan';
 
 function PricingPage() {

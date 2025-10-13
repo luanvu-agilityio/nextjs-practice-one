@@ -21,6 +21,7 @@ import AddressIcon from '../icons/Address';
 
 // Utils
 import { ContactFormData, contactSchema } from '@/utils';
+import { getFriendlyMessage } from '../common/ErrorMessage';
 
 function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +59,9 @@ function ContactPage() {
     } catch (error) {
       showToast({
         title: 'Failed to Send Message',
-        description: 'Please try again or contact us directly.',
+        description:
+          getFriendlyMessage(error) ||
+          'Please try again or contact us directly.',
         variant: 'error',
       });
     } finally {
@@ -159,10 +162,11 @@ function ContactPage() {
                 />
 
                 <div>
-                  <label className='block text-sm font-medium text-primary mb-2'>
+                  <label htmlFor='contact-project-type' className='block text-sm font-medium text-primary mb-2'>
                     Project*
                   </label>
                   <select
+                    id='contact-project-type'
                     className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-background focus:border-orange-background'
                     {...control.register('projectType')}
                   >
@@ -178,12 +182,14 @@ function ContactPage() {
                     </Typography>
                   )}
                 </div>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-primary mb-2'>
-                  Label
+                <label
+                  htmlFor='contact-message'
+                  className='block text-sm font-medium text-primary mb-2'
+                >
+                  Message*
                 </label>
                 <textarea
+                  id='contact-message'
                   name='message'
                   placeholder='Briefly describe your requirements'
                   rows={3}

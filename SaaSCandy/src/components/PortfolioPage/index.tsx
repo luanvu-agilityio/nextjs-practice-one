@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 // Components
 import { Button, Heading, Typography } from '@/components/common';
@@ -12,9 +13,13 @@ import CheckIcon from '../icons/Check';
 import ServiceCard from '../ServiceCard';
 
 // Constants
-import { docs, features } from '@/constants';
+import { docs, features, ROUTES } from '@/constants';
 
 function PortfolioPage() {
+  const router = useRouter();
+  const handleNavigation = () => {
+    router.push(ROUTES.SERVICES);
+  };
   return (
     <>
       {/* Features Section */}
@@ -54,7 +59,9 @@ function PortfolioPage() {
                 </div>
               ))}
             </div>
-            <Button variant='primary'>All Services</Button>
+            <Button variant='primary' onClick={handleNavigation}>
+              All Services
+            </Button>
           </div>
         </div>
       </Section>

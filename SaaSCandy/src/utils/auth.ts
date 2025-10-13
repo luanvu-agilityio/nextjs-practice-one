@@ -1,4 +1,4 @@
-import { AUTH_ROUTES } from '@/constants/auth-routes';
+import { ROUTES } from '@/constants/auth-routes';
 import { signIn, signOut } from 'next-auth/react';
 
 export const handleSocialAuth = async (
@@ -7,7 +7,7 @@ export const handleSocialAuth = async (
 ) => {
   try {
     await signIn(provider, {
-      callbackUrl: AUTH_ROUTES.HOME,
+      callbackUrl: ROUTES.HOME,
       // Add redirect parameter to distinguish between sign in and sign up
       redirect: true,
     });
@@ -17,9 +17,7 @@ export const handleSocialAuth = async (
   }
 };
 
-export const handleSignOut = async (
-  callbackUrl: string = AUTH_ROUTES.SIGN_IN
-) => {
+export const handleSignOut = async (callbackUrl: string = ROUTES.SIGN_IN) => {
   try {
     await signOut({ callbackUrl });
   } catch (error) {
@@ -29,14 +27,12 @@ export const handleSignOut = async (
 };
 
 export const extractBreadcrumbs = (pathname: string) => {
-  const segments = pathname.split('/').filter(Boolean);
+  const segments = pathname.split(ROUTES.HOME).filter(Boolean);
 
-  const breadcrumbs = [
-    { label: 'Home', href: AUTH_ROUTES.HOME, isActive: false },
-  ];
+  const breadcrumbs = [{ label: 'Home', href: ROUTES.HOME, isActive: false }];
 
   segments.forEach((segment, index) => {
-    const href = '/' + segments.slice(0, index + 1).join('/');
+    const href = ROUTES.HOME + segments.slice(0, index + 1).join('/');
     const label = segment.charAt(0).toUpperCase() + segment.slice(1);
     const isActive = index === segments.length - 1;
 

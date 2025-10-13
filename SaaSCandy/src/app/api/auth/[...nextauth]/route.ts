@@ -85,10 +85,20 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  session: { strategy: 'jwt' },
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 0, // Force session update on every request
+  },
 
   callbacks: {
-    async jwt({ token, user, account }): Promise<ExtendedJWT> {
+    async jwt({
+      token,
+      user,
+      account,
+      trigger,
+      session,
+    }): Promise<ExtendedJWT> {
       const extendedToken = token as ExtendedJWT;
 
       // Handle first-time login
@@ -105,6 +115,37 @@ export const authOptions: NextAuthOptions = {
         const backendToken = (user as AuthUser).token;
         if (typeof backendToken === 'string') {
           extendedToken.accessToken = backendToken;
+        }
+      }
+
+      // Handle session update trigger (when update() is called)
+      if (trigger === 'update' && session) {
+        if (session.user) {
+          extendedToken.user = {
+            ...extendedToken.user,
+            ...session.user,
+          };
+          extendedToken.lastUpdated = Date.now();
+        }
+
+        if (extendedToken.user?.id) {
+          try {
+            const freshUser = await authApi.getUser(extendedToken.user.id);
+            extendedToken.user = {
+              ...extendedToken.user,
+              id: freshUser.id,
+              name: freshUser.name,
+              email: freshUser.email,
+              firstName: freshUser.firstName,
+              lastName: freshUser.lastName,
+            };
+            extendedToken.lastUpdated = Date.now();
+          } catch (error) {
+            console.error(
+              'Failed to fetch fresh user data in JWT callback:',
+              error
+            );
+          }
         }
       }
 

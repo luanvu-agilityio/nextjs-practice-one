@@ -26,7 +26,7 @@ function PricingPlanCard({ plan }: Readonly<PricingPlanCardProps>) {
         </div>
       )}
 
-      <div className='text-center space-y-6'>
+      <div className='text-center space-y-6 w-full'>
         <Typography
           size='lg'
           content={name}
@@ -42,7 +42,7 @@ function PricingPlanCard({ plan }: Readonly<PricingPlanCardProps>) {
 
         <Typography
           content={description}
-          className='w-57 text-gray-background text-lg font-semibold'
+          className='px-8 text-gray-background text-lg font-semibold'
         />
       </div>
 

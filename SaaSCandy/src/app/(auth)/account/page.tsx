@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import AccountDetailPage from '@/components/AccountDetailPage';
+import AccountPageContent from '@/components/AccountPageContent';
 
 export const metadata: Metadata = {
   title: 'Account Details | SaaSCandy',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AccountPage() {
-  return <AccountDetailPage />;
+  return <AccountPageContent />;
 }

@@ -1,5 +1,5 @@
 import { http } from '@/service';
-import { User } from '@/types/user';
+import { UpdateUserData, User } from '@/types/user';
 
 export interface AuthResponse {
   token: string;
@@ -78,15 +78,32 @@ export const authApi = {
     }
   },
 
-  updateUser: async (
-    id: string,
-    patch: Partial<Omit<User, 'id'>>
-  ): Promise<User> => {
+  updateUser: async (id: string, patch: UpdateUserData): Promise<User> => {
     try {
-      return await http.put<User>(`${USERS_ENDPOINT}/${id}`, patch);
+      const updateData = { ...patch };
+      if (patch.newPassword) {
+        updateData.password = patch.newPassword;
+        delete updateData.newPassword;
+      }
+
+      return await http.put<User>(`${USERS_ENDPOINT}/${id}`, updateData);
     } catch (error) {
       console.error('Update user API error:', error);
       throw new Error('Failed to update user data.');
+    }
+  },
+
+  // Verify current password
+  verifyPassword: async (
+    id: string,
+    currentPassword: string
+  ): Promise<boolean> => {
+    try {
+      const user = await http.get<User>(`${USERS_ENDPOINT}/${id}`);
+      return user.password === currentPassword;
+    } catch (error) {
+      console.error('Verify password API error:', error);
+      throw new Error('Failed to verify password.');
     }
   },
 };

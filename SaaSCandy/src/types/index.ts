@@ -4,3 +4,4 @@ export * from './service';
 export * from './plan';
 export * from './pricing-plan';
 export * from './faq';
+export * from './toast';

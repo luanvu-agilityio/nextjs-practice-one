@@ -31,7 +31,7 @@ import GitHubIcon from '../icons/GitHubIcon';
 // Constants
 import {
   AUTH_MESSAGES,
-  AUTH_ROUTES,
+  ROUTES,
   SOCIAL_PROVIDERS,
   TOAST_MESSAGES,
 } from '@/constants';
@@ -42,7 +42,7 @@ import { signUpAction } from '@/lib/auth';
 import { extractBreadcrumbs, handleSocialAuth } from '@/utils';
 
 // Types
-import { AuthState } from '@/types';
+import { AuthState, TOAST_VARIANTS } from '@/types';
 
 function SignUpForm() {
   const pathname = usePathname();
@@ -90,7 +90,7 @@ function SignUpForm() {
       showToast({
         title: TOAST_MESSAGES.SIGN_UP.SUCCESS.title,
         description: TOAST_MESSAGES.SIGN_UP.SUCCESS.description,
-        variant: 'success',
+        variant: TOAST_VARIANTS.SUCCESS,
         duration: 3000,
       });
 
@@ -98,12 +98,12 @@ function SignUpForm() {
       signIn('credentials', {
         email: serverState.credentials.email,
         password: serverState.credentials.password,
-        callbackUrl: AUTH_ROUTES.HOME,
+        callbackUrl: ROUTES.HOME,
       }).catch(() => {
         showToast({
           title: TOAST_MESSAGES.SIGN_UP.AUTO_SIGNIN_FAILED.title,
           description: TOAST_MESSAGES.SIGN_UP.AUTO_SIGNIN_FAILED.description,
-          variant: 'warning',
+          variant: TOAST_VARIANTS.WARNING,
           duration: 6000,
         });
       });
@@ -122,7 +122,7 @@ function SignUpForm() {
       showToast({
         title: TOAST_MESSAGES.SIGN_UP.ERROR.title,
         description: errorMessage,
-        variant: 'error',
+        variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
     }
@@ -138,7 +138,7 @@ function SignUpForm() {
           '{provider}',
           provider
         ),
-        variant: 'info',
+        variant: TOAST_VARIANTS.INFO,
         duration: 3000,
       });
     } catch (error) {
@@ -149,7 +149,7 @@ function SignUpForm() {
           '{provider}',
           provider
         ),
-        variant: 'error',
+        variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
     }
@@ -161,7 +161,7 @@ function SignUpForm() {
     <div className='flex flex-col items-center max-w-[1296px] mx-auto'>
       {/* Header Section */}
       <div className='pb-12'>
-        <Heading as='h1' size='xl' content={AUTH_MESSAGES.SIGN_UP.title} />
+        <Heading as='h2' size='xl' content={AUTH_MESSAGES.SIGN_UP.title} />
 
         {/* Breadcrumb */}
         <Breadcrumb className='justify-center mt-4'>
@@ -189,7 +189,7 @@ function SignUpForm() {
         <div className='flex flex-col gap-10'>
           {/* Logo */}
           <div className='flex justify-center'>
-            <Link href={AUTH_ROUTES.HOME} className='flex items-center gap-3'>
+            <Link href={ROUTES.HOME} className='flex items-center gap-3'>
               <LogoIcon className='w-10 h-10' />
               <span className='text-3xl font-secondary text-primary'>
                 SaaS<span className='font-medium'>Candy</span>
@@ -282,7 +282,7 @@ function SignUpForm() {
               <div className='text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_UP.privacyText}{' '}
                 <Link
-                  href={AUTH_ROUTES.PRIVACY}
+                  href={ROUTES.PRIVACY}
                   className='text-primary font-medium hover:underline'
                 >
                   {AUTH_MESSAGES.SIGN_UP.privacyLink}
@@ -292,7 +292,7 @@ function SignUpForm() {
               <div className='text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_UP.alreadyMember}{' '}
                 <Link
-                  href={AUTH_ROUTES.SIGN_IN}
+                  href={ROUTES.SIGN_IN}
                   className='text-primary font-medium hover:underline'
                 >
                   {AUTH_MESSAGES.SIGN_UP.signInLink}

@@ -8,18 +8,7 @@ import { Typography } from '../Typography';
 
 // Utils
 import { cn } from '@/lib/utils';
-
-type ToastVariant = 'success' | 'error' | 'warning' | 'info';
-
-interface ToastProps {
-  id?: string | number;
-  title: string;
-  description?: string;
-  variant?: ToastVariant;
-  icon?: React.ReactNode;
-  hasCloseIcon?: boolean;
-  duration?: number;
-}
+import { ToastProps } from '@/types';
 
 const toastIcons = {
   success: CheckCircle,
@@ -38,7 +27,8 @@ const showToast = (props: Omit<ToastProps, 'id'>) => {
     duration = 4000,
   } = props;
 
-  const IconComponent = toastIcons[variant];
+  const typedVariant = variant as keyof typeof toastIcons;
+  const IconComponent = toastIcons[typedVariant];
 
   return toast.custom(
     t => (
@@ -85,4 +75,4 @@ const showToast = (props: Omit<ToastProps, 'id'>) => {
   );
 };
 
-export { showToast, type ToastProps, type ToastVariant };
+export { showToast };

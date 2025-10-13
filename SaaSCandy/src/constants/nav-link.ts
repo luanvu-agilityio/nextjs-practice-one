@@ -4,14 +4,15 @@ import TwitterIcon from '@/components/icons/TwitterIcon';
 import FacebookIcon from '@/components/icons/FacebookIcon';
 import GooglePlusIcon from '@/components/icons/GooglePlusIcon';
 import LinkedInIcon from '@/components/icons/LinkedInIcon';
+import { ROUTES } from './auth-routes';
 
 export const NAV_LINKS = [
-  { href: '/portfolio', label: 'Portfolio' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/services', label: 'Services' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
-  { href: '/docs', label: 'Docs' },
+  { href: ROUTES.PORTFOLIO, label: 'Portfolio' },
+  { href: ROUTES.PRICING, label: 'Pricing' },
+  { href: ROUTES.SERVICES, label: 'Services' },
+  { href: ROUTES.BLOG, label: 'Blog' },
+  { href: ROUTES.CONTACT, label: 'Contact' },
+  { href: ROUTES.DOCS, label: 'Docs' },
 ];
 
 type SocialLink = {

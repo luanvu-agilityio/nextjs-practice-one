@@ -51,6 +51,27 @@ export const VALIDATION_MESSAGES = {
   EMAIL_INVALID: 'Please enter a valid email address.',
   PASSWORD_REQUIRED: 'Please enter your password.',
   PASSWORD_MIN_LENGTH: 'Password must be at least 8 characters.',
+
+  // Account Form Validations
+  FIRST_NAME_MIN: 'First name must be at least 2 characters',
+  LAST_NAME_MIN: 'Last name must be at least 2 characters',
+  CURRENT_PASSWORD_REQUIRED: 'Current password is required',
+  NEW_PASSWORD_MIN: 'New password must be at least 6 characters',
+  CONFIRM_PASSWORD_REQUIRED: 'Please confirm your password',
+  PASSWORDS_DONT_MATCH: "Passwords don't match",
+
+  // Profile Update Validations
+  NAME_MIN: 'Name must be at least 2 characters',
+  NAME_MAX: 'Name is too long',
+  PASSWORD_MAX: 'Password is too long',
+  PASSWORD_REGEX:
+    'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+
+  PROJECT_NAME_REQUIRED: 'Project name is required',
+  PROJECT_TYPE_REQUIRED: 'Please select a project type',
+  MESSAGE_MIN_LENGTH: 'Message must be at least 10 characters',
+
+  AGREE_TERMS_REQUIRED: 'You must agree to the terms and conditions',
 };
 // General Messages
 export const GENERAL_MESSAGES = {
@@ -115,13 +136,66 @@ export const TOAST_MESSAGES = {
 
   // Account Management Messages
   ACCOUNT: {
+    PROFILE_UPDATE_SUCCESS: {
+      title: 'Profile Updated Successfully!',
+      description: 'Your profile information has been updated.',
+    },
+    PROFILE_UPDATE_ERROR: {
+      title: 'Profile Update Failed',
+      description: 'Failed to update profile. Please try again.',
+    },
+    PASSWORD_CHANGE_SUCCESS: {
+      title: 'Password Changed Successfully!',
+      description: 'Your password has been updated securely.',
+    },
+    PASSWORD_CHANGE_ERROR: {
+      title: 'Password Change Failed',
+      description: 'Failed to change password. Please try again.',
+    },
     SIGNOUT_SUCCESS: {
       title: 'Signed Out Successfully',
       description: 'You have been signed out. Come back soon!',
     },
     SIGNOUT_ERROR: {
       title: 'Sign Out Failed',
-      description: 'Failed to sign out. Please try again.',
+      description: 'There was an error signing you out. Please try again.',
+    },
+    SESSION_LOADING_ERROR: {
+      title: 'Loading Error',
+      description: 'Failed to load account session',
+    },
+  },
+
+  // Error Page Messages
+  ERROR_PAGES: {
+    ACCOUNT_ERROR: {
+      UNAUTHORIZED: {
+        title: 'Account Error',
+        description: 'You need to sign in to access your account.',
+        action: 'Go to Sign In',
+      },
+      NETWORK: {
+        title: 'Account Error',
+        description:
+          'Unable to connect to our servers. Please check your internet connection.',
+        action: 'Try Again',
+      },
+      GENERAL: {
+        title: 'Account Error',
+        description:
+          'We encountered an unexpected error while loading your account.',
+        action: 'Try Again',
+      },
+    },
+    NOT_FOUND: {
+      title: 'Account Not Found',
+      description:
+        "The account you're looking for doesn't exist or you don't have permission to access it. Please sign in with the correct credentials.",
+      actions: {
+        signIn: 'Sign In',
+        createAccount: 'Create Account',
+        backHome: 'Back to Home',
+      },
     },
   },
 

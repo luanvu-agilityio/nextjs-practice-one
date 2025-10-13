@@ -14,6 +14,9 @@ import { Button, Heading } from '@/components/common';
 import UserMenu from '@/components/UserMenu';
 import AuthSectionSkeleton from './AuthSectionSkeleton';
 
+// Constants
+import { ROUTES } from '@/constants';
+
 function Header(): JSX.Element {
   const { data: session, status } = useSession();
 
@@ -28,12 +31,12 @@ function Header(): JSX.Element {
 
     return (
       <div className='hidden sm:flex items-center gap-4'>
-        <Link href='/signin' className='no-underline'>
+        <Link href={ROUTES.SIGN_IN} className='no-underline'>
           <Button variant='secondary' size='small'>
             Sign In
           </Button>
         </Link>
-        <Link href='/signup' className='no-underline'>
+        <Link href={ROUTES.SIGN_UP} className='no-underline'>
           <Button variant='primary' size='small'>
             Sign Up
           </Button>
