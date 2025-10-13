@@ -21,7 +21,7 @@ import { Spinner } from '../ui/spinner';
 import LogoIcon from '@/components/icons/Logo';
 
 // Utils & Constants
-import { AUTH_ROUTES } from '@/constants';
+import { ROUTES } from '@/constants';
 
 function AccountDetailPage() {
   const { data: session, status } = useSession();
@@ -30,7 +30,7 @@ function AccountDetailPage() {
   // Redirect if not authenticated
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push(AUTH_ROUTES.SIGN_IN);
+      router.push(ROUTES.SIGN_IN);
     }
   }, [status, router]);
 
@@ -57,7 +57,7 @@ function AccountDetailPage() {
   const handleSignOut = async () => {
     try {
       await signOut({
-        callbackUrl: AUTH_ROUTES.HOME,
+        callbackUrl: ROUTES.HOME,
       });
     } catch (error) {
       console.error('Sign out error:', error);
@@ -106,7 +106,7 @@ function AccountDetailPage() {
         <div className='flex flex-col gap-10'>
           {/* Logo */}
           <div className='flex justify-center'>
-            <Link href={AUTH_ROUTES.HOME} className='flex items-center gap-3'>
+            <Link href={ROUTES.HOME} className='flex items-center gap-3'>
               <LogoIcon className='w-10 h-10' />
               <span className='text-3xl font-secondary text-primary'>
                 SaaS<span className='font-medium'>Candy</span>
