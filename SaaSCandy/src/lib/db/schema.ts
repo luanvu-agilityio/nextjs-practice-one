@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -48,10 +49,13 @@ export const verification = pgTable('verification', {
   value: text('value').notNull(),
   expiresAt: timestamp('expiresAt').notNull(),
   type: text('type').notNull().default('email'),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  createdAt: timestamp('createdAt')
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp('updatedAt')
+    .notNull()
+    .default(sql`now()`),
 });
-
 export const twoFactor = pgTable('twoFactor', {
   id: text('id').primaryKey(),
   secret: text('secret').notNull(),
