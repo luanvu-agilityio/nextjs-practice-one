@@ -12,7 +12,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: 'sqlite',
+    provider: 'pg',
   }),
 
   secret: process.env.BETTER_AUTH_SECRET!,

@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -8,16 +7,16 @@ export const user = pgTable('user', {
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
   twoFactorEnabled: boolean('twoFactorEnabled').default(false),
-  createdAt: timestamp('createdAt').notNull(),
-  updatedAt: timestamp('updatedAt').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expiresAt').notNull(),
   token: text('token').notNull().unique(),
-  createdAt: timestamp('createdAt').notNull(),
-  updatedAt: timestamp('updatedAt').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
   ipAddress: text('ipAddress'),
   userAgent: text('userAgent'),
   userId: text('userId')
@@ -39,8 +38,8 @@ export const account = pgTable('account', {
   refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt'),
   scope: text('scope'),
   password: text('password'),
-  createdAt: timestamp('createdAt').notNull(),
-  updatedAt: timestamp('updatedAt').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
 export const verification = pgTable('verification', {
@@ -49,13 +48,10 @@ export const verification = pgTable('verification', {
   value: text('value').notNull(),
   expiresAt: timestamp('expiresAt').notNull(),
   type: text('type').notNull().default('email'),
-  createdAt: timestamp('createdAt')
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp('updatedAt')
-    .notNull()
-    .default(sql`now()`),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
+
 export const twoFactor = pgTable('twoFactor', {
   id: text('id').primaryKey(),
   secret: text('secret').notNull(),
