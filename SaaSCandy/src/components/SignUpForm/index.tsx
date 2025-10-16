@@ -1,58 +1,49 @@
 'use client';
 
-import { Fragment, useActionState, useEffect } from 'react';
+import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
+
+// Better Auth
+import { signUp } from '@/lib/auth-client';
 
 // Components
+import { Heading } from '@/components/common';
 import {
   Breadcrumb,
+  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
-  Button,
-  Divider,
-  Heading,
-  InputController,
-} from '../common';
-import { showToast } from '../common/Toast';
-import SocialButton from '../SocialButton';
+  BreadcrumbPage,
+} from '@/components/common/Breadcrumb';
+import { showToast } from '@/components/common/Toast';
+import { SignUpForm } from './SignUpForm';
 
 // Icons
-import LogoIcon from '../icons/Logo';
-import GoogleIcon from '../icons/GoogleIcon';
-import GitHubIcon from '../icons/GitHubIcon';
+import LogoIcon from '@/components/icons/Logo';
 
 // Constants
-import {
-  AUTH_MESSAGES,
-  ROUTES,
-  SOCIAL_PROVIDERS,
-  TOAST_MESSAGES,
-} from '@/constants';
-
-// Utils
-import { signUpSchema, SignUpFormValues } from '@/utils/validation';
-import { signUpAction } from '@/lib/auth';
-import { extractBreadcrumbs, handleSocialAuth } from '@/utils';
+import { AUTH_MESSAGES, ROUTES, TOAST_MESSAGES } from '@/constants';
 
 // Types
-import { AuthState, TOAST_VARIANTS } from '@/types';
+import { TOAST_VARIANTS } from '@/types';
 
-function SignUpForm() {
+// Utils
+import { extractBreadcrumbs, handleSocialAuth } from '@/utils/auth';
+import { SignUpFormValues, signUpSchema } from '@/utils';
+
+function SignUpPageContent() {
   const pathname = usePathname();
   const breadcrumbs = extractBreadcrumbs(pathname);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
-    clearErrors,
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     mode: 'onBlur',
@@ -64,71 +55,51 @@ function SignUpForm() {
     },
   });
 
-  const [serverState, serverAction, isPending] = useActionState(
-    async (_prevState: AuthState, formData: FormData) => {
-      return await signUpAction(formData);
-    },
-    { error: null }
-  );
-
-  // Handle client form submission
   const onSubmit = async (data: SignUpFormValues) => {
-    clearErrors('root');
+    setIsLoading(true);
 
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-
-    serverAction(formData);
-  };
-
-  // Handle server response with Toast notifications
-  useEffect(() => {
-    // Handle success
-    if (serverState.success && serverState.credentials) {
-      showToast({
-        title: TOAST_MESSAGES.SIGN_UP.SUCCESS.title,
-        description: TOAST_MESSAGES.SIGN_UP.SUCCESS.description,
-        variant: TOAST_VARIANTS.SUCCESS,
-        duration: 3000,
+    try {
+      const result = await signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name,
       });
 
-      // Auto sign in after successful registration
-      signIn('credentials', {
-        email: serverState.credentials.email,
-        password: serverState.credentials.password,
-        callbackUrl: ROUTES.HOME,
-      }).catch(() => {
+      if (result.error) {
         showToast({
-          title: TOAST_MESSAGES.SIGN_UP.AUTO_SIGNIN_FAILED.title,
-          description: TOAST_MESSAGES.SIGN_UP.AUTO_SIGNIN_FAILED.description,
-          variant: TOAST_VARIANTS.WARNING,
-          duration: 6000,
+          title: TOAST_MESSAGES.SIGN_UP.ERROR.title,
+          description:
+            result.error.message || TOAST_MESSAGES.SIGN_UP.ERROR.description,
+          variant: TOAST_VARIANTS.ERROR,
+          duration: 5000,
         });
-      });
-    }
-
-    // Handle error
-    if (serverState.error) {
-      let errorMessage = TOAST_MESSAGES.SIGN_UP.ERROR.description;
-
-      if (typeof serverState.error === 'string') {
-        errorMessage = serverState.error;
-      } else if (serverState.error instanceof Error) {
-        errorMessage = serverState.error.message;
+        setIsLoading(false);
+        return;
       }
 
       showToast({
+        title: 'Account Created!',
+        description: 'Please check your email to verify your account.',
+        variant: TOAST_VARIANTS.SUCCESS,
+        duration: 7000,
+      });
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Sign up error:', error);
+      showToast({
         title: TOAST_MESSAGES.SIGN_UP.ERROR.title,
-        description: errorMessage,
+        description: TOAST_MESSAGES.SIGN_UP.ERROR.description,
         variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
+      setIsLoading(false);
     }
-  }, [serverState]);
+  };
 
   const handleSocialSignUp = async (provider: string) => {
+    setIsLoading(true);
+
     try {
       await handleSocialAuth(provider, 'signup');
 
@@ -142,7 +113,6 @@ function SignUpForm() {
         duration: 3000,
       });
     } catch (error) {
-      console.error('Social sign-up error:', error);
       showToast({
         title: TOAST_MESSAGES.SOCIAL.SIGNUP_ERROR.title,
         description: TOAST_MESSAGES.SOCIAL.SIGNUP_ERROR.description.replace(
@@ -152,27 +122,34 @@ function SignUpForm() {
         variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
+      setIsLoading(false);
     }
   };
 
-  const isLoading = isSubmitting || isPending;
+  const loading = isSubmitting || isLoading;
 
   return (
-    <div className='flex flex-col items-center max-w-[1296px] mx-auto'>
+    <div className='flex flex-col items-center max-w-[1296px] mx-auto px-4 sm:px-6'>
       {/* Header Section */}
-      <div className='pb-12'>
-        <Heading as='h2' size='xl' content={AUTH_MESSAGES.SIGN_UP.title} />
+      <div className='pb-8 sm:pb-12 text-center'>
+        <Heading
+          as='h1'
+          size='xl'
+          content={AUTH_MESSAGES.SIGN_UP.title}
+          className='text-3xl sm:text-5xl lg:text-6xl'
+        />
 
-        {/* Breadcrumb */}
-        <Breadcrumb className='justify-center mt-4'>
+        <Breadcrumb className='justify-center mt-3 sm:mt-4'>
           <BreadcrumbList>
             {breadcrumbs.map((item, index) => (
               <Fragment key={item.label}>
                 <BreadcrumbItem>
                   {item.isActive ? (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className='text-sm sm:xs'>
+                      {item.label}
+                    </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={item.href}>
+                    <BreadcrumbLink href={item.href} className='text-sm sm:xs'>
                       {item.label}
                     </BreadcrumbLink>
                   )}
@@ -185,101 +162,33 @@ function SignUpForm() {
       </div>
 
       {/* Form Section */}
-      <div className='py-14 px-16 w-159 rounded-4xl border border-form-border-color shadow-form'>
-        <div className='flex flex-col gap-10'>
+      <div className='py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form'>
+        <div className='flex flex-col gap-6 sm:gap-10'>
           {/* Logo */}
           <div className='flex justify-center'>
-            <Link href={ROUTES.HOME} className='flex items-center gap-3'>
-              <LogoIcon className='w-10 h-10' />
-              <span className='text-3xl font-secondary text-primary'>
+            <Link
+              href={ROUTES.HOME}
+              className='flex items-center gap-2 sm:gap-3'
+            >
+              <LogoIcon className='w-8 h-8 sm:w-10 sm:h-10' />
+              <span className='text-2xl sm:text-3xl font-secondary text-primary'>
                 SaaS<span className='font-medium'>Candy</span>
               </span>
             </Link>
           </div>
 
-          <div className='flex flex-col gap-8'>
-            {/* Social Sign Up Buttons */}
-            <div className='flex flex-row gap-4'>
-              <SocialButton
-                provider='google'
-                icon={GoogleIcon}
-                onClick={() => handleSocialSignUp(SOCIAL_PROVIDERS.GOOGLE)}
-                disabled={isLoading}
-              >
-                {AUTH_MESSAGES.SOCIAL.googleSignUp}
-              </SocialButton>
-
-              <SocialButton
-                provider='github'
-                icon={GitHubIcon}
-                onClick={() => handleSocialSignUp(SOCIAL_PROVIDERS.GITHUB)}
-                disabled={isLoading}
-              >
-                {AUTH_MESSAGES.SOCIAL.githubSignUp}
-              </SocialButton>
-            </div>
-
-            <Divider
-              text={AUTH_MESSAGES.DIVIDER}
-              className='text-gray-background'
+          <div className='flex flex-col gap-6 sm:gap-8'>
+            {/* Sign Up Form Component */}
+            <SignUpForm
+              control={control}
+              onSubmit={handleSubmit(onSubmit)}
+              onSocialSignUp={handleSocialSignUp}
+              isLoading={loading}
             />
 
-            {/* Client-side validated form */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='space-y-4'
-              noValidate
-            >
-              <InputController
-                name='name'
-                control={control}
-                label='Name'
-                placeholder='Name'
-                type='text'
-                autoComplete='name'
-                hideLabel
-                required
-              />
-
-              <InputController
-                name='email'
-                control={control}
-                label='Email'
-                placeholder='Email'
-                type='email'
-                autoComplete='email'
-                hideLabel
-                required
-              />
-
-              <InputController
-                name='password'
-                control={control}
-                label='Password'
-                placeholder='Password'
-                type='password'
-                autoComplete='new-password'
-                showPasswordToggle
-                hideLabel
-                required
-              />
-
-              <Button
-                type='submit'
-                variant='primary'
-                size='large'
-                disabled={isLoading}
-                className='w-full'
-              >
-                {isLoading
-                  ? AUTH_MESSAGES.SIGN_UP.submittingButton
-                  : AUTH_MESSAGES.SIGN_UP.submitButton}
-              </Button>
-            </form>
-
             {/* Footer Links */}
-            <div className='text-center space-y-3'>
-              <div className='text-md font-regular text-primary'>
+            <div className='text-center space-y-2 sm:space-y-3'>
+              <div className='text-sm sm:text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_UP.privacyText}{' '}
                 <Link
                   href={ROUTES.PRIVACY}
@@ -289,7 +198,7 @@ function SignUpForm() {
                 </Link>
               </div>
 
-              <div className='text-md font-regular text-primary'>
+              <div className='text-sm sm:text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_UP.alreadyMember}{' '}
                 <Link
                   href={ROUTES.SIGN_IN}
@@ -306,4 +215,4 @@ function SignUpForm() {
   );
 }
 
-export default SignUpForm;
+export { SignUpPageContent };

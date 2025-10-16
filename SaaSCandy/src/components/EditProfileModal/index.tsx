@@ -3,25 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSession } from 'next-auth/react';
-import type { DefaultSession } from 'next-auth';
-
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    } & DefaultSession['user'];
-  }
-  interface User {
-    id: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  }
-}
+import { useSession } from '@/lib/auth-client';
 
 // Components
 import { Button } from '@/components/common';
@@ -33,13 +15,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components';
-
-// API
-import { authApi } from '@/api/auth';
+import { ErrorMessage } from '../common/ErrorMessage';
 
 // Utils
 import { EditProfileFormData, editProfileSchema } from '@/utils';
-import { ErrorMessage } from '../common/ErrorMessage';
+
+// Service
+import { updateProfile } from '@/service';
 
 interface EditProfileModalProps {
   open: boolean;
@@ -52,22 +34,27 @@ function EditProfileModal({
   onOpenChange,
   onSuccess,
 }: Readonly<EditProfileModalProps>) {
-  const { data: session, update } = useSession();
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const user = session?.user;
 
   const { control, handleSubmit, reset } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     mode: 'onBlur',
     defaultValues: {
-      firstName: session?.user?.name?.split(' ')[0] || '',
-      lastName: session?.user?.name?.split(' ')[1] || '',
-      email: session?.user?.email || '',
+      firstName: user?.name?.split(' ')[0] || '',
+      lastName: user?.name?.split(' ')[1] || '',
+      email: user?.email || '',
     },
   });
 
   const onSubmit = async (data: EditProfileFormData) => {
-    if (!session?.user?.id) return;
+    if (!user?.id) {
+      setError('User session not found');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
@@ -75,21 +62,17 @@ function EditProfileModal({
     try {
       const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
 
-      const updatedUser = await authApi.updateUser(session.user.id, {
-        firstName: data.firstName,
-        lastName: data.lastName,
+      const result = await updateProfile({
         name: fullName,
         email: data.email,
       });
 
-      await update({
-        ...session,
-        user: {
-          ...session.user,
-          name: updatedUser.name || fullName,
-          email: updatedUser.email,
-        },
-      });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update profile');
+      }
+
+      // Reload to refresh session
+      window.location.reload();
 
       setTimeout(() => {
         onSuccess();
@@ -100,7 +83,6 @@ function EditProfileModal({
       setError(
         error instanceof Error ? error.message : 'Failed to update profile'
       );
-    } finally {
       setIsSubmitting(false);
     }
   };

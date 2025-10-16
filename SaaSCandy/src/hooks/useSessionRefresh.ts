@@ -1,31 +1,18 @@
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useSessionRefresh = () => {
-  const { data: session, update } = useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const refreshSession = async (
-    newUserData?: Partial<Record<string, unknown>>
-  ) => {
-    if (!session) return;
-
+  const refreshSession = async () => {
     try {
-      // Method 1: Update session with new data
-      if (newUserData) {
-        await update({
-          ...session,
-          user: {
-            ...session.user,
-            ...newUserData,
-          },
-        });
-      }
+      // Method 1: Invalidate React Query cache (refetch session)
+      await queryClient.invalidateQueries({
+        queryKey: ['session'],
+      });
 
-      // Method 2: Force a complete session refresh
-      await update();
-
-      // Method 3: Refresh the page data
+      // Method 2: Refresh Next.js router cache
       router.refresh();
 
       return true;

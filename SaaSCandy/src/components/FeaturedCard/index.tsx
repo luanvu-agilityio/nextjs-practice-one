@@ -31,23 +31,28 @@ function CardContent({
   actionText,
 }: Readonly<CardContentProps>) {
   return (
-    <div className='flex flex-col gap-8 justify-between items-start bg-white rounded-3xl shadow-form hover:shadow-md transition-shadow p-10 '>
-      <div className='flex items-center justify-center gap-6'>
+    <div className='flex flex-col gap-6 sm:gap-8 justify-between items-start bg-white rounded-2xl sm:rounded-3xl shadow-form hover:shadow-md transition-shadow p-6 sm:p-8 lg:p-10 h-full'>
+      <div className='flex items-center justify-start gap-4 sm:gap-6 w-full'>
         {icon && (
-          <div className='w-15 h-15 rounded-full flex items-center justify-center'>
+          <div className='w-12 h-12 sm:w-14 sm:h-14 lg:w-15 lg:h-15 rounded-full flex items-center justify-center flex-shrink-0'>
             {icon}
           </div>
         )}
-        <Heading as='h4' size='md' content={title} className='text-primary' />
+        <Heading
+          as='h4'
+          size='md'
+          content={title}
+          className='text-primary text-lg sm:text-xl lg:text-2xl'
+        />
       </div>
       <Typography
         content={description}
-        className='text-gray-background leading-relaxed'
+        className='text-gray-background leading-relaxed  sm:text-lg'
       />
       {href && (
-        <div className='text-orange-background font-semibold hover:text-orange-600 transition-colors inline-flex items-center gap-2'>
+        <div className='text-orange-background font-semibold hover:text-orange-600 transition-colors inline-flex items-center gap-2  sm:text-lg'>
           {actionText}
-          <ChevronRight />
+          <ChevronRight className='w-5 h-5' />
         </div>
       )}
     </div>
@@ -63,7 +68,7 @@ export function FeatureCard({
 }: Readonly<FeatureCardProps>) {
   if (href) {
     return (
-      <Link href={href} className='block group'>
+      <Link href={href} className='block group h-full'>
         <CardContent
           title={title}
           description={description}

@@ -69,13 +69,20 @@
     --foreground: #ededed;
   }
 }
+
 body {
   background-color: #ffffff;
   color: var(--primary);
   font-family: var(--font-primary);
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
+}
+
+/* Prevent horizontal scroll on mobile */
+html {
+  overflow-x: hidden;
 }
 
 [data-radix-popper-content-wrapper] {
@@ -92,4 +99,47 @@ body {
 .dropdown-container {
   position: relative;
   z-index: 50;
+}
+
+/* Drawer animation */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.mobile-auth-toggle {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .mobile-auth-toggle {
+    display: none;
+  }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+  /* Prevent text overflow */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Better button sizing on mobile */
+  button {
+    min-height: 44px; /* iOS touch target size */
+  }
 }

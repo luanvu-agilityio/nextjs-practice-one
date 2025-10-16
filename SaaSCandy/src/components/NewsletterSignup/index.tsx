@@ -22,23 +22,19 @@ function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
     <div className={`${className}`}>
       <Heading
         as='h3'
-        className='font-semibold text-primary text-[35px]'
+        className='font-semibold text-primary text-2xl sm:text-3xl lg:text-[35px] mb-4 sm:mb-6'
         content='Join our Newsletter'
       />
-      <form onSubmit={handleSubmit} className='space-y-4'>
+      <form onSubmit={handleSubmit} className='space-y-3 sm:space-y-4'>
         <Input
           type='email'
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder='Email address Subscribe'
-          className='px-4 py-2.5 border border-primary rounded-lg text-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent'
+          className='px-3 py-2 sm:px-4 sm:py-2.5 border border-primary rounded-lg text-sm sm:text-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full'
           required
         />
-        <Button
-          type='submit'
-          variant='primary'
-          className={`rounded-lg ${className}`}
-        >
+        <Button type='submit' variant='primary' className='rounded-lg w-full'>
           Subscribe
         </Button>
       </form>

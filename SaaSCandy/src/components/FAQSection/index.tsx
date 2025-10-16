@@ -17,41 +17,44 @@ function FAQSection() {
   };
 
   return (
-    <Section className='bg-white'>
-      <div className='mx-auto space-y-20'>
-        <div className='text-center space-y-7.5'>
-          <Typography size='lg' className='text-gray-background font-semibold'>
+    <Section className='bg-white px-4 sm:px-6'>
+      <div className='mx-auto space-y-12 sm:space-y-20'>
+        <div className='text-center space-y-4 sm:space-y-7.5'>
+          <Typography
+            size='lg'
+            className='text-gray-background font-semibold  sm:text-lg'
+          >
             Frequently Asked Questions
           </Typography>
           <Heading
             as='h2'
             size='2xl'
             content='Want to ask something from us?'
-            className='text-primary'
+            className='text-primary text-2xl sm:text-5xl lg:text-6xl px-4'
           />
         </div>
 
-        <div className='grid md:grid-cols-2 gap-x-6 gap-y-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-x-6 sm:gap-y-4'>
           {faqData.map((faq, index) => (
             <div
               key={index}
-              className='bg-light-gray rounded-[10px] py-6 px-7.5 space-y-6 cursor-pointer w-full'
+              className='bg-light-gray rounded-[10px] py-4 px-4 sm:py-6 sm:px-7.5 space-y-4 sm:space-y-6 cursor-pointer w-full'
               onClick={() => toggleFAQ(index)}
             >
-              <div className='flex items-center justify-between'>
+              <div className='flex items-center justify-between gap-4'>
                 <Heading
                   as='h3'
                   content={faq.question}
-                  className='text-lg font-semibold text-primary'
+                  className=' sm:text-lg font-semibold text-primary'
                 />
 
-                <span className='text-2xl text-primary'>
-                  {openIndex === index ? '−' : '−'}
+                <span className='text-xl sm:text-2xl text-primary flex-shrink-0'>
+                  {openIndex === index ? '−' : '+'}
                 </span>
               </div>
 
               {openIndex === index && (
-                <Typography className='text-gray-background text-lg font-medium'>
+                <Typography className='text-gray-background  sm:text-lg font-medium'>
                   {faq.answer}
                 </Typography>
               )}

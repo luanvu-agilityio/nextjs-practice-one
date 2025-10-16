@@ -1,10 +1,8 @@
+import { getSession } from '@/lib/auth-client';
+
 interface HttpError extends Error {
   status: number;
   data: unknown;
-}
-
-interface SessionWithToken {
-  accessToken?: string;
 }
 
 export class HttpClient {
@@ -22,26 +20,14 @@ export class HttpClient {
     try {
       if (typeof window === 'undefined') return {};
 
-      try {
-        const { getSession } = await import('next-auth/react');
-        const session = await getSession();
-        const accessToken = (session as SessionWithToken)?.accessToken;
+      const session = await getSession();
+      const accessToken = session?.data?.session?.token;
 
-        if (accessToken && typeof accessToken === 'string') {
-          return { Authorization: `Bearer ${accessToken}` };
-        }
-      } catch {
-        // next-auth not available, continue to fallback
+      if (accessToken && typeof accessToken === 'string') {
+        return { Authorization: `Bearer ${accessToken}` };
       }
 
-      // Fallback to localStorage-stored auth
-      const authData = localStorage.getItem('auth');
-      if (!authData) return {};
-
-      const auth = JSON.parse(authData) as { token?: string } | null;
-      if (!auth?.token) return {};
-
-      return { Authorization: `Bearer ${auth.token}` };
+      return {};
     } catch {
       return {};
     }

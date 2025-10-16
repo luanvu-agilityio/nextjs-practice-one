@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from '@/lib/auth-client';
 import { ChevronDown, CircleUserRound, LogOut, Settings } from 'lucide-react';
 
 // Shadcn Components
@@ -20,6 +20,7 @@ import { Typography } from '@/components/common';
 // Utils & Constants
 import { ROUTES } from '@/constants';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface UserMenuProps {
   className?: string;
@@ -27,6 +28,7 @@ interface UserMenuProps {
 
 function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
   const { data: session } = useSession();
+  const router = useRouter();
 
   if (!session?.user) {
     return null;
@@ -38,9 +40,9 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
 
   const handleSignOut = async () => {
     try {
-      await signOut({
-        callbackUrl: ROUTES.HOME,
-      });
+      await signOut();
+      router.push(ROUTES.HOME);
+      router.refresh();
     } catch (error) {
       console.error('Sign out error:', error);
     }

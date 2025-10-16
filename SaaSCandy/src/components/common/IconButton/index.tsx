@@ -17,6 +17,7 @@ const iconButtonVariants = cva(
           'border border-gray-foreground text-gray-foreground cursor-not-allowed',
       },
       size: {
+        sm: 'w-4 h-4',
         md: 'w-6 h-6 p-4',
         lg: 'w-8 h-8 font-secondary',
       },

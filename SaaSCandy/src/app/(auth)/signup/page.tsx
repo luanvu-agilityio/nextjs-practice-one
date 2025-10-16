@@ -1,9 +1,9 @@
-import SignUpForm from '@/components/SignUpForm';
+import { SignUpPageContent } from '@/components/SignUpForm';
 
 function SignUpPage() {
   return (
     <div className='py-16'>
-      <SignUpForm />;
+      <SignUpPageContent />;
     </div>
   );
 }

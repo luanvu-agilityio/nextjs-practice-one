@@ -25,3 +25,4 @@ export * from './DocsContent';
 export * from './EditProfileModal';
 export * from './ChangePasswordModal';
 export * from './Switch';
+export * from './VerifyEmailContent';

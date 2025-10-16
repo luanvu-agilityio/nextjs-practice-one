@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth-client';
 
 // Components
-import { Button } from '@/components/common';
+import { Button, showToast } from '@/components/common';
 import { ErrorMessage } from '../common/ErrorMessage';
 import { InputController } from '@/components/common/InputController';
 import {
@@ -17,11 +17,14 @@ import {
   DialogFooter,
 } from '@/components';
 
-// API
-import { authApi } from '@/api/auth';
-
 // Utils
 import { ChangePasswordFormData, changePasswordSchema } from '@/utils';
+
+// Types
+import { TOAST_VARIANTS } from '@/types';
+
+// Service
+import { changePassword } from '@/service';
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -38,12 +41,9 @@ function ChangePasswordModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
+  const user = session?.user;
 
-    reset,
-  } = useForm<ChangePasswordFormData>({
+  const { control, handleSubmit, reset } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
     mode: 'onBlur',
     defaultValues: {
@@ -54,18 +54,36 @@ function ChangePasswordModal({
   });
 
   const onSubmit = async (data: ChangePasswordFormData) => {
-    if (!session?.user?.id) return;
+    if (!user?.id) {
+      setError('User session not found');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      await authApi.updateUser(session.user.id, {
-        newPassword: data.newPassword,
+      const result = await changePassword(
+        data.currentPassword,
+        data.newPassword
+      );
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update password');
+      }
+
+      showToast({
+        title: 'Password Updated',
+        description: 'Your password has been changed successfully.',
+        variant: TOAST_VARIANTS.SUCCESS,
+        duration: 3000,
       });
-      onSuccess();
-      onOpenChange(false);
-      reset();
+
+      setTimeout(() => {
+        onSuccess();
+        onOpenChange(false);
+        reset();
+      }, 100);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : 'Failed to change password'

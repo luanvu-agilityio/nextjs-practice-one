@@ -38,18 +38,18 @@ function JoinUsSection() {
   return (
     <>
       <Section
-        className='text-white relative overflow-hidden'
+        className='text-white relative overflow-hidden px-4 sm:px-6'
         style={{
           backgroundImage: "url('/images/background/join-us.png')",
           backgroundSize: 'cover',
         }}
       >
-        <div className='max-w-[1296px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 '>
-          <div className='space-y-7.5 max-w-126.75'>
-            <div className='space-y-7.5'>
+        <div className='max-w-[1296px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16'>
+          <div className='space-y-4 sm:space-y-7.5 max-w-full lg:max-w-126.75'>
+            <div className='space-y-4 sm:space-y-7.5'>
               <Typography
                 size='lg'
-                className='text-orange-background font-semibold'
+                className='text-orange-background font-semibold  sm:text-lg'
               >
                 Join us Now
               </Typography>
@@ -58,14 +58,14 @@ function JoinUsSection() {
                 as='h2'
                 size='2xl'
                 content='Ready to try the product for free?'
-                className='text-white max-w-lg'
+                className='text-white max-w-full lg:max-w-lg text-2xl sm:text-5xl lg:text-6xl'
               />
             </div>
 
             <Divider text='' className='text-gray-background' />
 
-            <div className='space-y-7.5'>
-              <Typography className='text-blue-foreground text-md font-light'>
+            <div className='space-y-4 sm:space-y-7.5'>
+              <Typography className='text-blue-foreground text-sm sm:text-md font-light'>
                 Contrary to popular belief, Lorem Ipsum is not simply random
                 text. It has roots in a piece.
               </Typography>
@@ -76,13 +76,13 @@ function JoinUsSection() {
                   alt='Merky Lester'
                   width={53}
                   height={53}
-                  className='rounded-full'
+                  className='rounded-full w-12 h-12 sm:w-[53px] sm:h-[53px]'
                 />
                 <div>
-                  <Typography className='text-white font-semibold text-lg'>
+                  <Typography className='text-white font-semibold  sm:text-lg'>
                     Merky Lester
                   </Typography>
-                  <Typography className='text-blue-foreground text-lg font-medium'>
+                  <Typography className='text-blue-foreground  sm:text-lg font-medium'>
                     Managers
                   </Typography>
                 </div>
@@ -90,8 +90,11 @@ function JoinUsSection() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
-            <div className='grid grid-cols-2 gap-4'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='space-y-6 sm:space-y-8'
+          >
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <InputController
                 name='firstName'
                 label='Full name'
@@ -141,7 +144,7 @@ function JoinUsSection() {
               }
             />
 
-            <Button variant='primary' type='submit'>
+            <Button variant='primary' type='submit' className='w-full'>
               Try for Free
             </Button>
           </form>
@@ -149,35 +152,39 @@ function JoinUsSection() {
       </Section>
 
       {/* Trust logos */}
-      <Section className='bg-blue-background'>
+      <Section className='bg-blue-background px-4 sm:px-6'>
         <div className='text-center'>
-          <Typography className='text-white text-lg mb-10'>
+          <Typography className='text-white  sm:text-lg mb-6 sm:mb-10'>
             Trusted by content creators across the world
           </Typography>
-          <div className='flex justify-center items-center gap-18'>
+          <div className='flex flex-wrap justify-center items-center gap-8 sm:gap-12 lg:gap-18'>
             <Image
               src='/images/logo/google.svg'
               alt='Google Logo'
               width={88}
               height={30}
+              className='h-6 sm:h-[30px] w-auto'
             />
             <Image
               src='/images/logo/microsoft.svg'
               alt='Microsoft Logo'
               width={128}
               height={30}
+              className='h-6 sm:h-[30px] w-auto'
             />
             <Image
               src='/images/logo/amazon.svg'
               alt='Amazon Logo'
               width={94}
               height={32}
+              className='h-6 sm:h-8 w-auto'
             />
             <Image
               src='/images/logo/unique.svg'
               alt='Unique Logo'
               width={97}
               height={30}
+              className='h-6 sm:h-[30px] w-auto'
             />
           </div>
         </div>

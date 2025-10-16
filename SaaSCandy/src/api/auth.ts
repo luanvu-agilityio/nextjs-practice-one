@@ -21,9 +21,9 @@ export interface RegisterPayload {
 const USERS_ENDPOINT = 'users';
 
 export const authApi = {
+  // NOT used for actual authentication - only for MockAPI sync
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     try {
-      // For demo purposes, using mock API with query params
       const users = await http.get<User[]>(
         `${USERS_ENDPOINT}?email=${encodeURIComponent(payload.email)}&password=${encodeURIComponent(payload.password)}`
       );
@@ -43,6 +43,7 @@ export const authApi = {
     }
   },
 
+  // Sync new users to MockAPI
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     try {
       const userData = {
@@ -66,6 +67,19 @@ export const authApi = {
     } catch (error) {
       console.error('Registration API error:', error);
       throw new Error('Registration failed. Please try again.');
+    }
+  },
+
+  // Find user by email
+  findByEmail: async (email: string): Promise<User | null> => {
+    try {
+      const users = await http.get<User[]>(
+        `${USERS_ENDPOINT}?email=${encodeURIComponent(email)}`
+      );
+      return Array.isArray(users) && users.length > 0 ? users[0] : null;
+    } catch (error) {
+      console.error('Find user by email error:', error);
+      return null;
     }
   },
 
@@ -93,7 +107,6 @@ export const authApi = {
     }
   },
 
-  // Verify current password
   verifyPassword: async (
     id: string,
     currentPassword: string

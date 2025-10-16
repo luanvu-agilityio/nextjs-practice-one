@@ -1,27 +1,24 @@
 'use server';
 
-import { signIn } from 'next-auth/react';
-
-// API
+import { redirect } from 'next/navigation';
 import { authApi } from '@/api';
+import { ROUTES } from '@/constants';
+import type { AuthState } from '@/types';
 
-// Constants
-import { ROUTES } from '@/constants/auth-routes';
-
-// Server Action for Sign In
-export async function signInAction(formData: FormData) {
+export async function signInAction(formData: FormData): Promise<AuthState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
   try {
+    // Validate with MockAPI
     const response = await authApi.login({ email, password });
 
     if (!response.user) {
       return {
-        error: {
-          status: 401,
-          message: 'Invalid credentials',
-        },
+        error: 'Invalid email or password',
+        success: undefined,
+        user: undefined,
+        credentials: undefined,
       };
     }
 
@@ -29,55 +26,60 @@ export async function signInAction(formData: FormData) {
       success: true,
       user: response.user,
       credentials: { email, password },
+      error: undefined,
     };
   } catch (error) {
-    console.error('Sign in API error:', error);
-
-    return { error };
+    console.error('Sign in error:', error);
+    return {
+      error: error instanceof Error ? error.message : 'Sign in failed',
+      success: undefined,
+      user: undefined,
+      credentials: undefined,
+    };
   }
 }
 
-export async function signUpAction(formData: FormData) {
+export async function signUpAction(formData: FormData): Promise<AuthState> {
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
   try {
-    const { firstName, lastName } = extractNames(name);
+    const [firstName, lastName] = name.split(' ');
 
     const response = await authApi.register({
-      firstName,
-      lastName,
       email,
       password,
+      firstName: firstName || name,
+      lastName: lastName || '',
     });
+
+    if (!response.user) {
+      return {
+        error: 'Registration failed',
+        success: undefined,
+        user: undefined,
+        credentials: undefined,
+      };
+    }
 
     return {
       success: true,
       user: response.user,
       credentials: { email, password },
+      error: undefined,
     };
   } catch (error) {
-    console.error('Sign up API error:', error);
-
-    return { error };
+    console.error('Sign up error:', error);
+    return {
+      error: error instanceof Error ? error.message : 'Sign up failed',
+      success: undefined,
+      user: undefined,
+      credentials: undefined,
+    };
   }
 }
 
-// Server Action for Social Sign In
-export async function socialSignInAction(provider: string) {
-  try {
-    await signIn(provider, { callbackUrl: ROUTES.HOME });
-  } catch (error) {
-    console.error(`Social sign in error (${provider}):`, error);
-    return { error: `Failed to sign in with ${provider}` };
-  }
-}
-
-// Helper function to extract first and last name
-function extractNames(fullName: string) {
-  const parts = fullName.trim().split(' ');
-  const firstName = parts[0] || '';
-  const lastName = parts.slice(1).join(' ') || '';
-  return { firstName, lastName };
+export async function signOutAction() {
+  redirect(ROUTES.HOME);
 }

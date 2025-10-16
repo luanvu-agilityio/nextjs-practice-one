@@ -11,21 +11,21 @@ function ServicePage() {
     <>
       {/* App Categories Section */}
       <Section
-        className='bg-white '
+        className='bg-white px-4 sm:px-6'
         centered
         style={{
           backgroundImage: "url('/images/background/service-background.png')",
           backgroundSize: 'cover',
         }}
       >
-        <div className='flex flex-col justify-center items-center gap-20'>
+        <div className='flex flex-col justify-center items-center gap-12 sm:gap-20'>
           <Heading
             as='h3'
-            className='w-159'
+            className='max-w-full sm:w-159 text-2xl sm:text-5xl lg:text-6xl px-4'
             size='2xl'
             content='Innovative Apps for Your Business Needs'
           />
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full'>
             {appCategories.map(category => (
               <FeatureCard
                 key={category.title}

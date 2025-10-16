@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import { ChangeEvent, Fragment, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 // Components
-import { Button, Heading, Divider, InputController } from '@/components/common';
+import { Heading } from '@/components/common';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -18,37 +17,40 @@ import {
   BreadcrumbPage,
 } from '@/components/common/Breadcrumb';
 import { showToast } from '@/components/common/Toast';
-import SocialButton from '@/components/SocialButton';
 
 // Icons
 import LogoIcon from '@/components/icons/Logo';
-import GoogleIcon from '@/components/icons/GoogleIcon';
-import GitHubIcon from '@/components/icons/GitHubIcon';
+
 // Constants
-import {
-  AUTH_MESSAGES,
-  ROUTES,
-  SOCIAL_PROVIDERS,
-  TOAST_MESSAGES,
-} from '@/constants';
+import { AUTH_MESSAGES, ROUTES, TOAST_MESSAGES } from '@/constants';
 
 // Types
-import { AuthState, TOAST_VARIANTS } from '@/types';
+import { TOAST_VARIANTS } from '@/types';
 
 // Utils
 import { extractBreadcrumbs, handleSocialAuth } from '@/utils/auth';
-import { signInAction } from '@/lib/auth';
 import { SignInFormValues, signInSchema } from '@/utils';
 
-function SignInForm() {
+// Service
+import { send2FACode, verify2FACode } from '@/service';
+import { TwoFactorForm } from './TwoFactorForm';
+import { SignInForm } from './SignInForm';
+import { signIn } from '@/lib/auth-client';
+
+function SignInPageContent() {
   const pathname = usePathname();
+  const router = useRouter();
   const breadcrumbs = extractBreadcrumbs(pathname);
+  const [isLoading, setIsLoading] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
-    clearErrors,
   } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     mode: 'onBlur',
@@ -56,69 +58,124 @@ function SignInForm() {
     defaultValues: { email: '', password: '' },
   });
 
-  const [serverState, serverAction, isPending] = useActionState(
-    async (_prevState: AuthState, formData: FormData) => {
-      return await signInAction(formData);
-    },
-    { error: null }
-  );
-
   const onSubmit = async (data: SignInFormValues) => {
-    clearErrors('root');
+    setIsLoading(true);
+    setUserEmail(data.email);
+    setUserPassword(data.password);
 
-    const formData = new FormData();
-    formData.append('email', data.email);
-    formData.append('password', data.password);
+    try {
+      const result = await send2FACode(data.email, data.password);
 
-    serverAction(formData);
-  };
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send verification code');
+      }
 
-  // Handle server response with Toast notifications
-  useEffect(() => {
-    // Handle success
-    if (serverState.success && serverState.credentials) {
+      setRequires2FA(true);
+      setIsLoading(false);
+
       showToast({
-        title: TOAST_MESSAGES.SIGN_IN.SUCCESS.title,
-        description: TOAST_MESSAGES.SIGN_IN.SUCCESS.description,
-        variant: TOAST_VARIANTS.SUCCESS,
-        duration: 3000,
-      });
-
-      // Auto sign in with NextAuth
-      signIn('credentials', {
-        email: serverState.credentials.email,
-        password: serverState.credentials.password,
-        callbackUrl: ROUTES.HOME,
-      }).catch(() => {
-        showToast({
-          title: TOAST_MESSAGES.SIGN_IN.AUTH_ERROR.title,
-          description: TOAST_MESSAGES.SIGN_IN.AUTH_ERROR.description,
-          variant: TOAST_VARIANTS.ERROR,
-          duration: 5000,
-        });
-      });
-    }
-
-    // Handle error
-    if (serverState.error) {
-      showToast({
-        title: TOAST_MESSAGES.SIGN_IN.ERROR.title,
+        title: 'Code Sent!',
         description:
-          typeof serverState.error === 'string'
-            ? serverState.error
-            : TOAST_MESSAGES.SIGN_IN.ERROR.description,
+          'Please check your email for the 6-digit verification code',
+        variant: TOAST_VARIANTS.SUCCESS,
+        duration: 5000,
+      });
+
+      return;
+    } catch (error) {
+      console.error('Sign in error:', error);
+      showToast({
+        title: 'Error',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to send verification code',
         variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
+      setIsLoading(false);
     }
-  }, [serverState]);
+  };
 
-  const isLoading = isSubmitting || isPending;
+  const handleTwoFactorVerification = async () => {
+    if (!twoFactorCode || twoFactorCode.length !== 6) {
+      showToast({
+        title: 'Invalid Code',
+        description: 'Please enter a 6-digit code',
+        variant: TOAST_VARIANTS.ERROR,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Verify the email code
+      const result = await verify2FACode(userEmail, twoFactorCode);
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Invalid verification code');
+      }
+
+      const signInResult = await signIn.email({
+        email: result.data.email,
+        password: result.data.password,
+      });
+
+      if (signInResult.error) {
+        throw new Error(signInResult.error.message || 'Sign in failed');
+      }
+
+      showToast({
+        title: 'Success!',
+        description: 'Successfully signed in!',
+        variant: TOAST_VARIANTS.SUCCESS,
+      });
+
+      setUserPassword('');
+      router.push(ROUTES.HOME);
+      router.refresh();
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      showToast({
+        title: 'Verification Failed',
+        description:
+          error instanceof Error ? error.message : 'Invalid or expired code',
+        variant: TOAST_VARIANTS.ERROR,
+      });
+      setIsLoading(false);
+    }
+  };
+
+  // Resend code functionality
+  const handleResendCode = async () => {
+    if (!userEmail) return;
+
+    setIsLoading(true);
+    try {
+      const result = await send2FACode(userEmail, userPassword);
+
+      if (result.success) {
+        showToast({
+          title: 'Code Resent',
+          description: 'A new code has been sent to your email',
+          variant: TOAST_VARIANTS.SUCCESS,
+        });
+      }
+    } catch (error) {
+      showToast({
+        title: 'Error',
+        description: 'Failed to resend code',
+        variant: TOAST_VARIANTS.ERROR,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSocialSignIn = async (provider: string) => {
+    setIsLoading(true);
     try {
       await handleSocialAuth(provider, 'signin');
-
       showToast({
         title: TOAST_MESSAGES.SOCIAL.SIGNIN_REDIRECT.title,
         description: TOAST_MESSAGES.SOCIAL.SIGNIN_REDIRECT.description.replace(
@@ -139,6 +196,7 @@ function SignInForm() {
         variant: TOAST_VARIANTS.ERROR,
         duration: 5000,
       });
+      setIsLoading(false);
     }
   };
 
@@ -151,126 +209,104 @@ function SignInForm() {
     });
   };
 
-  return (
-    <div className='flex flex-col items-center max-w-[1296px] mx-auto'>
-      {/* Header Section */}
-      <div className='pb-12'>
-        <Heading as='h1' size='xl' content={AUTH_MESSAGES.SIGN_IN.title} />
+  const handleTwoFactorCode = (e: ChangeEvent<HTMLInputElement>) => {
+    //  Only allow numbers and limit to 6 digits
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setTwoFactorCode(value);
+  };
 
-        {/* Breadcrumb */}
-        <Breadcrumb className='justify-center mt-4'>
+  const handleBackToSignIn = () => {
+    setRequires2FA(false);
+    setTwoFactorCode('');
+    setUserEmail('');
+    setUserPassword('');
+  };
+
+  const loading = isSubmitting || isLoading;
+
+  return (
+    <div className='flex flex-col items-center max-w-[1296px] mx-auto px-4 sm:px-6'>
+      {/* Header Section */}
+      <div className='pb-8 sm:pb-12 text-center'>
+        <Heading
+          as='h2'
+          size='xl'
+          content={AUTH_MESSAGES.SIGN_IN.title}
+          className='text-3xl sm:text-5xl lg:text-6xl'
+        />
+
+        <Breadcrumb className='justify-center mt-3 sm:mt-4'>
           <BreadcrumbList>
             {breadcrumbs.map((item, index) => (
-              <React.Fragment key={item.label}>
+              <Fragment key={item.label}>
                 <BreadcrumbItem>
                   {item.isActive ? (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className='text-sm sm:xs'>
+                      {item.label}
+                    </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={item.href}>
+                    <BreadcrumbLink href={item.href} className='text-sm sm:xs'>
                       {item.label}
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
                 {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-              </React.Fragment>
+              </Fragment>
             ))}
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
       {/* Form Section */}
-      <div className='py-14 px-16 w-159 rounded-4xl border border-form-border-color shadow-form'>
-        <div className='flex flex-col gap-10'>
+      <div className='py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form'>
+        <div className='flex flex-col gap-6 sm:gap-10'>
           {/* Logo */}
           <div className='flex justify-center'>
-            <Link href={ROUTES.HOME} className='flex items-center gap-3'>
-              <LogoIcon className='w-10 h-10' />
-              <span className='text-3xl font-secondary text-primary'>
+            <Link
+              href={ROUTES.HOME}
+              className='flex items-center gap-2 sm:gap-3'
+            >
+              <LogoIcon className='w-8 h-8 sm:w-10 sm:h-10' />
+              <span className='text-2xl sm:text-3xl font-secondary text-primary'>
                 SaaS<span className='font-medium'>Candy</span>
               </span>
             </Link>
           </div>
 
-          <div className='flex flex-col gap-8'>
-            {/* Social Sign In Buttons */}
-            <div className='flex flex-row gap-4'>
-              <SocialButton
-                provider='google'
-                icon={GoogleIcon}
-                onClick={() => handleSocialSignIn(SOCIAL_PROVIDERS.GOOGLE)}
-                disabled={isLoading}
-              >
-                {AUTH_MESSAGES.SOCIAL.googleSignIn}
-              </SocialButton>
-
-              <SocialButton
-                provider='github'
-                icon={GitHubIcon}
-                onClick={() => handleSocialSignIn(SOCIAL_PROVIDERS.GITHUB)}
-                disabled={isLoading}
-              >
-                {AUTH_MESSAGES.SOCIAL.githubSignIn}
-              </SocialButton>
-            </div>
-
-            <Divider
-              text={AUTH_MESSAGES.DIVIDER}
-              className='text-gray-background'
-            />
-
-            {/* Sign In Form with Server Action */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='space-y-4'
-              noValidate
-            >
-              <InputController
-                name='email'
+          <div className='flex flex-col gap-6 sm:gap-8'>
+            {/* Toggle between SignIn and 2FA forms */}
+            {!requires2FA ? (
+              <SignInForm
                 control={control}
-                label='Email'
-                placeholder='Email'
-                type='email'
-                autoComplete='email'
-                hideLabel
-                required
+                onSubmit={handleSubmit(onSubmit)}
+                onSocialSignIn={handleSocialSignIn}
+                isLoading={loading}
               />
-
-              <InputController
-                name='password'
-                control={control}
-                label='Password'
-                placeholder='Password'
-                type='password'
-                autoComplete='current-password'
-                showPasswordToggle
-                hideLabel
-                required
+            ) : (
+              <TwoFactorForm
+                userEmail={userEmail}
+                twoFactorCode={twoFactorCode}
+                onCodeChange={handleTwoFactorCode}
+                onVerify={handleTwoFactorVerification}
+                onResendCode={handleResendCode}
+                onBack={handleBackToSignIn}
+                isLoading={loading}
               />
-
-              <Button
-                type='submit'
-                variant='primary'
-                size='large'
-                disabled={isLoading}
-                className='w-full'
-              >
-                {isLoading
-                  ? AUTH_MESSAGES.SIGN_IN.submittingButton
-                  : AUTH_MESSAGES.SIGN_IN.submitButton}
-              </Button>
-            </form>
+            )}
 
             {/* Footer Links */}
-            <div className='text-center space-y-3'>
-              <button
-                onClick={handleForgotPassword}
-                className='text-md font-regular text-primary hover:text-primary/80 transition-colors'
-                disabled={isLoading}
-              >
-                {AUTH_MESSAGES.SIGN_IN.forgotPassword}
-              </button>
+            <div className='text-center space-y-2 sm:space-y-3'>
+              {!requires2FA && (
+                <button
+                  onClick={handleForgotPassword}
+                  className='text-sm sm:text-md font-regular text-primary hover:text-primary/80 transition-colors'
+                  disabled={loading}
+                >
+                  {AUTH_MESSAGES.SIGN_IN.forgotPassword}
+                </button>
+              )}
 
-              <div className='text-md font-regular text-primary'>
+              <div className='text-sm sm:text-md font-regular text-primary'>
                 {AUTH_MESSAGES.SIGN_IN.notMember}{' '}
                 <Link
                   href={ROUTES.SIGN_UP}
@@ -287,4 +323,4 @@ function SignInForm() {
   );
 }
 
-export default SignInForm;
+export default SignInPageContent;

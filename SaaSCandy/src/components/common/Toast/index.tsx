@@ -34,7 +34,7 @@ const showToast = (props: Omit<ToastProps, 'id'>) => {
     t => (
       <div
         className={cn(
-          'flex max-w-[360px] w-full gap-3 rounded-lg py-3 px-4 shadow-lg border text-lg',
+          'flex max-w-[360px] w-full gap-3 rounded-lg py-3 px-4 shadow-lg border text-xl',
           {
             'bg-success-background text-white border-success-background':
               variant === 'success',
@@ -52,9 +52,9 @@ const showToast = (props: Omit<ToastProps, 'id'>) => {
         </div>
 
         <div className='flex flex-1 flex-col items-start gap-1'>
-          <div className='font-medium text-sm'>{title}</div>
+          <div className='font-medium text-lg'>{title}</div>
           {description && (
-            <Typography className='text-xs opacity-90'>
+            <Typography className='text-lg opacity-90'>
               {description}
             </Typography>
           )}
