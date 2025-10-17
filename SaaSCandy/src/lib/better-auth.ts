@@ -22,6 +22,7 @@ export const auth = betterAuth({
     enabled: true,
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
+    requireEmailVerification: true,
     sendVerificationEmail: async ({ user, token }) => {
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
 
@@ -36,7 +37,7 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, token }) => {
       const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 

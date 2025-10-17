@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUp } from '@/lib/auth-client';
 
 // Components
-import { Heading } from '@/components/common';
+import { Heading, Typography } from '@/components/common';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -37,8 +37,11 @@ import { SignUpFormValues, signUpSchema } from '@/utils';
 
 function SignUpPageContent() {
   const pathname = usePathname();
+  const router = useRouter();
   const breadcrumbs = extractBreadcrumbs(pathname);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   const {
     control,
@@ -57,6 +60,7 @@ function SignUpPageContent() {
 
   const onSubmit = async (data: SignUpFormValues) => {
     setIsLoading(true);
+    setUserEmail(data.email);
 
     try {
       const result = await signUp.email({
@@ -73,6 +77,7 @@ function SignUpPageContent() {
           variant: TOAST_VARIANTS.ERROR,
           duration: 5000,
         });
+        setEmailSent(true);
         setIsLoading(false);
         return;
       }
@@ -126,6 +131,8 @@ function SignUpPageContent() {
     }
   };
 
+  const handleSignIn = () => router.push(ROUTES.SIGN_IN);
+
   const loading = isSubmitting || isLoading;
 
   return (
@@ -135,7 +142,7 @@ function SignUpPageContent() {
         <Heading
           as='h1'
           size='xl'
-          content={AUTH_MESSAGES.SIGN_UP.title}
+          content={emailSent ? 'Check Your Email' : AUTH_MESSAGES.SIGN_UP.title}
           className='text-3xl sm:text-5xl lg:text-6xl'
         />
 
@@ -149,7 +156,10 @@ function SignUpPageContent() {
                       {item.label}
                     </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={item.href} className='text-sm sm:xs'>
+                    <BreadcrumbLink
+                      href={item.href}
+                      className='text-sm sm:text-xs'
+                    >
                       {item.label}
                     </BreadcrumbLink>
                   )}
@@ -177,38 +187,98 @@ function SignUpPageContent() {
             </Link>
           </div>
 
-          <div className='flex flex-col gap-6 sm:gap-8'>
-            {/* Sign Up Form Component */}
-            <SignUpForm
-              control={control}
-              onSubmit={handleSubmit(onSubmit)}
-              onSocialSignUp={handleSocialSignUp}
-              isLoading={loading}
-            />
-
-            {/* Footer Links */}
-            <div className='text-center space-y-2 sm:space-y-3'>
-              <div className='text-sm sm:text-md font-regular text-primary'>
-                {AUTH_MESSAGES.SIGN_UP.privacyText}{' '}
-                <Link
-                  href={ROUTES.PRIVACY}
-                  className='text-primary font-medium hover:underline'
+          {emailSent ? (
+            // Email Sent Confirmation
+            <div className='space-y-6 text-center'>
+              <div className='w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center'>
+                <svg
+                  className='w-10 h-10 text-green-600'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
                 >
-                  {AUTH_MESSAGES.SIGN_UP.privacyLink}
-                </Link>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+                  />
+                </svg>
               </div>
 
-              <div className='text-sm sm:text-md font-regular text-primary'>
-                {AUTH_MESSAGES.SIGN_UP.alreadyMember}{' '}
-                <Link
-                  href={ROUTES.SIGN_IN}
-                  className='text-primary font-medium hover:underline'
+              <div>
+                <Heading
+                  as='h2'
+                  size='md'
+                  content='Verification Email Sent!'
+                  className='text-2xl sm:text-3xl mb-3'
+                />
+                <Typography className=' sm:text-lg text-gray-background'>
+                  We&apos;ve sent a verification link to{' '}
+                  <strong className='text-primary break-all'>
+                    {userEmail}
+                  </strong>
+                </Typography>
+              </div>
+
+              <div className='bg-blue-50 border border-blue-200 rounded-lg p-4 text-left space-y-2'>
+                <Typography className='text-sm sm:text-xs text-blue-800'>
+                  <strong>Next steps:</strong>
+                </Typography>
+                <ol className='list-decimal list-inside text-sm sm:text-xs text-blue-700 space-y-1'>
+                  <li>Check your email inbox</li>
+                  <li>Click the verification link</li>
+                  <li>You&apos;ll be automatically signed in</li>
+                </ol>
+                <Typography
+                  className='text-xs sm:text-sm text-blue-600 mt-3'
+                  content="Didn't receive it? Check your spam folder"
+                />
+              </div>
+
+              <div className='pt-4 space-y-3'>
+                <button
+                  onClick={handleSignIn}
+                  className='text-sm sm:text-xs text-primary hover:underline'
                 >
-                  {AUTH_MESSAGES.SIGN_UP.signInLink}
-                </Link>
+                  Already verified? Sign In
+                </button>
               </div>
             </div>
-          </div>
+          ) : (
+            // Sign Up Form
+            <div className='flex flex-col gap-6 sm:gap-8'>
+              <SignUpForm
+                control={control}
+                onSubmit={handleSubmit(onSubmit)}
+                onSocialSignUp={handleSocialSignUp}
+                isLoading={loading}
+              />
+
+              {/* Footer Links */}
+              <div className='text-center space-y-2 sm:space-y-3'>
+                <div className='text-sm sm:text-md font-regular text-primary'>
+                  {AUTH_MESSAGES.SIGN_UP.privacyText}{' '}
+                  <Link
+                    href={ROUTES.PRIVACY}
+                    className='text-primary font-medium hover:underline'
+                  >
+                    {AUTH_MESSAGES.SIGN_UP.privacyLink}
+                  </Link>
+                </div>
+
+                <div className='text-sm sm:text-md font-regular text-primary'>
+                  {AUTH_MESSAGES.SIGN_UP.alreadyMember}{' '}
+                  <Link
+                    href={ROUTES.SIGN_IN}
+                    className='text-primary font-medium hover:underline'
+                  >
+                    {AUTH_MESSAGES.SIGN_UP.signInLink}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

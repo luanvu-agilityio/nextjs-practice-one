@@ -52,11 +52,19 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
-export const twoFactor = pgTable('twoFactor', {
+// For DEMO/LEARNING purposes only - stores verification codes
+// In production, use proper token-based verification
+export const emailVerificationCode = pgTable('emailVerificationCode', {
   id: text('id').primaryKey(),
-  secret: text('secret').notNull(),
-  backupCodes: text('backupCodes').notNull(),
   userId: text('userId')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  // For DEMO: Store plain password temporarily for easier testing
+  tempPassword: text('tempPassword'),
+  expiresAt: timestamp('expiresAt').notNull(),
+  verified: boolean('verified').default(false),
+  attempts: text('attempts').default('0'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
 });

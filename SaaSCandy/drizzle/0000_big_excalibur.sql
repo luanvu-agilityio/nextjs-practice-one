@@ -14,6 +14,18 @@ CREATE TABLE "account" (
 	"updatedAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "emailVerificationCode" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"email" text NOT NULL,
+	"code" text NOT NULL,
+	"tempPassword" text,
+	"expiresAt" timestamp NOT NULL,
+	"verified" boolean DEFAULT false,
+	"attempts" text DEFAULT '0',
+	"createdAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expiresAt" timestamp NOT NULL,
@@ -24,13 +36,6 @@ CREATE TABLE "session" (
 	"userAgent" text,
 	"userId" text NOT NULL,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
-);
---> statement-breakpoint
-CREATE TABLE "twoFactor" (
-	"id" text PRIMARY KEY NOT NULL,
-	"secret" text NOT NULL,
-	"backupCodes" text NOT NULL,
-	"userId" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
@@ -56,5 +61,5 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "twoFactor" ADD CONSTRAINT "twoFactor_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "emailVerificationCode" ADD CONSTRAINT "emailVerificationCode_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

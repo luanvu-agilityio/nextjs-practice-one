@@ -117,8 +117,8 @@ function SignInPageContent() {
       }
 
       const signInResult = await signIn.email({
-        email: result.data.email,
-        password: result.data.password,
+        email: userEmail,
+        password: userPassword,
       });
 
       if (signInResult.error) {
@@ -132,6 +132,7 @@ function SignInPageContent() {
       });
 
       setUserPassword('');
+      setTwoFactorCode('');
       router.push(ROUTES.HOME);
       router.refresh();
     } catch (error) {
@@ -160,6 +161,8 @@ function SignInPageContent() {
           description: 'A new code has been sent to your email',
           variant: TOAST_VARIANTS.SUCCESS,
         });
+        // Reset code input
+        setTwoFactorCode('');
       }
     } catch (error) {
       showToast({

@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import * as schema from '@/lib/db/schema';
+
+const MAX_ATTEMPTS = 3;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, code } = body;
 
+    // Validation
     if (!email || !code) {
       return NextResponse.json(
         { message: 'Email and code are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate code format (6 digits)
+    if (!/^\d{6}$/.test(code)) {
+      return NextResponse.json(
+        { success: false, error: 'Code must be 6 digits' },
         { status: 400 }
       );
     }
@@ -20,80 +31,95 @@ export async function POST(request: NextRequest) {
       where: eq(schema.user.email, email),
     });
 
+    // Case 1: User doesn't exist
     if (!user) {
-      return NextResponse.json({ message: 'Invalid code' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Invalid verification code' },
+        { status: 400 }
+      );
     }
 
-    // Find verification record
-    const verification = await db.query.verification.findFirst({
-      where: (v, { and, eq }) =>
-        and(eq(v.identifier, user.id), eq(v.type, 'email_2fa')),
+    // Find latest verification code for this user
+    const verificationRecord = await db.query.emailVerificationCode.findFirst({
+      where: and(
+        eq(schema.emailVerificationCode.userId, user.id),
+        eq(schema.emailVerificationCode.code, code),
+        eq(schema.emailVerificationCode.verified, false),
+        gt(schema.emailVerificationCode.expiresAt, new Date())
+      ),
+      orderBy: (table, { desc }) => [desc(table.createdAt)],
     });
 
-    if (!verification) {
+    // Case 2: No verification code found or expired
+    if (!verificationRecord) {
       return NextResponse.json(
-        { message: 'Invalid or expired code' },
+        {
+          success: false,
+          error: 'Verification code expired. Please request a new one.',
+        },
         { status: 400 }
       );
     }
 
-    // Parse stored data
-    let storedData;
-    try {
-      storedData = JSON.parse(verification.value);
-    } catch (error) {
-      console.error(
-        '[verify-2fa-code] Failed to parse verification data:',
-        error
-      );
-      return NextResponse.json(
-        { message: 'Invalid verification data' },
-        { status: 400 }
-      );
-    }
-
-    // Check if code matches
-    const inputCode = String(code).trim();
-    const storedCode = String(storedData.code).trim();
-
-    if (inputCode !== storedCode) {
-      return NextResponse.json(
-        { message: 'Invalid or expired code' },
-        { status: 400 }
-      );
-    }
-
-    // Check if code has expired
-    if (verification.expiresAt.getTime() < Date.now()) {
+    // Case 3: Too many attempts
+    const attempts = Number.parseInt(verificationRecord.attempts || '0');
+    if (attempts >= MAX_ATTEMPTS) {
+      // Delete the code
       await db
-        .delete(schema.verification)
-        .where(eq(schema.verification.id, verification.id));
+        .delete(schema.emailVerificationCode)
+        .where(eq(schema.emailVerificationCode.id, verificationRecord.id));
 
       return NextResponse.json(
-        { message: 'Code has expired. Please request a new one.' },
+        {
+          success: false,
+          error: 'Too many failed attempts. Please request a new code.',
+        },
         { status: 400 }
       );
     }
 
-    // Delete used code
-    await db
-      .delete(schema.verification)
-      .where(eq(schema.verification.id, verification.id));
+    // Case 4: Wrong code
+    if (verificationRecord.code !== code) {
+      await db
+        .update(schema.emailVerificationCode)
+        .set({ attempts: String(attempts + 1) })
+        .where(eq(schema.emailVerificationCode.id, verificationRecord.id));
 
+      const remainingAttempts = MAX_ATTEMPTS - (attempts + 1);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid code. ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Case 5: Correct code - Mark as verified
+    await db
+      .update(schema.emailVerificationCode)
+      .set({ verified: true })
+      .where(eq(schema.emailVerificationCode.id, verificationRecord.id));
+
+    // Return credentials for client-side sign-in
     return NextResponse.json({
       success: true,
-      message: 'Code verified',
       data: {
         email: user.email,
-        password: storedData.password,
+        // For DEMO: Return plain password stored during send-code
+        password: verificationRecord.tempPassword || '',
       },
+      message: 'Verification successful',
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Verify 2FA error:', error);
+    const errMessage = error instanceof Error ? error.message : 'Unknown error';
+
     return NextResponse.json(
       {
         success: false,
-        message: 'Verification failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Failed to verify code',
+        error: errMessage,
       },
       { status: 500 }
     );
