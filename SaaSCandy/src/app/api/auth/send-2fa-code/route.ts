@@ -4,7 +4,7 @@ import { TwoFactorEmail } from '@/constants/email-template';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import * as schema from '@/lib/db/schema';
-import bcrypt from 'bcryptjs';
+import { auth } from '@/lib/better-auth';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -25,44 +25,20 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    // Find user by email
-    const user = await db.query.user.findFirst({
-      where: eq(schema.user.email, email),
+    const signInResult = await auth.api.signInEmail({
+      body: { email, password },
     });
 
-    // Case 1: User doesn't exist
-    if (!user) {
-      // Don't reveal if user exists for security
-      return NextResponse.json({
-        success: true,
-        message: 'If an account exists, a code has been sent',
-      });
-    }
-
-    // Find account with password
-    const account = await db.query.account.findFirst({
-      where: eq(schema.account.userId, user.id),
-    });
-
-    // Case 2: Account not found or no password (social login only)
-    if (!account?.password) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Please sign in using your social account (Google/GitHub)',
-        },
-        { status: 401 }
-      );
-    }
-
-    // Case 3: Invalid password
-    const isValidPassword = await bcrypt.compare(password, account.password);
-    if (!isValidPassword) {
+    // If sign-in fails, return error
+    if (!signInResult?.user) {
       return NextResponse.json(
         { success: false, error: 'Invalid email or password' },
         { status: 401 }
       );
     }
+
+    // If successful, proceed with sending 2FA code
+    const user = signInResult.user;
 
     // Generate 6-digit code
     const code = generateCode();
