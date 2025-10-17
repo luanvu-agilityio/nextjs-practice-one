@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ChangePasswordModal renders correctly when open 1`] = `
+<div>
+  <div>
+    <div>
+      <div>
+        <h2>
+          Change Password
+        </h2>
+      </div>
+      <form
+        class="space-y-4"
+      >
+        <input
+          data-testid="currentPassword"
+          placeholder="Current Password"
+        />
+        <input
+          data-testid="newPassword"
+          placeholder="New Password"
+        />
+        <input
+          data-testid="confirmPassword"
+          placeholder="Confirm New Password"
+        />
+        <div>
+          <button
+            type="button"
+            variant="secondary"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            variant="primary"
+          >
+            Change Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+`;

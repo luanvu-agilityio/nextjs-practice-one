@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AddressIcon matches snapshot 1`] = `
+<svg
+  fill="none"
+  height="32"
+  viewBox="0 0 32 32"
+  width="32"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <circle
+    cx="15.9999"
+    cy="15.9999"
+    fill="#FFD245"
+    r="15.9999"
+  />
+  <mask
+    height="32"
+    id="mask0_2053_384"
+    maskUnits="userSpaceOnUse"
+    style="mask-type: alpha;"
+    width="32"
+    x="0"
+    y="0"
+  >
+    <circle
+      cx="15.9999"
+      cy="15.9999"
+      fill="#FFD245"
+      r="15.9999"
+    />
+  </mask>
+  <g
+    mask="url(#mask0_2053_384)"
+  >
+    <circle
+      cx="19.3045"
+      cy="9.53418"
+      fill="#FFE486"
+      r="15.9999"
+    />
+    <circle
+      cx="28.3808"
+      cy="9.53418"
+      fill="#EE7B11"
+      r="15.9999"
+    />
+  </g>
+  <circle
+    cx="24.7011"
+    cy="24.7013"
+    fill="#1642B9"
+    r="6.29869"
+    stroke="white"
+    stroke-width="2"
+  />
+</svg>
+`;

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SignInForm from '../index';
+import SignInPageContent from '../index';
 
 const mockPush = jest.fn();
 const mockPathname = '/signin';
@@ -38,7 +38,7 @@ jest.mock('next/link', () => {
   return MockedLink;
 });
 
-jest.mock('next-auth/react', () => ({
+jest.mock('better-auth/react', () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
 }));
 
@@ -258,7 +258,7 @@ describe('SignInForm - Snapshot', () => {
   });
 
   it('matches snapshot', () => {
-    const { container } = render(<SignInForm />);
+    const { container } = render(<SignInPageContent />);
     expect(container).toMatchSnapshot();
   });
 });
@@ -273,7 +273,7 @@ describe('SignInForm - Interactive', () => {
   it('handles social sign in button clicks', async () => {
     const user = userEvent.setup();
 
-    render(<SignInForm />);
+    render(<SignInPageContent />);
 
     const googleButton = screen.getByRole('button', {
       name: /sign in with google/i,
@@ -291,7 +291,7 @@ describe('SignInForm - Interactive', () => {
 
     mockUseActionState.mockReturnValue([{ error: null }, mockAction, false]);
 
-    render(<SignInForm />);
+    render(<SignInPageContent />);
 
     const emailInput = screen.getByTestId('email');
     const passwordInput = screen.getByTestId('password');

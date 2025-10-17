@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Header from '../index';
 import { JSX } from 'react';
-import { SessionProvider } from 'next-auth/react';
 
 jest.mock('next/link', () => {
   const MockedLink = ({
@@ -59,11 +58,7 @@ jest.mock('@/components/icons/ThemeSwitcherIcon', () => {
 
 describe.skip('Header - Snapshot', () => {
   it('matches snapshot', () => {
-    const { container } = render(
-      <SessionProvider>
-        <Header />
-      </SessionProvider>
-    );
+    const { container } = render(<Header />);
     expect(container).toMatchSnapshot();
   });
 });
@@ -71,11 +66,7 @@ describe.skip('Header - Snapshot', () => {
 describe.skip('Header - Interactive', () => {
   it('renders navigation buttons and they are clickable', async () => {
     const user = userEvent.setup();
-    render(
-      <SessionProvider>
-        <Header />
-      </SessionProvider>
-    );
+    render(<Header />);
 
     const signInButton = screen.getByRole('button', { name: /sign in/i });
     const signUpButton = screen.getByRole('button', { name: /sign up/i });

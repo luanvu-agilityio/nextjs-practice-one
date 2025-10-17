@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`CheckboxController renders correctly 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-1"
+  >
+    <div
+      class="flex items-start gap-3"
+    >
+      <input
+        class="mt-1 undefined"
+        type="checkbox"
+      />
+      <span
+        class="text-lg text-blue-foreground"
+      >
+        Accept terms
+      </span>
+    </div>
+  </div>
+</div>
+`;
