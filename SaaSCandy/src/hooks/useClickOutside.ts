@@ -1,7 +1,7 @@
 import { useEffect, RefObject } from 'react';
 
 interface UseOutsideClickProps {
-  ref: RefObject<HTMLElement>;
+  ref: RefObject<HTMLElement | null>;
   handler: () => void;
   enabled?: boolean;
 }

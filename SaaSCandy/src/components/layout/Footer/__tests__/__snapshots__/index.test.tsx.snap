@@ -1,5 +1,421 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Footer - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <footer
+    class="bg-dark-blue w-full"
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 py-12 sm:py-16 lg:py-17.5"
+    >
+      <div
+        class="flex flex-col lg:flex-row justify-between gap-12 lg:gap-33"
+      >
+        <div
+          class="w-full lg:w-76.5 flex flex-col gap-8 lg:gap-13.5"
+        >
+          <a
+            class="flex items-center gap-2 no-underline"
+            href="/"
+          >
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              height="32"
+              viewBox="0 0 32 32"
+              width="32"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="15.9999"
+                cy="15.9999"
+                fill="#FFD245"
+                r="15.9999"
+              />
+              <mask
+                height="32"
+                id="mask0_2053_384"
+                maskUnits="userSpaceOnUse"
+                style="mask-type: alpha;"
+                width="32"
+                x="0"
+                y="0"
+              >
+                <circle
+                  cx="15.9999"
+                  cy="15.9999"
+                  fill="#FFD245"
+                  r="15.9999"
+                />
+              </mask>
+              <g
+                mask="url(#mask0_2053_384)"
+              >
+                <circle
+                  cx="19.3045"
+                  cy="9.53418"
+                  fill="#FFE486"
+                  r="15.9999"
+                />
+                <circle
+                  cx="28.3808"
+                  cy="9.53418"
+                  fill="#EE7B11"
+                  r="15.9999"
+                />
+              </g>
+              <circle
+                cx="24.7011"
+                cy="24.7013"
+                fill="#1642B9"
+                r="6.29869"
+                stroke="white"
+                stroke-width="2"
+              />
+            </svg>
+            <div>
+              <h1
+                aria-level="1"
+                class="text-2xl font-semibold"
+                role="heading"
+              >
+                <span
+                  class="font-secondary text-white text-2xl sm:text-3xl font-light"
+                >
+                  SaaS
+                  <span
+                    class="font-medium"
+                  >
+                    Candy
+                  </span>
+                </span>
+              </h1>
+            </div>
+          </a>
+          <div
+            class="flex flex-col gap-6 lg:gap-6.5"
+          >
+            <p
+              class="text-md sm:text-lg text-white opacity-50 font-medium"
+              role="paragraph"
+            >
+              Rakon is a simple, elegant, and secure way to build your bitcoin and crypto portfolio.
+            </p>
+            <p
+              class="text-md text-white sm:text-lg font-medium"
+              role="paragraph"
+            >
+              1989 Don Jackson Lane
+              <br />
+              <span
+                class="  sm:text-lg text-blue-foreground font-medium"
+              >
+                Call us:
+                 
+                <span
+                  class="text-orange-background"
+                >
+                  808-956-9599
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div
+          class="hidden lg:grid grid-cols-3 gap-6   sm:text-lg flex-1"
+        >
+          <div>
+            <h4
+              aria-level="4"
+              class="text-white mb-10 font-medium sm:text-lg"
+              role="heading"
+            >
+              Services
+            </h4>
+            <ul
+              class="space-y-6   sm:text-lg font-medium text-white opacity-50"
+            >
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/edtech"
+                >
+                  EdTech Apps
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/ecommerce"
+                >
+                  eCommerce Apps
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/crm"
+                >
+                  CRM Apps
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/health"
+                >
+                  Health Apps
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/analytics"
+                >
+                  Web Analytics Apps
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/services/banking"
+                >
+                  Banking Apps
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              aria-level="4"
+              class="text-white sm:text-lg mb-10 font-medium"
+              role="heading"
+            >
+              Company
+            </h4>
+            <ul
+              class="space-y-6   sm:text-lg font-medium text-white opacity-50"
+            >
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/about"
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a
+                  class="hover:text-white hover:opacity-100 transition-opacity"
+                  href="/contact"
+                >
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              aria-level="4"
+              class="text-white mb-10 font-medium sm:text-lg"
+              role="heading"
+            >
+              Subscribe
+            </h4>
+            <p
+              class="text-md sm:text-lg font-medium text-white opacity-50 mb-4"
+              role="paragraph"
+            >
+              Subscribe to get the latest news from us
+            </p>
+            <form
+              class="flex flex-col gap-2.5"
+            >
+              <input
+                aria-label="Email"
+                class="flex-1 rounded-lg bg-transparent border border-gray-700 px-3 py-2 text-sm placeholder-gray-400 text-white"
+                placeholder="Enter email address"
+                type="email"
+              />
+              <button
+                class="inline-flex items-center justify-center font-semibold text-md leading-none tracking-normal rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-orange-background text-white hover:opacity-90 focus-visible:ring-primary px-4 py-2.5 w-full"
+              >
+                Register
+              </button>
+            </form>
+          </div>
+        </div>
+        <div
+          class="lg:hidden flex flex-col gap-4 w-full"
+        >
+          <div
+            class="border-b border-gray-700"
+          >
+            <button
+              class="w-full flex items-center justify-between py-4 text-white"
+            >
+              <h4
+                aria-level="4"
+                class="text-white font-medium"
+                role="heading"
+              >
+                Services
+              </h4>
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-chevron-down w-5 h-5 transition-transform"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m6 9 6 6 6-6"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="border-b border-gray-700"
+          >
+            <button
+              class="w-full flex items-center justify-between py-4 text-white"
+            >
+              <h4
+                aria-level="4"
+                class="text-white font-medium"
+                role="heading"
+              >
+                Company
+              </h4>
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-chevron-down w-5 h-5 transition-transform"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m6 9 6 6 6-6"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="border-b border-gray-700"
+          >
+            <button
+              class="w-full flex items-center justify-between py-4 text-white"
+            >
+              <h4
+                aria-level="4"
+                class="text-white font-medium"
+                role="heading"
+              >
+                Subscribe
+              </h4>
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-chevron-down w-5 h-5 transition-transform"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m6 9 6 6 6-6"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="relative mt-12 lg:mt-0 lg:pt-17.5"
+      >
+        <div
+          class="  sm:text-lg font-medium text-white flex flex-col sm:flex-row items-center justify-between gap-6"
+        >
+          <span
+            class="opacity-50 text-center sm:text-left"
+          >
+            ©
+            2025
+             - All Rights Reserved by GetNextJs
+          </span>
+          <div
+            aria-label="Social media links"
+            class="flex gap-4 sm:gap-6"
+          >
+            <button
+              class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border-none text-primary hover:opacity-90 w-6 h-6 p-4"
+              data-testid="icon-button"
+            >
+              <a
+                class="inline-block"
+                href="https://facebook.com"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <div>
+                  Facebook
+                </div>
+              </a>
+            </button>
+            <button
+              class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border-none text-primary hover:opacity-90 w-6 h-6 p-4"
+              data-testid="icon-button"
+            >
+              <a
+                class="inline-block"
+                href="https://twitter.com"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <div>
+                  Twitter
+                </div>
+              </a>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a
+      class="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 lg:right-10 lg:bottom-10 bg-orange-background text-white text-sm sm:text-md font-semibold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-lg hover:bg-orange-600 transition-colors z-50"
+      href="#"
+    >
+      <span
+        class="hidden sm:inline"
+      >
+        Get This Template
+      </span>
+      <span
+        class="sm:hidden"
+      >
+        Get Template
+      </span>
+    </a>
+  </footer>
+</div>
+`;
+
 exports[`Footer - Snapshot matches snapshot 1`] = `
 <div>
   <footer

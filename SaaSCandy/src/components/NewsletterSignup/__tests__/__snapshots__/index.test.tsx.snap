@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`NewsletterSignup - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <h3
+      aria-level="3"
+      class="font-semibold text-primary text-2xl sm:text-3xl lg:text-[35px] mb-4 sm:mb-6"
+      role="heading"
+    >
+      Join our Newsletter
+    </h3>
+    <form
+      class="space-y-3 sm:space-y-4"
+    >
+      <div
+        class="flex flex-col gap-2 w-full"
+      >
+        <div
+          class="flex items-center h-11 min-w-0 transition-colors bg-transparent focus-within:border-white px-3 py-2 sm:px-4 sm:py-2.5 border border-primary rounded-lg text-sm sm:text-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full"
+        >
+          <input
+            aria-invalid="false"
+            class="w-full bg-transparent outline-none placeholder:text-placeholder disabled:pointer-events-none disabled:cursor-not-allowed"
+            id="input-«r0»"
+            placeholder="Email address Subscribe"
+            required=""
+            type="email"
+            value=""
+          />
+        </div>
+      </div>
+      <button
+        class="inline-flex items-center justify-center font-semibold text-md leading-none tracking-normal transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-orange-background text-white hover:opacity-90 focus-visible:ring-primary px-9 py-5 rounded-lg w-full"
+        type="submit"
+      >
+        Subscribe
+      </button>
+    </form>
+  </div>
+</div>
+`;

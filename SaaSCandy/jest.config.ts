@@ -2,38 +2,59 @@ import type { Config } from 'jest';
 import nextJest from 'next/jest.js';
 
 const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: './',
 });
 
-// Add any custom config to be passed to Jest
 const config: Config = {
-  preset: 'ts-jest/presets/default-esm',
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
-  },
   testEnvironment: 'jsdom',
-  coverageProvider: 'v8',
-  clearMocks: true,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  coverageDirectory: 'coverage',
-  collectCoverage: false,
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.{js,jsx,ts,tsx}',
-    '!**/*.d.ts',
-    '!<rootDir>/src/**/*.stories.{js,jsx,ts,tsx}',
-    // '!<rootDir>/src/constants/*',
-    // '!<rootDir>/src/interfaces/*',
-    // '!<rootDir>/src/layouts/*',
-    // '!<rootDir>/src/mocks/*',
-    // '!<rootDir>/src/enums/*',
-    // '!<rootDir>/src/lib/**',
-    // '!<rootDir>/src/stores/**',
-    // '!<rootDir>/node_modules/',
-    // '!<rootDir>/src/app/**/*',
-    // '!<rootDir>/src/middleware.ts',
-    // '!<rootDir>/src/icons/*',
+
+  // Module name mapping
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+
+  // Test match patterns - be explicit about what to test
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}',
   ],
+
+  // Ignore patterns - don't look in these directories
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/dist/', '/build/'],
+
+  // Transform configuration
+  transform: {
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          jsx: 'react-jsx',
+        },
+      },
+    ],
+  },
+
+  // Critical: Tell Jest to ignore node_modules except for ESM packages
+  transformIgnorePatterns: [
+    'node_modules/(?!(.pnpm|better-auth|@react-email|@tanstack)/)',
+    '/node_modules/(?!lucide-react/)',
+    '/node_modules/(?!nanostores/)',
+  ],
+
+  // Module file extensions
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+
+  // Coverage configuration
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!**/*.d.ts',
+    '!src/**/*.stories.{js,jsx,ts,tsx}',
+    '!src/**/__tests__/**',
+    '!src/**/*.test.{js,jsx,ts,tsx}',
+    '!src/**/*.spec.{js,jsx,ts,tsx}',
+  ],
+  coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html', 'json'],
   coverageThreshold: {
     global: {
@@ -44,16 +65,19 @@ const config: Config = {
     },
   },
   coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/index.ts$'],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
 
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  // Clear mocks between tests
+  clearMocks: true,
+
+  // Globals configuration for better-auth and other packages
   globals: {
     'ts-jest': {
-      useESM: true,
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+      },
     },
   },
 };
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+
 export default createJestConfig(config);

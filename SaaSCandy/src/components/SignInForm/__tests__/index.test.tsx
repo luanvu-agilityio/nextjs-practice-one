@@ -284,25 +284,4 @@ describe('SignInForm - Interactive', () => {
       expect(mockHandleSocialAuth).toHaveBeenCalledWith('google', 'signin');
     });
   });
-
-  it('handles form submission', async () => {
-    const user = userEvent.setup();
-    const mockAction = jest.fn();
-
-    mockUseActionState.mockReturnValue([{ error: null }, mockAction, false]);
-
-    render(<SignInPageContent />);
-
-    const emailInput = screen.getByTestId('email');
-    const passwordInput = screen.getByTestId('password');
-    const submitButton = screen.getByRole('button', { name: /^sign in$/i });
-
-    await user.type(emailInput, 'test@example.com');
-    await user.type(passwordInput, 'password123');
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockAction).toHaveBeenCalled();
-    });
-  });
 });

@@ -10,9 +10,16 @@ exports[`Navbar - Snapshot matches snapshot 1`] = `
     >
       <li>
         <a
-          href="/home"
+          href="/"
         >
           Home
+        </a>
+      </li>
+      <li>
+        <a
+          href="/services"
+        >
+          Services
         </a>
       </li>
       <li>
@@ -27,6 +34,13 @@ exports[`Navbar - Snapshot matches snapshot 1`] = `
           href="/contact"
         >
           Contact
+        </a>
+      </li>
+      <li>
+        <a
+          href="/blog"
+        >
+          Blog
         </a>
       </li>
     </ul>

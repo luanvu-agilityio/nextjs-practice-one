@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AccountPage - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div
+    data-testid="account-page-content"
+  >
+    Account Page Content
+  </div>
+</div>
+`;

@@ -1,0 +1,149 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SignInForm - Snapshot matches snapshot 1`] = `
+<div>
+  <div
+    class="flex flex-col items-center max-w-[1296px] mx-auto px-4 sm:px-6"
+  >
+    <div
+      class="pb-8 sm:pb-12 text-center"
+    >
+      <h2>
+        Sign In
+      </h2>
+      <nav>
+        <ol>
+          <li>
+            <a
+              href="/"
+            >
+              Home
+            </a>
+          </li>
+          <span>
+            /
+          </span>
+          <li>
+            <span>
+              Sign In
+            </span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <div
+      class="py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form"
+    >
+      <div
+        class="flex flex-col gap-6 sm:gap-10"
+      >
+        <div
+          class="flex justify-center"
+        >
+          <a
+            href="/"
+          >
+            <svg
+              class="w-8 h-8 sm:w-10 sm:h-10"
+              data-testid="logo-icon"
+            />
+            <span
+              class="text-2xl sm:text-3xl font-secondary text-primary"
+            >
+              SaaS
+              <span
+                class="font-medium"
+              >
+                Candy
+              </span>
+            </span>
+          </a>
+        </div>
+        <div
+          class="flex flex-col gap-6 sm:gap-8"
+        >
+          <div
+            class="flex flex-col sm:flex-row gap-3 sm:gap-4"
+          >
+            <button
+              data-provider="google"
+            >
+              <span
+                class="hidden sm:inline"
+              >
+                Sign in with Google
+              </span>
+              <span
+                class="sm:hidden"
+              >
+                Google
+              </span>
+            </button>
+            <button
+              data-provider="github"
+            >
+              <span
+                class="hidden sm:inline"
+              >
+                Sign in with GitHub
+              </span>
+              <span
+                class="sm:hidden"
+              >
+                GitHub
+              </span>
+            </button>
+          </div>
+          <div>
+            or
+          </div>
+          <form
+            class="space-y-3 sm:space-y-4"
+            novalidate=""
+          >
+            <input
+              data-testid="email"
+              name="email"
+              placeholder="Email"
+              type="email"
+            />
+            <input
+              data-testid="password"
+              name="password"
+              placeholder="Password"
+              type="password"
+            />
+            <button
+              class="w-full"
+              type="submit"
+              variant="primary"
+            >
+              Sign In
+            </button>
+          </form>
+          <div
+            class="text-center space-y-2 sm:space-y-3"
+          >
+            <button
+              class="text-sm sm:text-md font-regular text-primary hover:text-primary/80 transition-colors"
+            >
+              Forgot Password?
+            </button>
+            <div
+              class="text-sm sm:text-md font-regular text-primary"
+            >
+              Not a member?
+               
+              <a
+                href="/signup"
+              >
+                Sign up
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

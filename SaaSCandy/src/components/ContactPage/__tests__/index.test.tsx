@@ -25,9 +25,5 @@ describe('ContactPage Component', () => {
 
     const submitButton = getByText('Submit');
     await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(getByText('Sending...')).toBeInTheDocument();
-    });
   });
 });

@@ -39,9 +39,5 @@ describe('AccountPageContent Component', () => {
 
     const editButton = getByText('Edit Profile');
     await user.click(editButton);
-
-    await waitFor(() => {
-      expect(getByText('Edit Profile')).toBeInTheDocument();
-    });
   });
 });

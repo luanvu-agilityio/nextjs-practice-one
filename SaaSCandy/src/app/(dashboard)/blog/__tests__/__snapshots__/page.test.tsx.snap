@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Blog Page - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div
+    data-testid="page-layout"
+  >
+    <h1>
+      Blog
+    </h1>
+    <p>
+      Discover a wealth of insightful materials meticulously crafted to provide you with a comprehensive understanding of the latest trends.
+    </p>
+    <div
+      data-testid="blog-page"
+    >
+      Blog Page Content
+    </div>
+  </div>
+</div>
+`;

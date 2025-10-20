@@ -1,84 +1,90 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import Header from '../index';
-import { JSX } from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import Header from '@/components/layout/Header';
+import { useSession } from '@/lib/auth-client';
+import { SessionQueryParams } from 'better-auth';
 
-jest.mock('next/link', () => {
-  const MockedLink = ({
-    children,
-    href,
-  }: {
-    children: React.ReactNode;
-    href: string;
-  }) => {
-    return <a href={href}>{children}</a>;
-  };
-  MockedLink.displayName = 'MockedLink';
-  return MockedLink;
-});
-
-jest.mock('@/components/NavBar', () => {
-  return function Navbar() {
-    return <nav data-testid='navbar'>Navbar</nav>;
-  };
-});
-
-jest.mock('@/components/common', () => ({
-  Button: ({
-    children,
-    ...props
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    children: React.ReactNode;
-  }) => <button {...props}>{children}</button>,
-  Heading: ({
-    content,
-    as,
-    ...props
-  }: {
-    content: string;
-    as?: keyof JSX.IntrinsicElements;
-    [key: string]: unknown;
-  }) => {
-    const Tag = as || 'h1';
-    return <Tag {...props}>{content}</Tag>;
+jest.mock('@/lib/auth-client');
+jest.mock('@/constants', () => ({
+  ROUTES: {
+    SIGN_IN: '/signin',
+    SIGN_UP: '/signup',
   },
+  NAV_LINKS: [
+    { label: 'Home', href: '/' },
+    { label: 'Services', href: '/services' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Blog', href: '/blog' },
+  ],
 }));
 
-jest.mock('@/components/icons/Logo', () => {
-  return function LogoIcon({ className }: { className?: string }) {
-    return <svg data-testid='logo-icon' className={className} />;
-  };
-});
+const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
-jest.mock('@/components/icons/ThemeSwitcherIcon', () => {
-  return function ThemeSwitcherIcon({ className }: { className?: string }) {
-    return <svg data-testid='theme-switcher-icon' className={className} />;
-  };
-});
-
-describe.skip('Header - Snapshot', () => {
-  it('matches snapshot', () => {
-    const { container } = render(<Header />);
-    expect(container).toMatchSnapshot();
+describe('Header - Interactive Tests', () => {
+  beforeEach(() => {
+    mockUseSession.mockReturnValue({
+      data: null,
+      isPending: false,
+      error: null,
+      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+        throw new Error('Function not implemented.');
+      },
+    });
   });
-});
 
-describe.skip('Header - Interactive', () => {
-  it('renders navigation buttons and they are clickable', async () => {
-    const user = userEvent.setup();
+  it('should render logo and brand name', () => {
     render(<Header />);
 
-    const signInButton = screen.getByRole('button', { name: /sign in/i });
-    const signUpButton = screen.getByRole('button', { name: /sign up/i });
+    expect(screen.getByText(/SaaS/)).toBeInTheDocument();
+    expect(screen.getByText(/Candy/)).toBeInTheDocument();
+  });
 
-    expect(signInButton).toBeInTheDocument();
-    expect(signUpButton).toBeInTheDocument();
+  it('should render auth buttons when not authenticated', () => {
+    render(<Header />);
 
-    await user.click(signInButton);
-    await user.click(signUpButton);
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
+    expect(screen.getByText('Sign Up')).toBeInTheDocument();
+  });
 
-    // Verify buttons are interactive (clicks don't throw errors)
-    expect(signInButton).toBeInTheDocument();
-    expect(signUpButton).toBeInTheDocument();
+  it('should show loading skeleton when session is pending', () => {
+    mockUseSession.mockReturnValue({
+      data: null,
+      isPending: true,
+      error: null,
+      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+        throw new Error('Function not implemented.');
+      },
+    });
+
+    const { container } = render(<Header />);
+
+    const skeletons = container.querySelectorAll('.animate-pulse');
+    expect(skeletons.length).toBeGreaterThan(0);
+  });
+
+  it('should toggle mobile auth menu', () => {
+    render(<Header />);
+
+    const toggleButton = screen.getByLabelText('Toggle auth menu');
+
+    // Click to open
+    fireEvent.click(toggleButton);
+
+    // Mobile dropdown should appear (check for backdrop)
+    const backdrop = document.querySelector('.fixed.inset-0');
+    expect(backdrop).toBeInTheDocument();
+  });
+
+  it('should close mobile menu when backdrop clicked', () => {
+    render(<Header />);
+
+    const toggleButton = screen.getByLabelText('Toggle auth menu');
+    fireEvent.click(toggleButton);
+
+    const backdrop = document.querySelector('.fixed.inset-0') as HTMLElement;
+    fireEvent.click(backdrop);
+
+    // Menu should be closed
+    expect(document.querySelector('.fixed.inset-0')).not.toBeInTheDocument();
   });
 });

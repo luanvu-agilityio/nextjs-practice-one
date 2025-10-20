@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AuthSectionSkeleton - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div
+    class="hidden sm:flex items-center gap-4"
+  >
+    <div
+      class="w-20 h-8 bg-gray-200 rounded animate-pulse"
+    />
+    <div
+      class="w-20 h-8 bg-gray-200 rounded animate-pulse"
+    />
+  </div>
+</div>
+`;

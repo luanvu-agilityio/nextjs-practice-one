@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ContentRenderer - Snapshot Tests should match snapshot with all block types 1`] = `
+<div>
+  <div
+    class="prose prose-sm sm:prose-base lg:prose-lg max-w-none "
+  >
+    <h2
+      aria-level="2"
+      class="text-gray-900 font-bold mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl"
+      role="heading"
+    >
+      Test Heading
+    </h2>
+    <p
+      class="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-xs lg:text-lg"
+      role="paragraph"
+    >
+      Test paragraph content
+    </p>
+    <ul
+      class="mb-3 sm:mb-4 pl-4 sm:pl-6 space-y-1 sm:space-y-2"
+    >
+      <li
+        class="text-gray-600 text-sm sm:text-xs"
+      >
+        Item 1
+      </li>
+      <li
+        class="text-gray-600 text-sm sm:text-xs"
+      >
+        Item 2
+      </li>
+      <li
+        class="text-gray-600 text-sm sm:text-xs"
+      >
+        Item 3
+      </li>
+    </ul>
+    <blockquote
+      class="border-l-4 border-primary pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 italic text-gray-700 bg-gray-50 rounded-r"
+    >
+      <p
+        class="text-sm sm:text-xs"
+        role="paragraph"
+      >
+        "Test quote"
+      </p>
+      <cite
+        class="text-xs sm:text-sm text-gray-500"
+      >
+        — 
+        Test Author
+      </cite>
+    </blockquote>
+    <div
+      class="mb-4 sm:mb-6"
+    >
+      <img
+        alt="Test image"
+        class="w-full rounded-lg"
+        data-nimg="1"
+        decoding="async"
+        height="400"
+        loading="lazy"
+        src="/_next/image?url=%2Ftest.jpg&w=1920&q=75"
+        srcset="/_next/image?url=%2Ftest.jpg&w=828&q=75 1x, /_next/image?url=%2Ftest.jpg&w=1920&q=75 2x"
+        style="color: transparent;"
+        width="800"
+      />
+      <p
+        class="text-xs sm:text-sm text-gray-500 text-center mt-2 italic"
+        role="paragraph"
+      >
+        Test caption
+      </p>
+    </div>
+    <pre
+      class="bg-gray-900 text-gray-100 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm"
+    >
+      <code
+        class="language-javascript"
+      >
+        const test = "hello";
+      </code>
+    </pre>
+  </div>
+</div>
+`;

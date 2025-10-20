@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`EditProfileModal - Snapshot Tests should match snapshot when open 1`] = `
+<div
+  aria-hidden="true"
+  data-aria-hidden="true"
+/>
+`;

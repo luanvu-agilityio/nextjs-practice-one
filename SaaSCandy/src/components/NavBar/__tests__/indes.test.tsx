@@ -16,12 +16,17 @@ jest.mock('next/link', () => {
   return MockedLink;
 });
 
-// Mock constants
 jest.mock('@/constants', () => ({
+  ROUTES: {
+    SIGN_IN: '/signin',
+    SIGN_UP: '/signup',
+  },
   NAV_LINKS: [
-    { href: '/home', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
+    { label: 'Home', href: '/' },
+    { label: 'Services', href: '/services' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Blog', href: '/blog' },
   ],
 }));
 

@@ -1,0 +1,242 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BlogDetailLoading - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <section
+    class="py-12 sm:py-16 bg-white"
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+    >
+      <div
+        class="animate-pulse"
+      >
+        <div
+          class="flex items-center gap-4 text-sm mb-7"
+        >
+          <div
+            class="h-4 bg-gray-200 rounded w-20"
+          />
+          <div
+            class="h-4 bg-gray-200 rounded w-24"
+          />
+        </div>
+        <div
+          class="flex items-center justify-between gap-6 mb-6"
+        >
+          <div
+            class="flex-1"
+          >
+            <div
+              class="h-8 bg-gray-200 rounded w-full mb-2"
+            />
+            <div
+              class="h-8 bg-gray-200 rounded w-3/4"
+            />
+          </div>
+          <div
+            class="flex items-center justify-end gap-6 w-76.5"
+          >
+            <div
+              class="w-20 h-20 bg-gray-200 rounded-full"
+            />
+            <div
+              class="flex flex-col"
+            >
+              <div
+                class="h-6 bg-gray-200 rounded w-24 mb-1"
+              />
+              <div
+                class="h-6 bg-gray-200 rounded w-16"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="mb-8"
+        >
+          <div
+            class="w-full h-[440px] bg-gray-200 rounded-3xl"
+          />
+        </div>
+        <div
+          class="flex items-start justify-between gap-6"
+        >
+          <article
+            class="flex-1"
+          >
+            <div
+              class="mb-8 space-y-6"
+            >
+              <div
+                class="h-8 bg-gray-200 rounded w-2/3"
+              />
+              <div
+                class="space-y-4"
+              >
+                <div
+                  class="h-4 bg-gray-200 rounded w-full"
+                />
+                <div
+                  class="h-4 bg-gray-200 rounded w-11/12"
+                />
+                <div
+                  class="h-4 bg-gray-200 rounded w-full"
+                />
+                <div
+                  class="h-4 bg-gray-200 rounded w-5/6"
+                />
+              </div>
+              <div
+                class="space-y-3"
+              >
+                <div
+                  class="flex items-start gap-2"
+                >
+                  <div
+                    class="w-2 h-2 bg-gray-200 rounded-full mt-2"
+                  />
+                  <div
+                    class="h-4 bg-gray-200 rounded flex-1"
+                  />
+                </div>
+                <div
+                  class="flex items-start gap-2"
+                >
+                  <div
+                    class="w-2 h-2 bg-gray-200 rounded-full mt-2"
+                  />
+                  <div
+                    class="h-4 bg-gray-200 rounded flex-1"
+                  />
+                </div>
+                <div
+                  class="flex items-start gap-2"
+                >
+                  <div
+                    class="w-2 h-2 bg-gray-200 rounded-full mt-2"
+                  />
+                  <div
+                    class="h-4 bg-gray-200 rounded flex-1"
+                  />
+                </div>
+              </div>
+              <div
+                class="space-y-4"
+              >
+                <div
+                  class="h-4 bg-gray-200 rounded w-full"
+                />
+                <div
+                  class="h-4 bg-gray-200 rounded w-4/5"
+                />
+                <div
+                  class="h-4 bg-gray-200 rounded w-full"
+                />
+              </div>
+            </div>
+            <div
+              class="border-t pt-8 mb-8"
+            >
+              <div
+                class="h-7 bg-gray-200 rounded w-16 mb-4"
+              />
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <div
+                  class="h-6 bg-gray-200 rounded-full w-16"
+                />
+                <div
+                  class="h-6 bg-gray-200 rounded-full w-14"
+                />
+                <div
+                  class="h-6 bg-gray-200 rounded-full w-20"
+                />
+              </div>
+            </div>
+            <div
+              class="border-t pt-8 mb-8"
+            >
+              <div
+                class="h-7 bg-gray-200 rounded w-16 mb-4"
+              />
+              <ul
+                class="space-y-2"
+              >
+                <li>
+                  <div
+                    class="h-5 bg-gray-200 rounded w-20"
+                  />
+                </li>
+                <li>
+                  <div
+                    class="h-5 bg-gray-200 rounded w-16"
+                  />
+                </li>
+                <li>
+                  <div
+                    class="h-5 bg-gray-200 rounded w-18"
+                  />
+                </li>
+              </ul>
+            </div>
+            <div
+              class="border-t pt-8"
+            >
+              <div
+                class="h-10 bg-gray-200 rounded w-48 mb-4"
+              />
+              <div
+                class="space-y-4"
+              >
+                <div
+                  class="h-12 bg-gray-200 rounded"
+                />
+                <div
+                  class="h-12 bg-gray-200 rounded w-32"
+                />
+              </div>
+            </div>
+          </article>
+          <div
+            class="sticky w-104 py-12 px-11 space-y-12 shadow-form rounded-lg"
+          >
+            <div
+              class="space-y-3"
+            >
+              <div
+                class="h-10 bg-gray-200 rounded w-16 mb-4"
+              />
+              <div
+                class="h-10 bg-gray-200 rounded"
+              />
+              <div
+                class="h-10 bg-gray-200 rounded"
+              />
+              <div
+                class="h-10 bg-gray-200 rounded"
+              />
+            </div>
+            <div>
+              <div
+                class="h-10 bg-gray-200 rounded w-48 mb-4"
+              />
+              <div
+                class="space-y-4"
+              >
+                <div
+                  class="h-12 bg-gray-200 rounded"
+                />
+                <div
+                  class="h-12 bg-gray-200 rounded"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;

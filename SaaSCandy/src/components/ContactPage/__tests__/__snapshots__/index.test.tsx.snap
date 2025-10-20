@@ -1,6 +1,6 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`ContactPage Component > matches snapshot 1`] = `
+exports[`ContactPage Component matches snapshot 1`] = `
 <div>
   <section
     class="py-12 sm:py-16 bg-white"

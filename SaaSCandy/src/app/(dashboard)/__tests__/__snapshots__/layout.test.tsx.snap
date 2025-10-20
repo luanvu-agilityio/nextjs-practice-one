@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`DashboardLayout - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div>
+    <div>
+      Test Content
+    </div>
+  </div>
+</div>
+`;
