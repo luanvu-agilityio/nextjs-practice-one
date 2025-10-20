@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 // Components
 import { Heading } from '@/components/common';
+import { Skeleton } from '@/components/common/Skeleton';
 
 interface BlogCardProps {
   slug: string;
@@ -50,4 +51,19 @@ function BlogCard({ slug, title, image, date }: Readonly<BlogCardProps>) {
     </article>
   );
 }
-export { BlogCard };
+
+function BlogCardSkeleton() {
+  return (
+    <article className='group'>
+      <div className='block rounded-lg overflow-hidden bg-white'>
+        <Skeleton className='object-cover w-full h-48 sm:h-60 lg:h-71' />
+        <div className='flex flex-col gap-3 sm:gap-4 py-6 sm:py-8 lg:py-10 px-4 sm:px-0'>
+          <Skeleton className='h-6 sm:h-7 w-3/4 mb-2' />
+          <Skeleton className='h-4 w-1/4' />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export { BlogCard, BlogCardSkeleton };
