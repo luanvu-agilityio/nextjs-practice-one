@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Section > matches snapshot 1`] = `
+<div>
+  <section
+    class="py-12 sm:py-16 "
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+    >
+      <div
+        class="mb-8 sm:mb-12 "
+      >
+        <h2
+          aria-level="2"
+          class="text-gray-900 font-bold mb-3 sm:mb-4 text-2xl sm:text-4xl lg:text-5xl"
+          role="heading"
+        >
+          Test Title
+        </h2>
+        <p
+          class="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto sm:text-lg"
+          role="paragraph"
+        >
+          Test Subtitle
+        </p>
+      </div>
+      <div>
+        Content
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
 exports[`Section matches snapshot 1`] = `
 <div>
   <section

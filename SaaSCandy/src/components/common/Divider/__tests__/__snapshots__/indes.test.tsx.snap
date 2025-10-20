@@ -1,5 +1,30 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Divider > renders match snapshot 1`] = `
+<div>
+  <div
+    class="relative flex items-center justify-center "
+  >
+    <div
+      class="absolute inset-0 flex items-center"
+    >
+      <div
+        class="w-full border-t border-gray-200"
+      />
+    </div>
+    <div
+      class="relative bg-white px-4"
+    >
+      <span
+        class="text-sm text-gray-500 font-medium"
+      >
+        OR
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Divider renders match snapshot 1`] = `
 <div>
   <div

@@ -1,0 +1,392 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ContactPage Component > matches snapshot 1`] = `
+<div>
+  <section
+    class="py-12 sm:py-16 bg-white"
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+    >
+      <div
+        class="flex flex-col items-center gap-8 sm:gap-12 lg:gap-16"
+      >
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 w-full"
+        >
+          <div
+            class="flex items-start gap-3 sm:gap-4"
+          >
+            <svg
+              class="w-12 h-12 sm:w-16 sm:h-16 lg:w-17 lg:h-17 flex-shrink-0"
+              fill="none"
+              height="48"
+              viewBox="0 0 68 68"
+              width="48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                fill="#FFDFAF"
+                height="68"
+                rx="34"
+                width="68"
+              />
+              <g
+                clip-path="url(#clip0_47_5617)"
+              >
+                <mask
+                  height="36"
+                  id="mask0_47_5617"
+                  maskUnits="userSpaceOnUse"
+                  width="36"
+                  x="16"
+                  y="16"
+                >
+                  <path
+                    d="M52 16H16V52H52V16Z"
+                    fill="white"
+                  />
+                </mask>
+                <g
+                  mask="url(#mask0_47_5617)"
+                >
+                  <path
+                    d="M16.4289 28.8623L18.1797 27.5707V33.3117L16 32.2268V29.711C16 29.3764 16.1589 29.0614 16.4289 28.8623Z"
+                    fill="#1642B9"
+                  />
+                  <path
+                    d="M52 29.711V32.2268L49.8203 33.3117V27.5707L51.5711 28.8623C51.8411 29.0614 52 29.3764 52 29.711Z"
+                    fill="#1642B9"
+                  />
+                  <path
+                    d="M52 34.5829V50.9453C52 51.5276 51.5274 52 50.9453 52H17.0547C16.4725 52 16 51.5276 16 50.9453V34.5829C17.0577 35.1097 32.4978 42.7978 33.5296 43.3115C33.678 43.3853 33.839 43.4219 34 43.4219C34.161 43.4219 34.322 43.3853 34.4704 43.3115C35.4738 42.812 51.7636 34.7006 52 34.5829Z"
+                    fill="#1642B9"
+                  />
+                  <path
+                    d="M37.1641 18.1094H30.8359L33.3672 16.2109C33.742 15.9297 34.2581 15.9297 34.6329 16.2109L37.1641 18.1094Z"
+                    fill="#1642B9"
+                  />
+                  <path
+                    d="M46.6562 20.2188H21.3438C20.7616 20.2188 20.2891 20.6913 20.2891 21.2734V34.3621L34 41.1894L47.7109 34.3621V21.2734C47.7109 20.6913 47.2385 20.2188 46.6562 20.2188ZM34 32.875H27.6718C27.0897 32.875 26.6171 32.4025 26.6171 31.8203C26.6171 31.2382 27.0897 30.7656 27.6718 30.7656H34C34.5821 30.7656 35.0547 31.2382 35.0547 31.8203C35.0547 32.4025 34.5821 32.875 34 32.875ZM40.3282 28.6562H27.6718C27.0897 28.6562 26.6171 28.1838 26.6171 27.6015C26.6171 27.0194 27.0897 26.5469 27.6718 26.5469H40.3282C40.9103 26.5469 41.3829 27.0194 41.3829 27.6015C41.3829 28.1838 40.9103 28.6562 40.3282 28.6562Z"
+                    fill="white"
+                  />
+                </g>
+              </g>
+              <defs>
+                <clippath
+                  id="clip0_47_5617"
+                >
+                  <rect
+                    fill="white"
+                    height="36"
+                    transform="translate(16 16)"
+                    width="36"
+                  />
+                </clippath>
+              </defs>
+            </svg>
+            <div
+              class="space-y-3 sm:space-y-4 lg:space-y-5"
+            >
+              <p
+                class="font-bold text-lg sm:text-xl lg:text-2xl"
+                role="paragraph"
+              >
+                Email Us
+              </p>
+              <div
+                class="space-y-1"
+              >
+                <p
+                  class="text-gray-background text-sm sm:xs lg:text-lg font-regular"
+                  role="paragraph"
+                >
+                  Feel free to contact us at
+                </p>
+                <p
+                  class="text-gray-background text-sm sm:xs lg:text-lg font-regular break-words"
+                  role="paragraph"
+                >
+                  info@saascandy.com
+                </p>
+                <p
+                  class="text-gray-background text-sm sm:xs lg:text-lg font-regular"
+                  role="paragraph"
+                >
+                  We respond promptly
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-3 sm:gap-4"
+          >
+            <svg
+              class="w-12 h-12 sm:w-16 sm:h-16 lg:w-17 lg:h-17 flex-shrink-0"
+              fill="none"
+              height="48"
+              viewBox="0 0 69 68"
+              width="48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                fill="#FFDFAF"
+                height="68"
+                rx="34"
+                width="68"
+                x="0.5"
+              />
+              <path
+                d="M37.401 20.1555H31.5983C31.406 20.1555 31.2214 20.0832 31.0855 19.9547C30.9494 19.8261 30.873 19.6517 30.873 19.4699V16.7277C30.873 16.5459 30.9494 16.3715 31.0855 16.243C31.2214 16.1144 31.406 16.0422 31.5983 16.0422H37.401C37.5933 16.0422 37.7778 16.1144 37.9138 16.243C38.0499 16.3715 38.1262 16.5459 38.1262 16.7277V19.4699C38.1262 19.6517 38.0499 19.8261 37.9138 19.9547C37.7778 20.0832 37.5933 20.1555 37.401 20.1555ZM32.3236 18.7844H36.6757V17.4133H32.3236V18.7844Z"
+                fill="white"
+              />
+              <path
+                d="M37.4021 27.0109C37.4015 27.5561 37.172 28.0789 36.7641 28.4645C36.3561 28.8501 35.803 29.067 35.2261 29.0675H33.7755C33.1986 29.067 32.6455 28.8501 32.2376 28.4645C31.8296 28.0789 31.6002 27.5561 31.5995 27.0109H28.6982C27.6598 27.0112 26.6466 26.7086 25.7969 26.1445V33.1807C25.7969 33.3627 25.8732 33.537 26.0093 33.6655C26.1454 33.7941 26.3298 33.8663 26.5221 33.8663H42.4795C42.6718 33.8663 42.8563 33.7941 42.9923 33.6655C43.1284 33.537 43.2048 33.3627 43.2048 33.1807V26.1445C42.355 26.7086 41.3419 27.0112 40.3035 27.0109H37.4021Z"
+                fill="white"
+              />
+              <path
+                d="M43.2035 18.7844H25.7956C25.6033 18.7844 25.4187 18.8566 25.2827 18.9852C25.1467 19.1137 25.0703 19.2881 25.0703 19.4699V22.2121C25.0714 23.1209 25.4538 23.9921 26.1337 24.6347C26.8136 25.2773 27.7354 25.6388 28.6969 25.6398H31.5982C31.5989 25.0946 31.8283 24.5718 32.2363 24.1862C32.6442 23.8007 33.1973 23.5838 33.7743 23.5832H35.2248C35.8018 23.5838 36.3548 23.8007 36.7628 24.1862C37.1707 24.5718 37.4002 25.0946 37.4009 25.6398H40.3022C41.2636 25.6388 42.1854 25.2773 42.8654 24.6347C43.5452 23.9921 43.9277 23.1209 43.9288 22.2121V19.4699C43.9288 19.2881 43.8524 19.1137 43.7163 18.9852C43.5804 18.8566 43.3958 18.7844 43.2035 18.7844Z"
+                fill="white"
+              />
+              <path
+                d="M35.2248 24.9543H33.7742C33.3736 24.9543 33.0488 25.2612 33.0488 25.6398V27.0109C33.0488 27.3895 33.3736 27.6965 33.7742 27.6965H35.2248C35.6254 27.6965 35.9501 27.3895 35.9501 27.0109V25.6398C35.9501 25.2612 35.6254 24.9543 35.2248 24.9543Z"
+                fill="white"
+              />
+              <path
+                d="M20.7194 36.4257H14.9167C14.5161 36.4257 14.1914 36.7327 14.1914 37.1113V50.8222C14.1914 51.2009 14.5161 51.5078 14.9167 51.5078H20.7194C21.12 51.5078 21.4447 51.2009 21.4447 50.8222V37.1113C21.4447 36.7327 21.12 36.4257 20.7194 36.4257Z"
+                fill="#1642B9"
+              />
+              <path
+                d="M54.0235 32.6572C53.2575 31.9306 52.2343 31.4975 51.1508 31.4413C50.0672 31.3852 49 31.7099 48.1547 32.353L40.8615 37.8673C41.5946 38.4451 42.1844 39.1681 42.5891 39.9852C42.9939 40.8023 43.2036 41.6934 43.2037 42.5957C43.2026 43.5044 42.8201 44.3756 42.1403 45.0182C41.4604 45.6608 40.5386 46.0223 39.5772 46.0234H30.8732C30.6808 46.0234 30.4963 45.9512 30.3603 45.8226C30.2242 45.694 30.1478 45.5197 30.1478 45.3379C30.1478 45.1561 30.2242 44.9817 30.3603 44.8531C30.4963 44.7245 30.6808 44.6523 30.8732 44.6523H39.5772C40.154 44.6517 40.7071 44.4348 41.115 44.0493C41.523 43.6637 41.7524 43.141 41.7531 42.5957C41.7524 41.8348 41.56 41.0851 41.1919 40.4086C40.8238 39.732 40.2905 39.148 39.6362 38.7049C39.4556 38.5799 39.2662 38.4666 39.0694 38.3659C39.0128 38.3371 38.9533 38.3134 38.8953 38.2866C38.736 38.2129 38.5728 38.1473 38.406 38.0902C38.3448 38.0691 38.2849 38.0455 38.2227 38.0266C38.0104 37.9633 37.7939 37.9132 37.5747 37.877C37.5161 37.867 37.4566 37.8593 37.3972 37.8512C37.1584 37.8171 36.9173 37.799 36.6758 37.7969H32.5269C30.6816 36.8629 28.614 36.391 26.5211 36.4257C25.2958 36.4223 24.0757 36.5768 22.8945 36.8851V50.1367H38.3731C39.3101 50.1369 40.2362 49.9462 41.0883 49.5775C41.9404 49.2089 42.6983 48.671 43.3105 48.0004L54.162 36.1258C54.6036 35.6368 54.8345 35.0086 54.8089 34.366C54.7833 33.7235 54.503 33.1135 54.0235 32.6572Z"
+                fill="#1642B9"
+              />
+            </svg>
+            <div
+              class="space-y-3 sm:space-y-4 lg:space-y-5"
+            >
+              <p
+                class="font-bold text-lg sm:text-xl lg:text-2xl"
+                role="paragraph"
+              >
+                Address
+              </p>
+              <div
+                class="space-y-1"
+              >
+                <p
+                  class="text-gray-background text-sm sm:text-xs lg:text-lg font-regular"
+                  role="paragraph"
+                >
+                  2118 Beaver St, London NW1 5XG,
+                </p>
+                <p
+                  class="text-gray-background text-sm sm:text-xs lg:text-lg font-regular"
+                  role="paragraph"
+                >
+                  United Kingdom
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="w-full"
+        >
+          <img
+            alt="Company address"
+            class="w-full h-auto rounded-lg sm:rounded-xl"
+            data-nimg="1"
+            decoding="async"
+            height="446"
+            loading="lazy"
+            src="/_next/image?url=%2Fimages%2Fhero%2Fmap.png&w=3840&q=75"
+            srcset="/_next/image?url=%2Fimages%2Fhero%2Fmap.png&w=1200&q=75 1x, /_next/image?url=%2Fimages%2Fhero%2Fmap.png&w=3840&q=75 2x"
+            style="color: transparent;"
+            width="1170"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    class="py-12 sm:py-16 bg-white"
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+    >
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-7.5 items-start lg:items-center"
+      >
+        <div
+          class="space-y-6 sm:space-y-8 lg:space-y-9 order-2 lg:order-1"
+        >
+          <h4
+            aria-level="4"
+            class="font-semibold max-w-full lg:max-w-70 text-2xl sm:text-3xl lg:text-4xl"
+            role="heading"
+          >
+            Get Online Consultation
+          </h4>
+          <form
+            class="space-y-4 sm:space-y-5"
+          >
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <div
+                class="flex flex-col gap-2 w-full"
+              >
+                <label
+                  class="text-sm font-medium text-placeholder"
+                  for="input-«r0»"
+                >
+                  User Name*
+                </label>
+                <div
+                  class="flex items-center h-11 w-full min-w-0 rounded-lg border text-md transition-colors bg-transparent px-4 py-2.5 focus-within:border-white border-gray-background"
+                >
+                  <input
+                    aria-invalid="false"
+                    class="w-full bg-transparent outline-none placeholder:text-placeholder disabled:pointer-events-none disabled:cursor-not-allowed"
+                    id="input-«r0»"
+                    name="name"
+                    placeholder="Enter your name"
+                    type="text"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div
+                class="flex flex-col gap-2 w-full"
+              >
+                <label
+                  class="text-sm font-medium text-placeholder"
+                  for="input-«r1»"
+                >
+                  Project Name*
+                </label>
+                <div
+                  class="flex items-center h-11 w-full min-w-0 rounded-lg border text-md transition-colors bg-transparent px-4 py-2.5 focus-within:border-white border-gray-background"
+                >
+                  <input
+                    aria-invalid="false"
+                    class="w-full bg-transparent outline-none placeholder:text-placeholder disabled:pointer-events-none disabled:cursor-not-allowed"
+                    id="input-«r1»"
+                    name="projectName"
+                    placeholder="Enter project name"
+                    type="text"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <div
+                class="flex flex-col gap-2 w-full"
+              >
+                <label
+                  class="text-sm font-medium text-placeholder"
+                  for="input-«r2»"
+                >
+                  Email address*
+                </label>
+                <div
+                  class="flex items-center h-11 w-full min-w-0 rounded-lg border text-md transition-colors bg-transparent px-4 py-2.5 focus-within:border-white border-gray-background"
+                >
+                  <input
+                    aria-invalid="false"
+                    class="w-full bg-transparent outline-none placeholder:text-placeholder disabled:pointer-events-none disabled:cursor-not-allowed"
+                    id="input-«r2»"
+                    name="email"
+                    placeholder="Enter your email"
+                    type="email"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  class="block text-sm sm:text-xs font-medium text-primary mb-2"
+                  for="contact-project-type"
+                >
+                  Project*
+                </label>
+                <select
+                  class="w-full px-3 py-2 sm:px-4 sm:py-2.5 text-sm sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-background focus:border-orange-background"
+                  id="contact-project-type"
+                  name="projectType"
+                >
+                  <option
+                    value=""
+                  >
+                    Choose the type of work
+                  </option>
+                  <option
+                    value="web-development"
+                  >
+                    Web Development
+                  </option>
+                  <option
+                    value="mobile-app"
+                  >
+                    Mobile App
+                  </option>
+                  <option
+                    value="design"
+                  >
+                    UI/UX Design
+                  </option>
+                  <option
+                    value="consultation"
+                  >
+                    Consultation
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                class="block text-sm sm:text-xs font-medium text-primary mb-2"
+                for="contact-message"
+              >
+                Message*
+              </label>
+              <textarea
+                class="w-full px-3 py-2 sm:px-4 sm:py-2.5 text-sm sm:text-xs border border-primary rounded-lg focus:ring-2 focus:ring-orange-background focus:border-orange-background resize-none"
+                id="contact-message"
+                name="message"
+                placeholder="Briefly describe your requirements"
+                rows="4"
+              />
+            </div>
+            <button
+              class="inline-flex items-center justify-center font-semibold text-md leading-none tracking-normal rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-orange-background text-white hover:opacity-90 focus-visible:ring-primary px-9 py-5 w-full sm:w-auto"
+              type="submit"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+        <div
+          class="w-full order-1 lg:order-2"
+        >
+          <img
+            alt="Company image"
+            class="w-full h-auto rounded-lg sm:rounded-xl max-w-md lg:max-w-none mx-auto"
+            data-nimg="1"
+            decoding="async"
+            height="570"
+            loading="lazy"
+            src="/_next/image?url=%2Fimages%2Fhero%2Fcontact.png&w=1200&q=75"
+            srcset="/_next/image?url=%2Fimages%2Fhero%2Fcontact.png&w=640&q=75 1x, /_next/image?url=%2Fimages%2Fhero%2Fcontact.png&w=1200&q=75 2x"
+            style="color: transparent;"
+            width="570"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;

@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Skeleton > matches snapshot 1`] = `
+<div>
+  <div
+    class="animate-pulse rounded-md bg-muted"
+  />
+</div>
+`;
+
 exports[`Skeleton matches snapshot 1`] = `
 <div>
   <div

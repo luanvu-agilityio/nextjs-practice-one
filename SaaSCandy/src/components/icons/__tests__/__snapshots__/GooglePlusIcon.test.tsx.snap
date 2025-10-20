@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`AddressIcon > matches snapshot 1`] = `
+<svg
+  fill="none"
+  height="40"
+  viewBox="0 0 40 40"
+  width="40"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect
+    height="39"
+    rx="19.5"
+    stroke="#EE7B11"
+    width="39"
+    x="0.5"
+    y="0.5"
+  />
+  <path
+    d="M31 19H29V17H27V19H25V21H27V23H29V21H31M16 19V21.4H20C19.8 22.4 18.8 24.4 16 24.4C13.6 24.4 11.7 22.4 11.7 20C11.7 17.6 13.6 15.6 16 15.6C17.4 15.6 18.3 16.2 18.8 16.7L20.7 14.9C19.5 13.7 17.9 13 16 13C12.1 13 9 16.1 9 20C9 23.9 12.1 27 16 27C20 27 22.7 24.2 22.7 20.2C22.7 19.7 22.7 19.4 22.6 19H16Z"
+    fill="#EE7B11"
+  />
+</svg>
+`;
+
 exports[`AddressIcon matches snapshot 1`] = `
 <svg
   fill="none"

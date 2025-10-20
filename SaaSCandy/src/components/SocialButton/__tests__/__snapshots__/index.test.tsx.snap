@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`SocialButton - Snapshot > matches snapshot 1`] = `
+<div>
+  <button
+    aria-label="Sign in with google"
+    class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-xl text-md font-medium transition-colors border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+    data-provider="google"
+  >
+    <svg
+      class="w-5 h-5"
+      data-testid="mock-icon"
+    >
+      <path />
+    </svg>
+    Continue with Google
+  </button>
+</div>
+`;
+
 exports[`SocialButton - Snapshot matches snapshot 1`] = `
 <div>
   <button

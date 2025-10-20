@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Dialog Components > renders Dialog with content correctly 1`] = `
+<div
+  aria-hidden="true"
+  data-aria-hidden="true"
+/>
+`;
+
 exports[`Dialog Components renders Dialog with content correctly 1`] = `
 <div
   aria-hidden="true"
