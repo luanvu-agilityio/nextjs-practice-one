@@ -29,7 +29,7 @@ describe('HeroSection - Snapshot Tests', () => {
       data: null,
       isPending: false,
       error: null,
-      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+      refetch: function (): void {
         throw new Error('Function not implemented.');
       },
     });
@@ -52,7 +52,7 @@ describe('HeroSection - Snapshot Tests', () => {
       data: null,
       isPending: true,
       error: null,
-      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+      refetch: function (): void {
         throw new Error('Function not implemented.');
       },
     });

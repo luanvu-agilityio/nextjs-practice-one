@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AccountPageContent from '../index';
 import { useSession } from '@/lib/auth-client';

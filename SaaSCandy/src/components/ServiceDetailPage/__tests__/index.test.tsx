@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import ServiceDetailPage from '../index';
 import { Service } from '@/types';
+import Image from 'next/image';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -12,7 +13,7 @@ jest.mock('next/image', () => ({
     src: string;
     alt: string;
     className: string;
-  }) => <img src={src} alt={alt} className={className} />,
+  }) => <Image src={src} alt={alt} className={className} />,
 }));
 
 jest.mock('../../common/Section', () => ({

@@ -1,7 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import ChangePasswordModal from '../index';
-import { changePassword } from '@/service';
-import { showToast } from '@/components/common';
 
 jest.mock('@/lib/auth-client', () => ({
   useSession: () => ({

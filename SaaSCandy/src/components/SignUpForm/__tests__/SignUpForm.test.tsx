@@ -1,5 +1,5 @@
 // src/components/SignUpForm/__tests__/SignUpForm.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import { SignUpForm } from '../SignUpForm';

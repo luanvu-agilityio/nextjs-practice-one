@@ -1,7 +1,4 @@
-// Service Detail Page Tests
-import ServicePage, {
-  generateMetadata,
-} from '@/app/(dashboard)/services/[slug]/page';
+import { generateMetadata } from '@/app/(dashboard)/services/[slug]/page';
 import { getServiceBySlug } from '@/helpers';
 
 jest.mock('next/navigation', () => ({
