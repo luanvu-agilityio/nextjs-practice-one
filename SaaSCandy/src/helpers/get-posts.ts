@@ -6,7 +6,12 @@ export const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
 };
 
 export const getAllPosts = async (): Promise<BlogPost[]> => {
-  return await blogService.getAllPosts();
+  try {
+    return await blogService.getAllPosts();
+  } catch (error) {
+    console.error('Error fetching all posts:', error);
+    return [];
+  }
 };
 
 export const getRecentPosts = async (
