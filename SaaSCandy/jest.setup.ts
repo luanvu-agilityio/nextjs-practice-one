@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 
 global.Request = jest.fn();
+// @ts-expect-error: Response may not exist on global in the Node.js environment
 global.Response = jest.fn();
 global.Headers = jest.fn();
 global.fetch = jest.fn();
