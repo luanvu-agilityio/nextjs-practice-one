@@ -72,7 +72,7 @@ function JoinUsSection() {
 
               <div className='flex items-center gap-3'>
                 <Image
-                  src='/images/avatar/merky-lester.png'
+                  src='https://res.cloudinary.com/dhxpzzz5a/image/upload/v1760984406/avatar-6_bvm1tg.jpg'
                   alt='Merky Lester'
                   width={53}
                   height={53}
