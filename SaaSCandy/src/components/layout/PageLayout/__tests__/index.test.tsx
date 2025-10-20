@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import PageLayout from '@/components/layout/PageLayout';
 import { useSession } from '@/lib/auth-client';
 import { usePathname } from 'next/navigation';
-import { SessionQueryParams } from 'better-auth';
 
 jest.mock('@/lib/auth-client');
 jest.mock('next/navigation', () => ({
@@ -90,7 +89,7 @@ describe('PageLayout - Interactive Tests', () => {
       data: null,
       isPending: false,
       error: null,
-      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+      refetch: function (): void {
         throw new Error('Function not implemented.');
       },
       isRefetching: false,
@@ -180,7 +179,7 @@ describe('PageLayout - Interactive Tests', () => {
       },
       isPending: false,
       error: null,
-      refetch: function (queryParams?: { query?: SessionQueryParams }): void {
+      refetch: function (): void {
         throw new Error('Function not implemented.');
       },
       isRefetching: false,

@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import HeroSection from '@/components/HeroSection';
 import { useSession } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
-import { SessionQueryParams } from 'better-auth';
 
 jest.mock('@/lib/auth-client');
 jest.mock('next/navigation', () => ({
@@ -32,6 +31,7 @@ describe('HeroSection - Snapshot Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
+      isRefetching: false,
     });
   });
 
@@ -55,6 +55,7 @@ describe('HeroSection - Snapshot Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
+      isRefetching: false,
     });
 
     render(<HeroSection />);

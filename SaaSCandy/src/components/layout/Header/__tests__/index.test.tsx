@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Header from '@/components/layout/Header';
 import { useSession } from '@/lib/auth-client';
-import { SessionQueryParams } from 'better-auth';
 
 jest.mock('@/lib/auth-client');
 jest.mock('@/constants', () => ({
@@ -22,13 +21,14 @@ const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 describe('Header - Interactive Tests', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue({
+    return mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
+      isRefetching: false,
     });
   });
 
@@ -54,6 +54,7 @@ describe('Header - Interactive Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
+      isRefetching: false,
     });
 
     const { container } = render(<Header />);

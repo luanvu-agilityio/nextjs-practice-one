@@ -30,8 +30,8 @@ describe('BlogPage Component', () => {
     (getAllPosts as jest.Mock).mockResolvedValue(mockPosts);
   });
 
-  it('matches snapshot', async () => {
-    const { container } = await BlogPage();
+  it('matches snapshot', () => {
+    const { container } = render(<BlogPage />);
     expect(container).toMatchSnapshot();
   });
 

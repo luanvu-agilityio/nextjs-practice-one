@@ -9,7 +9,7 @@ const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 describe('EditProfileModal - Snapshot Tests', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue({
+    return mockUseSession.mockReturnValue({
       data: {
         user: {
           id: '123',
@@ -33,6 +33,7 @@ describe('EditProfileModal - Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
   });
 
