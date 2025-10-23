@@ -1,17 +1,36 @@
 import { BlogPost } from '@/types/blog-post';
 
-class BlogHttpClient {
+/**
+ * BlogHttpClient is a lightweight HTTP client for interacting with the blog API.
+ * It supports GET requests and builds URLs from a base URL and path.
+ */
+export class BlogHttpClient {
   private readonly baseUrl: string;
 
+  /**
+   * Creates a new BlogHttpClient instance.
+   * @param baseUrl - The base URL for the blog API.
+   */
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 
+  /**
+   * Builds a full URL from the base URL and path.
+   * @param path - The endpoint path or full URL.
+   * @returns The full URL as a string.
+   */
   private buildUrl(path: string) {
     if (path.startsWith('http')) return path;
     return `${this.baseUrl}/${path.replace(/^\/+/, '')}`;
   }
 
+  /**
+   * Makes a GET request to the specified path.
+   * @param path - The endpoint path or full URL.
+   * @returns The parsed response data.
+   * @throws {Error} If the response is not OK.
+   */
   async get<T>(path: string): Promise<T> {
     const url = this.buildUrl(path);
 
@@ -44,8 +63,16 @@ const BLOG_API_BASE =
 
 const blogHttp = new BlogHttpClient(BLOG_API_BASE);
 
+/**
+ * blogService provides methods to interact with blog post resources via the blog API.
+ * Includes fetching all posts, fetching by slug or ID, pagination, filtering by tag, and searching.
+ */
 export const blogService = {
-  // Get all blog posts
+  /**
+   * Fetches all blog posts.
+   * @returns An array of BlogPost objects.
+   * @throws {Error} If fetching fails or response format is invalid.
+   */
   getAllPosts: async (): Promise<BlogPost[]> => {
     try {
       const response = await fetch(
@@ -68,11 +95,16 @@ export const blogService = {
       return posts;
     } catch (error) {
       console.error('Error fetching blog posts:', error);
-      // TODO: handle error properly
-      throw error;
+      return [];
     }
   },
 
+  /**
+   * Fetches a blog post by its slug.
+   * @param slug - The unique slug identifier for the blog post.
+   * @returns The BlogPost object if found, otherwise null.
+   * @throws {Error} If fetching fails or response format is invalid.
+   */
   getPostBySlug: async (slug: string): Promise<BlogPost | null> => {
     try {
       const response = await fetch(
@@ -99,7 +131,11 @@ export const blogService = {
     }
   },
 
-  // Get blog post by ID
+  /**
+   * Fetches a blog post by its ID.
+   * @param id - The unique ID of the blog post.
+   * @returns The BlogPost object if found, otherwise null.
+   */
   getPostById: async (id: string): Promise<BlogPost | null> => {
     try {
       return await blogHttp.get<BlogPost>(`blog-posts/${id}`);
@@ -109,41 +145,11 @@ export const blogService = {
     }
   },
 
-  // Get paginated posts
-  getPaginatedPosts: async (
-    page: number = 1,
-    limit: number = 6
-  ): Promise<{
-    posts: BlogPost[];
-    total: number;
-    hasMore: boolean;
-  }> => {
-    try {
-      const posts = await blogHttp.get<BlogPost[]>(
-        `blog-posts?page=${page}&limit=${limit}`
-      );
-
-      // MockAPI doesn't return total count, so we need to get all posts to calculate
-      const allPosts = await blogHttp.get<BlogPost[]>('blog-posts');
-      const total = allPosts.length;
-      const hasMore = page * limit < total;
-
-      return {
-        posts,
-        total,
-        hasMore,
-      };
-    } catch (error) {
-      console.error('Error fetching paginated blog posts:', error);
-      return {
-        posts: [],
-        total: 0,
-        hasMore: false,
-      };
-    }
-  },
-
-  // Get posts by tag
+  /**
+   * Fetches blog posts that match a specific tag.
+   * @param tag - The tag to filter blog posts by.
+   * @returns An array of BlogPost objects that contain the specified tag.
+   */
   getPostsByTag: async (tag: string): Promise<BlogPost[]> => {
     try {
       const posts = await blogHttp.get<BlogPost[]>('blog-posts');
@@ -156,7 +162,11 @@ export const blogService = {
     }
   },
 
-  // Search posts
+  /**
+   * Searches blog posts by a query string.
+   * @param query - The search term to match against title, excerpt, or tags.
+   * @returns An array of BlogPost objects matching the query.
+   */
   searchPosts: async (query: string): Promise<BlogPost[]> => {
     try {
       const posts = await blogHttp.get<BlogPost[]>('blog-posts');

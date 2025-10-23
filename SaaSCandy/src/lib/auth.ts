@@ -1,5 +1,17 @@
 'use server';
 
+/**
+ * Server-side authentication actions for sign-in, sign-up, and sign-out.
+ *
+ * - Uses MockAPI for demo authentication and registration.
+ * - Returns AuthState objects for UI feedback.
+ * - Handles errors and redirects on sign-out.
+ *
+ * Usage:
+ *   await signInAction(formData);
+ *   await signUpAction(formData);
+ *   await signOutAction();
+ */
 import { redirect } from 'next/navigation';
 import { authApi } from '@/api';
 import { ROUTES } from '@/constants';

@@ -20,8 +20,18 @@ export interface RegisterPayload {
 
 const USERS_ENDPOINT = 'users';
 
+/**
+ * authApi provides methods for user authentication and user management via MockAPI.
+ * Includes login, registration, user lookup, update, and password verification.
+ */
 export const authApi = {
-  // NOT used for actual authentication - only for MockAPI sync
+  /**
+   * Authenticates a user by email and password.
+   * NOT used for actual authentication - only for MockAPI sync.
+   * @param payload - Login credentials.
+   * @returns AuthResponse with token and user data.
+   * @throws {Error} If credentials are invalid or request fails.
+   */
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     try {
       const users = await http.get<User[]>(
@@ -43,7 +53,12 @@ export const authApi = {
     }
   },
 
-  // Sync new users to MockAPI
+  /**
+   * Registers a new user and syncs to MockAPI.
+   * @param payload - Registration data.
+   * @returns AuthResponse with token and user data.
+   * @throws {Error} If registration fails.
+   */
   register: async (payload: RegisterPayload): Promise<AuthResponse> => {
     try {
       const userData = {
@@ -70,7 +85,11 @@ export const authApi = {
     }
   },
 
-  // Find user by email
+  /**
+   * Finds a user by email.
+   * @param email - The user's email address.
+   * @returns The User object if found, otherwise null.
+   */
   findByEmail: async (email: string): Promise<User | null> => {
     try {
       const users = await http.get<User[]>(
@@ -83,6 +102,12 @@ export const authApi = {
     }
   },
 
+  /**
+   * Fetches a user by ID.
+   * @param id - The user's unique ID.
+   * @returns The User object.
+   * @throws {Error} If fetching fails.
+   */
   getUser: async (id: string): Promise<User> => {
     try {
       return await http.get<User>(`${USERS_ENDPOINT}/${id}`);
@@ -92,6 +117,13 @@ export const authApi = {
     }
   },
 
+  /**
+   * Updates a user's data.
+   * @param id - The user's unique ID.
+   * @param patch - Partial user data to update.
+   * @returns The updated User object.
+   * @throws {Error} If update fails.
+   */
   updateUser: async (id: string, patch: UpdateUserData): Promise<User> => {
     try {
       const updateData = { ...patch };
@@ -107,6 +139,13 @@ export const authApi = {
     }
   },
 
+  /**
+   * Verifies a user's current password.
+   * @param id - The user's unique ID.
+   * @param currentPassword - The current password to verify.
+   * @returns True if the password matches, false otherwise.
+   * @throws {Error} If verification fails.
+   */
   verifyPassword: async (
     id: string,
     currentPassword: string

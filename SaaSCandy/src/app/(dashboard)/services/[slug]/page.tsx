@@ -40,6 +40,7 @@ export default function ServicePage({ params }: Readonly<ServicePageProps>) {
 
   if (!service) {
     notFound();
+    return null;
   }
 
   return (

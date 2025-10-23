@@ -3,23 +3,18 @@ import userEvent from '@testing-library/user-event';
 import SignInPageContent from '../index';
 
 const mockPush = jest.fn();
+const mockRefresh = jest.fn();
 const mockPathname = '/signin';
 const mockSignIn = jest.fn();
-const mockSignInAction = jest.fn();
 const mockHandleSocialAuth = jest.fn();
 const mockShowToast = jest.fn();
-
-// Mock useActionState
-const mockUseActionState = jest.fn();
-
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  useActionState: (...args: unknown[]) => mockUseActionState(...args),
-}));
+const mockSend2FACode = jest.fn();
+const mockVerify2FACode = jest.fn();
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
+    refresh: mockRefresh,
   }),
   usePathname: () => mockPathname,
 }));
@@ -38,20 +33,30 @@ jest.mock('next/link', () => {
   return MockedLink;
 });
 
-jest.mock('better-auth/react', () => ({
-  signIn: (...args: unknown[]) => mockSignIn(...args),
+jest.mock('@/lib/auth-client', () => ({
+  signIn: {
+    email: (...args: unknown[]) => mockSignIn(...args),
+  },
 }));
 
-jest.mock('@/lib/auth', () => ({
-  signInAction: (...args: unknown[]) => mockSignInAction(...args),
+jest.mock('@/service', () => ({
+  send2FACode: (...args: unknown[]) => mockSend2FACode(...args),
+  verify2FACode: (...args: unknown[]) => mockVerify2FACode(...args),
 }));
 
-jest.mock('@/utils/auth', () => ({
+jest.mock('@/utils/social-auth', () => ({
+  handleSocialAuth: (...args: unknown[]) => mockHandleSocialAuth(...args),
+}));
+
+jest.mock('@/utils', () => ({
+  signInSchema: jest.requireActual('zod').z.object({
+    email: jest.requireActual('zod').z.string().email(),
+    password: jest.requireActual('zod').z.string().min(1),
+  }),
   extractBreadcrumbs: jest.fn(() => [
     { label: 'Home', href: '/', isActive: false },
     { label: 'Sign In', href: '/signin', isActive: true },
   ]),
-  handleSocialAuth: (...args: unknown[]) => mockHandleSocialAuth(...args),
 }));
 
 // Mock Toast component
@@ -123,9 +128,9 @@ jest.mock('@/constants', () => ({
 jest.mock('react-hook-form', () => ({
   useForm: jest.fn(() => ({
     control: {},
-    handleSubmit: jest.fn(fn => (e: Event) => {
-      e.preventDefault();
-      fn({ email: 'test@example.com', password: 'password123' });
+    handleSubmit: jest.fn(fn => (e?: Event) => {
+      e?.preventDefault();
+      return fn({ email: 'test@example.com', password: 'password123' });
     }),
     formState: {
       isSubmitting: false,
@@ -243,18 +248,46 @@ jest.mock('@/components/icons/Logo', () => {
   };
 });
 
-jest.mock('@/utils', () => ({
-  signInSchema: jest.requireActual('zod').z.object({
-    email: jest.requireActual('zod').z.string().email(),
-    password: jest.requireActual('zod').z.string().min(1),
-  }),
+jest.mock('../SignInForm', () => ({
+  SignInForm: ({
+    onSubmit,
+    onSocialSignIn,
+  }: {
+    onSubmit: () => void;
+    onSocialSignIn: (provider: string) => void;
+  }) => (
+    <div data-testid='signin-form'>
+      <button onClick={onSubmit}>Submit</button>
+      <button onClick={() => onSocialSignIn('google')}>
+        Sign in with Google
+      </button>
+    </div>
+  ),
+}));
+
+jest.mock('../TwoFactorForm', () => ({
+  TwoFactorForm: ({
+    onVerify,
+    onBack,
+  }: {
+    onVerify: () => void;
+    onBack: () => void;
+  }) => (
+    <div data-testid='twofactor-form'>
+      <button onClick={onVerify}>Verify</button>
+      <button onClick={onBack}>Back</button>
+    </div>
+  ),
 }));
 
 describe('SignInForm - Snapshot', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
-    mockUseActionState.mockReturnValue([{ error: null }, jest.fn(), false]);
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('matches snapshot', () => {
@@ -266,8 +299,11 @@ describe('SignInForm - Snapshot', () => {
 describe('SignInForm - Interactive', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
-    mockUseActionState.mockReturnValue([{ error: null }, jest.fn(), false]);
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('handles social sign in button clicks', async () => {

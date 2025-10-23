@@ -1,49 +1,5 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Tags Component > matches snapshot 1`] = `
-<div>
-  <div
-    class=""
-  >
-    <h3
-      aria-level="3"
-      class="font-semibold text-gray-900 mb-2 sm:mb-3 text-lg sm:text-xl"
-      role="heading"
-    >
-      Tags
-    </h3>
-    <ul
-      class="space-y-1"
-    >
-      <li>
-        <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
-        >
-          - 
-          javascript
-        </span>
-      </li>
-      <li>
-        <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
-        >
-          - 
-          react
-        </span>
-      </li>
-      <li>
-        <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
-        >
-          - 
-          typescript
-        </span>
-      </li>
-    </ul>
-  </div>
-</div>
-`;
-
 exports[`Tags Component matches snapshot 1`] = `
 <div>
   <div

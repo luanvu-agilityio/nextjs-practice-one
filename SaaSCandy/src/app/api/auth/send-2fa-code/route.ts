@@ -1,12 +1,25 @@
+/**
+ * API route for sending a 2FA code to the user's email during sign-in.
+ *
+ * - Validates email and password.
+ * - Uses Better Auth to check credentials.
+ * - Generates and stores a 6-digit code with expiration.
+ * - Sends the code via email using Resend.
+ * - Returns success or error messages.
+ *
+ * Method: POST
+ * Body: { email: string, password: string }
+ * Response: { success: boolean, message: string }
+ */
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 import { TwoFactorEmail } from '@/constants/email-template';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import * as schema from '@/lib/db/schema';
 import { auth } from '@/lib/better-auth';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 // Generate random 6-digit code
 function generateCode(): string {
@@ -63,8 +76,8 @@ export async function POST(request: NextRequest) {
 
     // Send email with code
     try {
-      const result = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      const result = await sgMail.send({
+        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
         to: email,
         subject: 'Your SaaSCandy Login Code',
         html: TwoFactorEmail({ code, userName: user.name || 'User' }),

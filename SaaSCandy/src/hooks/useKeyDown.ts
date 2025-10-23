@@ -6,6 +6,15 @@ interface UseKeyDownProps {
   enabled?: boolean;
 }
 
+/**
+ * Custom React hook that listens for specific keydown events and triggers a handler.
+ *
+ * Useful for keyboard shortcuts or accessibility features.
+ *
+ * @param keys - Array of key names to listen for (e.g., ['Escape', 'Enter']).
+ * @param handler - Function to call when a specified key is pressed.
+ * @param enabled - If false, disables the keydown listener (default: true).
+ */
 function useKeyDown({ keys, handler, enabled = true }: UseKeyDownProps) {
   useEffect(() => {
     if (!enabled) return;

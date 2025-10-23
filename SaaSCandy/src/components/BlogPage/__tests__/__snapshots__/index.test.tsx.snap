@@ -1,3 +1,21 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`BlogPage Component matches snapshot 1`] = `undefined`;
+exports[`BlogPage Component matches snapshot 1`] = `
+<div>
+  <section
+    class="py-12 sm:py-16 bg-white"
+  >
+    <div
+      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+    >
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+      >
+        <div>
+          Mocked BlogList
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;

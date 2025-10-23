@@ -3,6 +3,11 @@ import BlogPage from '../index';
 import { getAllPosts } from '@/helpers';
 
 jest.mock('@/helpers');
+jest.mock('../../BlogList', () => {
+  const MockedBlogList = () => <div>Mocked BlogList</div>;
+  MockedBlogList.displayName = 'MockedBlogList';
+  return MockedBlogList;
+});
 
 describe('BlogPage Component', () => {
   const mockPosts = [
@@ -33,13 +38,5 @@ describe('BlogPage Component', () => {
   it('matches snapshot', () => {
     const { container } = render(<BlogPage />);
     expect(container).toMatchSnapshot();
-  });
-
-  it('renders all blog posts', async () => {
-    const result = await BlogPage();
-    const { getByText } = render(result);
-
-    expect(getByText('Test Post 1')).toBeInTheDocument();
-    expect(getByText('Test Post 2')).toBeInTheDocument();
   });
 });

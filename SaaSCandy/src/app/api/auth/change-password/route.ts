@@ -1,3 +1,16 @@
+/**
+ * API route for changing the user's password.
+ *
+ * - Requires authentication (session).
+ * - Validates current and new password.
+ * - Verifies the current password using Argon2.
+ * - Updates the password in the database after hashing.
+ * - Returns success or error messages.
+ *
+ * Method: POST
+ * Body: { currentPassword: string, newPassword: string }
+ * Response: { success: boolean, message: string }
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { hash, verify } from '@node-rs/argon2';
 import { eq } from 'drizzle-orm';

@@ -1,21 +1,9 @@
 // Components
 import Section from '../common/Section';
-import { BlogCard, BlogCardSkeleton } from '../BlogCard';
+import { BlogCardSkeleton } from '../BlogCard';
 import React, { Suspense } from 'react';
 
-// Helper
-import { getAllPosts } from '@/helpers';
-
-async function BlogList() {
-  const posts = await getAllPosts();
-  return (
-    <>
-      {posts.map(p => (
-        <BlogCard key={p.slug} {...p} />
-      ))}
-    </>
-  );
-}
+import BlogList from '../BlogList';
 
 function BlogSkeleton() {
   return (

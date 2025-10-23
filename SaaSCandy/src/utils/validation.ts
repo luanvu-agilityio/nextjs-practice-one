@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { VALIDATION_MESSAGES } from '@/constants/messages';
 
+/**
+ * Zod schema for sign-in form validation.
+ * Requires a valid email and a password with minimum length.
+ */
 export const signInSchema = z.object({
   email: z
     .string()
@@ -12,6 +16,10 @@ export const signInSchema = z.object({
     .min(8, VALIDATION_MESSAGES.PASSWORD_MIN_LENGTH),
 });
 
+/**
+ * Zod schema for sign-up form validation.
+ * Requires name, valid email, and a strong password.
+ */
 export const signUpSchema = z.object({
   name: z
     .string()
@@ -31,6 +39,10 @@ export const signUpSchema = z.object({
     ),
 });
 
+/**
+ * Zod schema for join-us form validation.
+ * Requires first name, last name, valid email, password, and agreement to terms.
+ */
 export const joinUsSchema = z.object({
   firstName: z.string().min(2, VALIDATION_MESSAGES.FIRST_NAME_MIN),
   lastName: z.string().min(2, VALIDATION_MESSAGES.LAST_NAME_MIN),
@@ -40,6 +52,11 @@ export const joinUsSchema = z.object({
     message: VALIDATION_MESSAGES.AGREE_TERMS_REQUIRED,
   }),
 });
+
+/**
+ * Zod schema for contact form validation.
+ * Requires name, valid email, project name, project type, and message.
+ */
 export const contactSchema = z.object({
   name: z.string().min(2, VALIDATION_MESSAGES.NAME_MIN),
   email: z.string().email(VALIDATION_MESSAGES.EMAIL_INVALID),
@@ -48,12 +65,21 @@ export const contactSchema = z.object({
   message: z.string().min(10, VALIDATION_MESSAGES.MESSAGE_MIN_LENGTH),
 });
 
+/**
+ * Zod schema for edit profile form validation.
+ * Allows optional first and last name, and requires a valid email.
+ */
 export const editProfileSchema = z.object({
   firstName: z.string().min(2, VALIDATION_MESSAGES.FIRST_NAME_MIN).optional(),
   lastName: z.string().min(2, VALIDATION_MESSAGES.LAST_NAME_MIN).optional(),
   email: z.string().email(VALIDATION_MESSAGES.EMAIL_INVALID),
 });
 
+/**
+ * Zod schema for change password form validation.
+ * Requires current password, new password, and confirmation.
+ * Ensures new password and confirmation match.
+ */
 export const changePasswordSchema = z
   .object({
     currentPassword: z

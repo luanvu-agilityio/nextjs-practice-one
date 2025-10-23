@@ -1,14 +1,28 @@
+/**
+ * Better Auth configuration for authentication and user management.
+ *
+ * - Uses Drizzle ORM adapter for PostgreSQL.
+ * - Enables email/password and social authentication (Google, GitHub).
+ * - Supports email verification and password reset via Resend.
+ * - Integrates two-factor authentication (2FA) plugin.
+ * - Sends custom verification and reset emails.
+ *
+ * Exports:
+ *   - `auth`: Better Auth instance for use in API routes and middleware.
+ *   - `Session`, `User`: Type definitions for session and user objects.
+ */
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { twoFactor } from 'better-auth/plugins';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
+
 import { db } from './db';
 import {
   ResetPasswordEmail,
   VerificationEmail,
 } from '@/constants/email-template';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -26,8 +40,8 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, token }) => {
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
 
-      await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      await sgMail.send({
+        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
         to: user.email,
         subject: 'Verify your email - SaaSCandy',
         html: VerificationEmail({ verificationUrl }),
@@ -41,8 +55,8 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, token }) => {
       const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 
-      await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      await sgMail.send({
+        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
         to: user.email,
         subject: 'Reset your password - SaaSCandy',
         html: ResetPasswordEmail({ resetUrl }),

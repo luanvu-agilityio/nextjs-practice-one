@@ -1,3 +1,3 @@
 export * from './breadcrumb';
 export * from './validation';
-export * from './auth';
+export * from './social-auth';

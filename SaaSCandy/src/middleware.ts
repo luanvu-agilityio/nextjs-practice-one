@@ -1,3 +1,15 @@
+/**
+ * Next.js middleware for route protection and authentication.
+ *
+ * - Allows static assets, Next.js internals, and public routes to pass through.
+ * - Checks if the current route is protected.
+ * - If protected, verifies the user's session using Better Auth.
+ * - Redirects unauthenticated users to the sign-in page, preserving the original path.
+ * - Handles authentication errors gracefully.
+ *
+ * Configuration:
+ *   - Uses a matcher to exclude API/auth, static, image, and favicon routes from middleware.
+ */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from '@/lib/better-auth';

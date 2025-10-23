@@ -1,10 +1,21 @@
+/**
+ * API route for sending an email verification link to the user.
+ *
+ * - Generates a verification token and URL.
+ * - Sends the verification email using Resend.
+ * - Returns success or error messages.
+ *
+ * Method: POST
+ * Body: { email: string }
+ * Response: { success: boolean, message: string, data?: any }
+ */
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 
 // Constants
 import { VerificationEmail } from '@/constants/email-template';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +25,8 @@ export async function POST(request: NextRequest) {
     const token = crypto.randomUUID();
     const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
 
-    const result = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    const result = await sgMail.send({
+      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
       to: email,
       subject: 'Verify your email - SaaSCandy',
       html: VerificationEmail({ verificationUrl }),

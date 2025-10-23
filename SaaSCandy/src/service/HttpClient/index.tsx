@@ -5,10 +5,28 @@ interface HttpError extends Error {
   data: unknown;
 }
 
+/**
+ * HttpClient class for making HTTP requests with optional authentication.
+ *
+ * Features:
+ * - Supports GET, POST, PUT, DELETE methods.
+ * - Automatically adds JSON headers.
+ * - Optionally adds Bearer token from session for authenticated requests.
+ * - Handles error responses and throws HttpError with status and data.
+ * - Builds URLs from base URL and path.
+ *
+ * Usage:
+ *   const http = new HttpClient(API_BASE);
+ *   const data = await http.get('/resource');
+ */
 export class HttpClient {
   baseUrl: string;
   defaultHeaders: Record<string, string>;
 
+  /**
+   * Creates a new HttpClient instance.
+   * @param baseUrl - The base URL for all requests.
+   */
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/+$/, '');
     this.defaultHeaders = {
@@ -16,6 +34,10 @@ export class HttpClient {
     };
   }
 
+  /**
+   * Gets the Authorization header if a session token is available.
+   * @returns An object with the Authorization header or an empty object.
+   */
   private async getAuthHeader(): Promise<Record<string, string>> {
     try {
       if (typeof window === 'undefined') return {};
@@ -33,11 +55,24 @@ export class HttpClient {
     }
   }
 
+  /**
+   * Builds a full URL from the base URL and path.
+   * @param path - The endpoint path or full URL.
+   * @returns The full URL as a string.
+   */
   private buildUrl(path: string) {
     if (path.startsWith('http')) return path;
     return `${this.baseUrl}/${path.replace(/^\/+/, '')}`;
   }
 
+  /**
+   * Makes an HTTP request with the specified method, path, and body.
+   * @param method - HTTP method ('GET', 'POST', etc.).
+   * @param path - Endpoint path or full URL.
+   * @param body - Optional request body.
+   * @returns The parsed response data.
+   * @throws {HttpError} If the response is not OK.
+   */
   private async request<T>(
     method: string,
     path: string,
@@ -69,24 +104,48 @@ export class HttpClient {
     return data;
   }
 
+  /**
+   * Makes a GET request.
+   * @param path - Endpoint path or full URL.
+   * @returns The response data.
+   */
   get<T>(path: string) {
     return this.request<T>('GET', path);
   }
 
+  /**
+   * Makes a POST request.
+   * @param path - Endpoint path or full URL.
+   * @param body - Optional request body.
+   * @returns The response data.
+   */
   post<T>(path: string, body?: unknown) {
     return this.request<T>('POST', path, body);
   }
 
+  /**
+   * Makes a PUT request.
+   * @param path - Endpoint path or full URL.
+   * @param body - Optional request body.
+   * @returns The response data.
+   */
   put<T>(path: string, body?: unknown) {
     return this.request<T>('PUT', path, body);
   }
 
+  /**
+   * Makes a DELETE request.
+   * @param path - Endpoint path or full URL.
+   * @returns The response data.
+   */
   delete<T>(path: string) {
     return this.request<T>('DELETE', path);
   }
 }
 
-// Create HTTP client instances
+/**
+ * Default HTTP client instance using the API base URL from environment variables.
+ */
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   'https://68c8bdb1ceef5a150f623481.mockapi.io/';

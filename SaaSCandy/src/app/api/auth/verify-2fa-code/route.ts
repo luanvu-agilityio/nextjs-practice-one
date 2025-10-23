@@ -1,3 +1,17 @@
+/**
+ * API route for verifying a 2FA code sent to the user's email during sign-in.
+ *
+ * - Validates the request body for email and code.
+ * - Checks code format (6 digits).
+ * - Finds the user and the latest unverified code record.
+ * - Handles expired codes and max attempt limits.
+ * - Marks the code as verified if correct, and returns credentials for sign-in.
+ * - Returns appropriate error messages for all failure cases.
+ *
+ * Method: POST
+ * Body: { email: string, code: string }
+ * Response: { success: boolean, data?: { email, password }, error?: string }
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { and, eq, gt } from 'drizzle-orm';

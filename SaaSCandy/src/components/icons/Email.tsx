@@ -8,7 +8,7 @@ const EmailIcon = (props: React.SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <rect width='68' height='68' rx='34' fill='#FFDFAF' />
-    <g clip-path='url(#clip0_47_5617)'>
+    <g clipPath='url(#clip0_47_5617)'>
       <mask
         id='mask0_47_5617'
         maskUnits='userSpaceOnUse'

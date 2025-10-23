@@ -1,3 +1,16 @@
+/**
+ * API route for updating the user's profile information.
+ *
+ * - Requires authentication (session).
+ * - Validates and updates name and email.
+ * - Checks for email uniqueness before updating.
+ * - Updates the user record in the database.
+ * - Returns success or error messages.
+ *
+ * Method: POST
+ * Body: { name: string, email?: string }
+ * Response: { success: boolean, message: string }
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 

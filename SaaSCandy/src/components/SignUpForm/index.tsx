@@ -32,8 +32,8 @@ import { AUTH_MESSAGES, ROUTES, TOAST_MESSAGES } from '@/constants';
 import { TOAST_VARIANTS } from '@/types';
 
 // Utils
-import { extractBreadcrumbs, handleSocialAuth } from '@/utils/auth';
-import { SignUpFormValues, signUpSchema } from '@/utils';
+import { handleSocialAuth } from '@/utils/social-auth';
+import { extractBreadcrumbs, SignUpFormValues, signUpSchema } from '@/utils';
 
 function SignUpPageContent() {
   const pathname = usePathname();

@@ -57,6 +57,14 @@ function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning className='overflow-x-hidden'>
+      <head>
+        <link
+          rel='preload'
+          as='image'
+          href='/images/background/homepage.png'
+          fetchPriority='high'
+        />
+      </head>
       <body className={`${ubuntu.variable} ${manrope.variable} antialiased`}>
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>

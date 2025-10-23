@@ -62,7 +62,7 @@ jest.mock('@/constants', () => ({
 }));
 
 // Mock utils
-jest.mock('@/utils/auth', () => ({
+jest.mock('@/utils/breadcrumb', () => ({
   extractBreadcrumbs: () => [
     { label: 'Home', href: '/', isActive: false },
     { label: 'Sign Up', href: '/signup', isActive: true },
