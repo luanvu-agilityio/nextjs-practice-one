@@ -2,8 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import VerifyEmailPage from '@/app/(auth)/email-verification/page';
 
 // Mock the VerifyEmailContent component
-jest.mock('@/components/VerifyEmailContent', () => ({
-  VerifyEmailContent: function VerifyEmailContent() {
+jest.mock('@/components/pages/VerifyEmailContent', () => ({
+  VerifyEmailContent: () => {
     return <div data-testid='verify-email-content'>Verify Email Content</div>;
   },
 }));

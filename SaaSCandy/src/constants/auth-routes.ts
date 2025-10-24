@@ -11,6 +11,7 @@ export const ROUTES = {
   SERVICES: '/services',
   BLOG: '/blog',
   DOCS: '/docs',
+  FORGOT_PASSWORD: '/forgot-password',
 };
 
 export const AUTH_ROUTES = [
@@ -43,6 +44,9 @@ export const PUBLIC_ROUTES = [
   ROUTES.ABOUT,
   ROUTES.CONTACT,
   ROUTES.PRICING,
+  ROUTES.BLOG,
+  ROUTES.DOCS,
+  ROUTES.FORGOT_PASSWORD,
 ];
 
 export const PROTECTED_ROUTES = [ROUTES.ACCOUNT];

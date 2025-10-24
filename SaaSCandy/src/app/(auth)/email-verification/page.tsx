@@ -1,9 +1,9 @@
 'use client';
 
-import { VerifyEmailContent } from '@/components/VerifyEmailContent';
+import { VerifyEmailContent } from '@/components';
 import { Suspense } from 'react';
 
-export default function VerifyEmailPage() {
+const VerifyEmailPage = () => {
   return (
     <Suspense
       fallback={
@@ -15,4 +15,5 @@ export default function VerifyEmailPage() {
       <VerifyEmailContent />
     </Suspense>
   );
-}
+};
+export default VerifyEmailPage;

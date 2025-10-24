@@ -7,10 +7,10 @@ interface ContentRendererProps {
   className?: string;
 }
 
-function ContentRenderer({
+const ContentRenderer = ({
   blocks,
   className = '',
-}: Readonly<ContentRendererProps>) {
+}: Readonly<ContentRendererProps>) => {
   const renderBlock = (block: ContentBlock) => {
     switch (block.type) {
       case 'heading':
@@ -117,6 +117,6 @@ function ContentRenderer({
       {blocks.map(renderBlock)}
     </div>
   );
-}
+};
 
 export { ContentRenderer };

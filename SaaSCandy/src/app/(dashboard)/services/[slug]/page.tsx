@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
 // Components
-import PageLayout from '@/components/layout/PageLayout';
-import ServiceDetailPage from '@/components/ServiceDetailPage';
+import { PageLayout } from '@/components/layout';
+import { ServiceDetailPageContent } from '@/components/pages';
 
 // Helpers
 import { getAllServices, getServiceBySlug } from '@/helpers';
@@ -13,7 +13,7 @@ interface ServicePageProps {
   };
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const services = getAllServices();
   return services.map(service => ({
     slug: service.slug,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: ServicePageProps) {
   };
 }
 
-export default function ServicePage({ params }: Readonly<ServicePageProps>) {
+const ServicePage = ({ params }: Readonly<ServicePageProps>) => {
   const service = getServiceBySlug(params.slug);
 
   if (!service) {
@@ -45,7 +45,8 @@ export default function ServicePage({ params }: Readonly<ServicePageProps>) {
 
   return (
     <PageLayout title={service.title} subtitle={service.subtitle}>
-      <ServiceDetailPage service={service} />
+      <ServiceDetailPageContent service={service} />
     </PageLayout>
   );
-}
+};
+export default ServicePage;

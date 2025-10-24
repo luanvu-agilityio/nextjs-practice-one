@@ -6,20 +6,19 @@ import { useSession } from '@/lib/auth-client';
 import { User } from 'lucide-react';
 
 // Icons
-import LogoIcon from '@/components/icons/Logo';
-import ThemeSwitcherIcon from '@/components/icons/ThemeSwitcherIcon';
+import { LogoIcon, ThemeSwitcherIcon } from '@/icons';
 
 // Components
 import Navbar from '@/components/NavBar';
 import { Button, Heading } from '@/components/common';
 import { IconButton } from '@/components/common/IconButton';
-import UserMenu from '@/components/UserMenu';
+import { UserMenu } from '@/components/UserMenu';
 import AuthSectionSkeleton from './AuthSectionSkeleton';
 
 // Constants
 import { ROUTES } from '@/constants';
 
-function Header(): JSX.Element {
+const Header = (): JSX.Element => {
   const { data: session, isPending } = useSession();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
@@ -113,9 +112,10 @@ function Header(): JSX.Element {
         <Link
           href='/'
           className='flex items-center gap-2 no-underline flex-shrink-0'
+          aria-label='Homepage'
         >
           <LogoIcon className='w-6 h-6 sm:w-8 sm:h-8' />
-
+          <span className='sr-only'>Homepage</span>
           <div className='hidden sm:block'>
             <Heading
               as='h1'
@@ -140,6 +140,7 @@ function Header(): JSX.Element {
       </div>
     </header>
   );
-}
+};
 
-export default Header;
+Header.displayName = 'Header';
+export { Header };

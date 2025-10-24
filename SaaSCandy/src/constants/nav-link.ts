@@ -1,9 +1,12 @@
 import type { ComponentType } from 'react';
 
-import TwitterIcon from '@/components/icons/TwitterIcon';
-import FacebookIcon from '@/components/icons/FacebookIcon';
-import GooglePlusIcon from '@/components/icons/GooglePlusIcon';
-import LinkedInIcon from '@/components/icons/LinkedInIcon';
+import {
+  TwitterIcon,
+  FacebookIcon,
+  GooglePlusIcon,
+  LinkedInIcon,
+} from '@/icons';
+
 import { ROUTES } from './auth-routes';
 
 export const NAV_LINKS = [

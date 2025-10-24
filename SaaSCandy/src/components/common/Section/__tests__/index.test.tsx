@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import Section from '../index';
+import { Section } from '../index';
 
 describe('Section', () => {
   it('matches snapshot', () => {

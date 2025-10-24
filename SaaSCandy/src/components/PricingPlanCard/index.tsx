@@ -2,12 +2,12 @@
 import { Button, Typography } from '../common';
 
 // Icons
-import CheckIcon from '../icons/Check';
+import { CheckIcon } from '@/icons';
 
 // Types
 import { PricingPlanCardProps } from '@/types';
 
-function PricingPlanCard({ plan }: Readonly<PricingPlanCardProps>) {
+const PricingPlanCard = ({ plan }: Readonly<PricingPlanCardProps>) => {
   const { name, popular, price, description, features } = plan;
   return (
     <div
@@ -69,5 +69,5 @@ function PricingPlanCard({ plan }: Readonly<PricingPlanCardProps>) {
       </Button>
     </div>
   );
-}
-export default PricingPlanCard;
+};
+export { PricingPlanCard };

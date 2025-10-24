@@ -7,13 +7,13 @@ import Link from 'next/link';
 import { Button, Heading, IconButton, Typography } from '@/components/common';
 
 // Icons
-import LogoIcon from '@/components/icons/Logo';
+import { LogoIcon } from '@/icons/Logo';
 import { ChevronDown } from 'lucide-react';
 
 // Constants
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants';
 
-export default function Footer(): JSX.Element {
+const Footer = (): JSX.Element => {
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -27,7 +27,11 @@ export default function Footer(): JSX.Element {
         <div className='flex flex-col lg:flex-row justify-between gap-12 lg:gap-33'>
           {/* Brand Section */}
           <div className='w-full lg:w-76.5 flex flex-col gap-8 lg:gap-13.5'>
-            <Link href='/' className='flex items-center gap-2 no-underline'>
+            <Link
+              href='/'
+              className='flex items-center gap-2 no-underline'
+              aria-label='Homepage'
+            >
               <LogoIcon className='w-8 h-8' />
               <div>
                 <Heading
@@ -63,7 +67,7 @@ export default function Footer(): JSX.Element {
             {/* Services Column */}
             <div>
               <Heading
-                as='h4'
+                as='h2'
                 content='Services'
                 className='text-white mb-10 font-medium   sm:text-lg'
               />
@@ -122,7 +126,7 @@ export default function Footer(): JSX.Element {
             {/* Company Column */}
             <div>
               <Heading
-                as='h4'
+                as='h2'
                 content='Company'
                 className='text-white   sm:text-lg mb-10 font-medium'
               />
@@ -143,7 +147,7 @@ export default function Footer(): JSX.Element {
             {/* Subscribe Column */}
             <div>
               <Heading
-                as='h4'
+                as='h2'
                 content='Subscribe'
                 className='text-white mb-10 font-medium   sm:text-lg'
               />
@@ -173,7 +177,7 @@ export default function Footer(): JSX.Element {
                 className='w-full flex items-center justify-between py-4 text-white'
               >
                 <Heading
-                  as='h4'
+                  as='h2'
                   content='Services'
                   className='text-white font-medium  '
                 />
@@ -244,7 +248,7 @@ export default function Footer(): JSX.Element {
                 className='w-full flex items-center justify-between py-4 text-white'
               >
                 <Heading
-                  as='h4'
+                  as='h2'
                   content='Company'
                   className='text-white font-medium  '
                 />
@@ -277,7 +281,7 @@ export default function Footer(): JSX.Element {
                 className='w-full flex items-center justify-between py-4 text-white'
               >
                 <Heading
-                  as='h4'
+                  as='h2'
                   content='Subscribe'
                   className='text-white font-medium  '
                 />
@@ -316,26 +320,27 @@ export default function Footer(): JSX.Element {
               ©{new Date().getFullYear()} - All Rights Reserved by GetNextJs
             </span>
 
-            <div
+            <nav
               className='flex gap-4 sm:gap-6'
               aria-label='Social media links'
             >
               {SOCIAL_LINKS.map(s => {
                 const IconComponent = s.icon;
                 return (
-                  <IconButton key={s.href} variant='ghost'>
+                  <IconButton key={s.href} variant='ghost' aria-label={s.label}>
                     <Link
                       href={s.href}
                       target='_blank'
                       rel='noreferrer'
                       className='inline-block'
+                      aria-label={s.label}
                     >
                       <IconComponent />
                     </Link>
                   </IconButton>
                 );
               })}
-            </div>
+            </nav>
           </div>
         </div>
       </div>
@@ -350,4 +355,7 @@ export default function Footer(): JSX.Element {
       </Link>
     </footer>
   );
-}
+};
+
+Footer.displayName = 'Footer';
+export { Footer };

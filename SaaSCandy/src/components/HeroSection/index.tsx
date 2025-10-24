@@ -8,21 +8,24 @@ import Image from 'next/image';
 import { User } from 'lucide-react';
 
 // Icons
-import LogoIcon from '../icons/Logo';
+import { LogoIcon, ThemeSwitcherIcon } from '@/icons';
 
 // Component
-import { Button, Heading, Typography } from '@/components/common';
-import { IconButton } from '@/components/common/IconButton';
-import Section from '../common/Section';
+import {
+  Button,
+  Heading,
+  Typography,
+  Section,
+  IconButton,
+} from '@/components/common';
 import Navbar from '../NavBar';
-import ThemeSwitcherIcon from '../icons/ThemeSwitcherIcon';
 import AuthSectionSkeleton from '../layout/Header/AuthSectionSkeleton';
-import UserMenu from '../UserMenu';
+import { UserMenu } from '../UserMenu';
 
 // Constants
 import { ROUTES } from '@/constants';
 
-function HeroSection() {
+const HeroSection = () => {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
@@ -188,6 +191,6 @@ function HeroSection() {
       </div>
     </Section>
   );
-}
+};
 
 export default HeroSection;

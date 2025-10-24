@@ -1,23 +1,25 @@
 'use client';
 
-import HeroSection from '@/components/HeroSection';
-import ServicePage from '@/components/ServicePage';
-import PortfolioPage from '@/components/PortfolioPage';
-import PricingPage from '@/components/PricingPage';
-import FAQSection from '@/components/FAQSection';
-import JoinUsSection from '@/components/JoinUsSection';
+import {
+  PortfolioPageContent,
+  PricingPageContent,
+  ServicePageContent,
+} from '@/components/pages';
 
-function HomePage() {
+import HeroSection from '@/components/HeroSection';
+import { FAQSection, JoinUsSection } from '@/components';
+
+const HomePage = () => {
   return (
     <>
       <HeroSection />
-      <ServicePage />
-      <PortfolioPage />
-      <PricingPage />
+      <ServicePageContent />
+      <PortfolioPageContent />
+      <PricingPageContent />
       <FAQSection />
       <JoinUsSection />
     </>
   );
-}
+};
 
 export default HomePage;

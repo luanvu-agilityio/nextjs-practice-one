@@ -1,11 +1,11 @@
-import { Heading } from '../common';
+import { Heading } from '@/components/common';
 
 interface TagsProps {
   tags: string[];
   className?: string;
 }
 
-function Tags({ tags, className = '' }: TagsProps) {
+const Tags = ({ tags, className = '' }: TagsProps) => {
   return (
     <div className={`${className}`}>
       <Heading
@@ -24,6 +24,6 @@ function Tags({ tags, className = '' }: TagsProps) {
       </ul>
     </div>
   );
-}
+};
 
 export { Tags };

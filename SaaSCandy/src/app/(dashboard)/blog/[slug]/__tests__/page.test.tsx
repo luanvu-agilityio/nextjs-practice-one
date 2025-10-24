@@ -10,9 +10,9 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
-jest.mock('@/components/BlogPostDetailPage', () =>
-  jest.fn(() => <div>BlogPostDetailPage</div>)
-);
+jest.mock('@/components/pages', () => ({
+  BlogPostPageDetailContent: () => <div>BlogPostDetailPage</div>,
+}));
 
 describe('BlogPostPage', () => {
   const params = { slug: 'test-slug' };

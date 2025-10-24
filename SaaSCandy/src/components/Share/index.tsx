@@ -12,7 +12,11 @@ interface ShareProps {
   className?: string;
 }
 
-function Share({ url = '', title = '', className = '' }: Readonly<ShareProps>) {
+const Share = ({
+  url = '',
+  title = '',
+  className = '',
+}: Readonly<ShareProps>) => {
   const shareUrl = typeof window !== 'undefined' ? window.location.href : url;
 
   const shareLinks = [
@@ -58,6 +62,6 @@ function Share({ url = '', title = '', className = '' }: Readonly<ShareProps>) {
       </div>
     </div>
   );
-}
+};
 
 export { Share };

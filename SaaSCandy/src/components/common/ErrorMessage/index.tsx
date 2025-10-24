@@ -24,7 +24,7 @@ interface ErrorMessageProps {
   customMessage?: string;
 }
 
-function handleStringError(errorString: string): string {
+const handleStringError = (errorString: string): string => {
   const s = errorString.toLowerCase();
 
   // Check for keywords in the error string
@@ -35,9 +35,9 @@ function handleStringError(errorString: string): string {
   }
 
   return GENERAL_MESSAGES.SOMETHING_WRONG;
-}
+};
 
-function handleErrorInstance(error: Error): string {
+const handleErrorInstance = (error: Error): string => {
   const msg = error.message.toLowerCase();
 
   // Check for exact matches first
@@ -48,16 +48,16 @@ function handleErrorInstance(error: Error): string {
   }
 
   return GENERAL_MESSAGES.SOMETHING_WRONG;
-}
+};
 
-function handleHttpError(status: number): string {
+const handleHttpError = (status: number): string => {
   return (
     HTTP_STATUS_MESSAGES[status as keyof typeof HTTP_STATUS_MESSAGES] ||
     GENERAL_MESSAGES.SOMETHING_WRONG
   );
-}
+};
 
-function getFriendlyMessage(err: unknown): string {
+const getFriendlyMessage = (err: unknown): string => {
   if (typeof err === 'string') {
     return handleStringError(err);
   }
@@ -72,7 +72,7 @@ function getFriendlyMessage(err: unknown): string {
   }
 
   return GENERAL_MESSAGES.SOMETHING_WRONG;
-}
+};
 
 const ErrorMessage = ({
   customMessage,

@@ -15,8 +15,8 @@ jest.mock('@/helpers', () => ({
   getServiceBySlug: jest.fn(),
 }));
 
-jest.mock('@/components/layout/PageLayout', () => {
-  return function MockPageLayout({
+jest.mock('@/components/layout/PageLayout', () => ({
+  MockPageLayout: ({
     title,
     subtitle,
     children,
@@ -24,7 +24,7 @@ jest.mock('@/components/layout/PageLayout', () => {
     title: string;
     subtitle: string;
     children: React.ReactNode;
-  }) {
+  }) => {
     return (
       <div>
         <h1>{title}</h1>
@@ -32,18 +32,14 @@ jest.mock('@/components/layout/PageLayout', () => {
         {children}
       </div>
     );
-  };
-});
+  },
+}));
 
-jest.mock('@/components/ServiceDetailPage', () => {
-  return function MockServiceDetailPage({
-    service,
-  }: {
-    service: { title: string };
-  }) {
+jest.mock('@/components/pages', () => ({
+  ServiceDetailPageContent: ({ service }: { service: { title: string } }) => {
     return <div data-testid='service-detail'>{service.title}</div>;
-  };
-});
+  },
+}));
 
 const mockGetAllServices = getAllServices as jest.MockedFunction<
   typeof getAllServices

@@ -1,6 +1,10 @@
-import BlogPostDetailPage from '@/components/BlogPostDetailPage';
-import { getPostBySlug } from '@/helpers';
 import { notFound } from 'next/navigation';
+
+// Components
+import { BlogPostDetailPageContent } from '@/components/pages';
+
+// Helpers
+import { getPostBySlug } from '@/helpers';
 
 interface BlogPostPageProps {
   params: {
@@ -22,12 +26,14 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
   };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();
   }
 
-  return <BlogPostDetailPage post={post} />;
+  return <BlogPostDetailPageContent post={post} />;
 }
+
+export default BlogPostPage;

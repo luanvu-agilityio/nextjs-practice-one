@@ -72,6 +72,9 @@ describe('auth-routes.ts', () => {
       '/about',
       '/contact',
       '/pricing',
+      '/blog',
+      '/docs',
+      '/forgot-password',
     ]);
   });
 

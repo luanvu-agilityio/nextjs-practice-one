@@ -7,7 +7,7 @@ import { Manrope, Ubuntu } from 'next/font/google';
 import './globals.css';
 
 // Layout
-import RootLayoutClient from '@/providers/RootLayoutClient';
+import { RootLayoutClient } from '@/providers';
 
 // Client Component
 
@@ -50,11 +50,11 @@ export const metadata: Metadata = {
   },
 };
 
-function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html lang='en' suppressHydrationWarning className='overflow-x-hidden'>
       <head>
@@ -64,11 +64,17 @@ function RootLayout({
           href='/images/background/homepage.png'
           fetchPriority='high'
         />
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link
+          rel='preconnect'
+          href='https://fonts.gstatic.com'
+          crossOrigin='anonymous'
+        />
       </head>
       <body className={`${ubuntu.variable} ${manrope.variable} antialiased`}>
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>
   );
-}
+};
 export default RootLayout;

@@ -1,6 +1,6 @@
-import { Skeleton } from '../../../components/common';
+import { Skeleton } from '@/components/common';
 
-export default function AccountLoading() {
+const AccountLoading = () => {
   return (
     <div className='flex flex-col items-center max-w-[1296px] mx-auto min-h-screen py-8'>
       {/* Header Loading */}
@@ -83,4 +83,5 @@ export default function AccountLoading() {
       </div>
     </div>
   );
-}
+};
+export default AccountLoading;

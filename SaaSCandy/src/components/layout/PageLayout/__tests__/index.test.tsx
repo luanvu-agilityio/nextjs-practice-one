@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import PageLayout from '@/components/layout/PageLayout';
+import { PageLayout } from '@/components/layout/PageLayout';
 import { useSession } from '@/lib/auth-client';
 import { usePathname } from 'next/navigation';
 

@@ -5,8 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 // Components
-import { Heading } from '@/components/common';
-import { Skeleton } from '@/components/common/Skeleton';
+import { Heading, Skeleton } from '@/components/common';
 
 interface BlogCardProps {
   slug: string;
@@ -15,7 +14,7 @@ interface BlogCardProps {
   date: string;
 }
 
-function BlogCard({ slug, title, image, date }: Readonly<BlogCardProps>) {
+const BlogCard = ({ slug, title, image, date }: Readonly<BlogCardProps>) => {
   return (
     <article className='group'>
       <Link
@@ -50,9 +49,9 @@ function BlogCard({ slug, title, image, date }: Readonly<BlogCardProps>) {
       </Link>
     </article>
   );
-}
+};
 
-function BlogCardSkeleton() {
+const BlogCardSkeleton = () => {
   return (
     <article className='group'>
       <div className='block rounded-lg overflow-hidden bg-white'>
@@ -64,6 +63,6 @@ function BlogCardSkeleton() {
       </div>
     </article>
   );
-}
+};
 
 export { BlogCard, BlogCardSkeleton };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import SocialButton from './index';
+import { SocialButton } from './index';
 
 // Mock icons
 const GoogleIcon = ({ className }: { className?: string }) => (

@@ -23,13 +23,13 @@ interface SocialButtonProps
   children: React.ReactNode;
 }
 
-function SocialButton({
+const SocialButton = ({
   provider,
   icon: Icon,
   children,
   className,
   ...props
-}: Readonly<SocialButtonProps>) {
+}: Readonly<SocialButtonProps>) => {
   return (
     <button
       className={cn(socialButtonVariants(), className)}
@@ -41,5 +41,5 @@ function SocialButton({
       {children}
     </button>
   );
-}
-export default SocialButton;
+};
+export { SocialButton };

@@ -2,8 +2,6 @@
 
 import { ComponentProps, ReactNode } from 'react';
 import { Control, FieldValues, Path, useController } from 'react-hook-form';
-
-// Components
 import { Typography } from '../Typography';
 
 interface CheckboxControllerProps<T extends FieldValues, K extends Path<T>>
@@ -25,10 +23,14 @@ const CheckboxController = <T extends FieldValues, K extends Path<T>>({
     fieldState: { error },
   } = useController({ name, control });
 
+  // Generate a unique id for the checkbox
+  const id = `checkbox-${String(name)}`;
+
   return (
     <div className='flex flex-col gap-1'>
       <div className='flex items-start gap-3'>
         <input
+          id={id}
           type='checkbox'
           checked={value || false}
           onChange={e => onChange(e.target.checked)}
@@ -37,9 +39,9 @@ const CheckboxController = <T extends FieldValues, K extends Path<T>>({
           {...props}
         />
         {label && (
-          <Typography className='text-lg text-blue-foreground'>
+          <label htmlFor={id} className='text-lg text-blue-foreground'>
             {label}
-          </Typography>
+          </label>
         )}
       </div>
       {error && (

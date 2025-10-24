@@ -1,11 +1,12 @@
 // Icons
-
-import ShoppingBagIcon from '@/components/icons/ShoppingBag';
-import SwapIcon from '@/components/icons/Swap';
-import HealthIcon from '@/components/icons/Health';
-import ChartIcon from '@/components/icons/Chart';
-import BankingIcon from '@/components/icons/Banking';
-import BookIcon from '@/components/icons/BookIcon';
+import {
+  ShoppingBagIcon,
+  SwapIcon,
+  HealthIcon,
+  ChartIcon,
+  BankingIcon,
+  BookIcon,
+} from '@/icons';
 
 export const appCategories = [
   {

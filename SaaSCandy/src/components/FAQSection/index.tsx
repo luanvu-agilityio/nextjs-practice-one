@@ -6,10 +6,9 @@ import { useState } from 'react';
 import { faqData } from '@/constants';
 
 // Components
-import { Heading, Typography } from '@/components/common';
-import Section from '../common/Section';
+import { Heading, Typography, Section } from '@/components/common';
 
-function FAQSection() {
+const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
@@ -64,6 +63,6 @@ function FAQSection() {
       </div>
     </Section>
   );
-}
+};
 
-export default FAQSection;
+export { FAQSection };

@@ -1,42 +1,24 @@
 import { render, screen } from '@testing-library/react';
+
+jest.mock('@/components', () => ({
+  FAQSection: () => <div data-testid='faq-section'>FAQ Section</div>,
+  JoinUsSection: () => <div data-testid='join-us-section'>Join Us Section</div>,
+}));
+
+jest.mock('@/components/HeroSection', () => ({
+  __esModule: true,
+  default: () => <div data-testid='hero-section'>Hero Section</div>,
+}));
+
+jest.mock('@/components/pages', () => ({
+  ServicePageContent: () => <div data-testid='service-page'>Service Page</div>,
+  PortfolioPageContent: () => (
+    <div data-testid='portfolio-page'>Portfolio Page</div>
+  ),
+  PricingPageContent: () => <div data-testid='pricing-page'>Pricing Page</div>,
+}));
+
 import HomePage from '@/app/page';
-
-// Mock all child components
-jest.mock('@/components/HeroSection', () => {
-  return function HeroSection() {
-    return <div data-testid='hero-section'>Hero Section</div>;
-  };
-});
-
-jest.mock('@/components/ServicePage', () => {
-  return function ServicePage() {
-    return <div data-testid='service-page'>Service Page</div>;
-  };
-});
-
-jest.mock('@/components/PortfolioPage', () => {
-  return function PortfolioPage() {
-    return <div data-testid='portfolio-page'>Portfolio Page</div>;
-  };
-});
-
-jest.mock('@/components/PricingPage', () => {
-  return function PricingPage() {
-    return <div data-testid='pricing-page'>Pricing Page</div>;
-  };
-});
-
-jest.mock('@/components/FAQSection', () => {
-  return function FAQSection() {
-    return <div data-testid='faq-section'>FAQ Section</div>;
-  };
-});
-
-jest.mock('@/components/JoinUsSection', () => {
-  return function JoinUsSection() {
-    return <div data-testid='join-us-section'>Join Us Section</div>;
-  };
-});
 
 describe('HomePage - Interactive Tests', () => {
   it('should render all main sections', () => {

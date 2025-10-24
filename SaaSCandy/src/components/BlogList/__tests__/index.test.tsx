@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import BlogList from '../index';
+import { BlogList } from '../index';
 
 // Mock getAllPosts to return a promise
 jest.mock('@/helpers', () => ({

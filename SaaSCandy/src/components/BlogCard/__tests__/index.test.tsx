@@ -1,12 +1,9 @@
 import { render } from '@testing-library/react';
 import { BlogCard } from '../index';
-import Image from 'next/image';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: Record<string, unknown>) => (
-    <Image src={''} alt={''} {...props} />
-  ),
+  default: (props: Record<string, unknown>) => <img {...props} />,
 }));
 
 jest.mock('next/link', () => ({

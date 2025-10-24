@@ -13,7 +13,7 @@ interface SectionProps {
   style?: CSSProperties;
 }
 
-function Section({
+const Section = ({
   title,
   subtitle,
   children,
@@ -21,7 +21,7 @@ function Section({
   containerClassName = '',
   style,
   centered = false,
-}: Readonly<SectionProps>) {
+}: Readonly<SectionProps>) => {
   return (
     <section className={`py-12 sm:py-16 ${className}`} style={style}>
       <div
@@ -50,5 +50,5 @@ function Section({
       </div>
     </section>
   );
-}
-export default Section;
+};
+export { Section };

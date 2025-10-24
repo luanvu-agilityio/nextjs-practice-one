@@ -95,6 +95,31 @@ export const changePasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .nonempty(VALIDATION_MESSAGES.EMAIL_REQUIRED)
+    .email(VALIDATION_MESSAGES.EMAIL_INVALID),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .nonempty(VALIDATION_MESSAGES.PASSWORD_REQUIRED)
+      .min(8, VALIDATION_MESSAGES.PASSWORD_MIN_LENGTH),
+    confirmPassword: z
+      .string()
+      .nonempty(VALIDATION_MESSAGES.PASSWORD_REQUIRED)
+      .min(8, VALIDATION_MESSAGES.PASSWORD_MIN_LENGTH),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: VALIDATION_MESSAGES.PASSWORDS_DONT_MATCH,
+    path: ['confirmPassword'],
+  });
+
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export type EditProfileFormData = z.infer<typeof editProfileSchema>;
 export type ContactFormData = z.infer<typeof contactSchema>;

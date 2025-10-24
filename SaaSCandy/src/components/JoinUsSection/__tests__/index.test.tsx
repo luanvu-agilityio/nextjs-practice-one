@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import JoinUsSection from '@/components/JoinUsSection';
+import { JoinUsSection } from '@/components/JoinUsSection';
 
 describe('JoinUsSection - Interactive Tests', () => {
   it('should render form with all input fields', () => {

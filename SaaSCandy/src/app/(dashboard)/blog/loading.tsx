@@ -1,6 +1,6 @@
-import Section from '@/components/common/Section';
+import { Section } from '@/components/common';
 
-function BlogListLoading() {
+const BlogListLoading = () => {
   return (
     <Section className='bg-white'>
       <div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-6'>
@@ -27,6 +27,6 @@ function BlogListLoading() {
       </div>
     </Section>
   );
-}
+};
 
 export default BlogListLoading;

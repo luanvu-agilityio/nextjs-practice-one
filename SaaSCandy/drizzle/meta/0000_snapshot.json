@@ -1,5 +1,5 @@
 {
-  "id": "787b2ac5-287e-48f5-844f-4ae952f88c59",
+  "id": "e687b3b3-8821-4893-b910-1f3680dbb83c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -302,6 +302,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "emailVerified": {
           "name": "emailVerified",
           "type": "boolean",
@@ -320,6 +326,18 @@
           "primaryKey": false,
           "notNull": false,
           "default": false
+        },
+        "resetToken": {
+          "name": "resetToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resetTokenExpires": {
+          "name": "resetTokenExpires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "createdAt": {
           "name": "createdAt",

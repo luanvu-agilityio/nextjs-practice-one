@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SocialButton from '../index';
+import { SocialButton } from '../index';
 
 // Mock icon component
 const MockIcon = ({ className }: { className?: string }) => (

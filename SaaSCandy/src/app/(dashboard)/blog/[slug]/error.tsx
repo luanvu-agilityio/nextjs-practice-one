@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Button, Heading, Typography } from '@/components/common';
-import Section from '@/components/common/Section';
+
+// Components
+import { Button, Heading, Typography, Section } from '@/components/common';
 
 interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
 }
 
-function BlogError({ error, reset }: ErrorProps) {
+const BlogError = ({ error, reset }: ErrorProps) => {
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Blog page error:', error);
@@ -75,5 +76,5 @@ function BlogError({ error, reset }: ErrorProps) {
       </div>
     </Section>
   );
-}
+};
 export default BlogError;

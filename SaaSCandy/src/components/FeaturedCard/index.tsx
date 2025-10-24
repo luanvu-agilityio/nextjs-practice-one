@@ -23,13 +23,13 @@ interface CardContentProps {
   actionText: string;
 }
 
-function CardContent({
+const CardContent = ({
   title,
   description,
   icon,
   href,
   actionText,
-}: Readonly<CardContentProps>) {
+}: Readonly<CardContentProps>) => {
   return (
     <div className='flex flex-col gap-6 sm:gap-8 justify-between items-start bg-white rounded-2xl sm:rounded-3xl shadow-form hover:shadow-md transition-shadow p-6 sm:p-8 lg:p-10 h-full'>
       <div className='flex items-center justify-start gap-4 sm:gap-6 w-full'>
@@ -57,15 +57,15 @@ function CardContent({
       )}
     </div>
   );
-}
+};
 
-export function FeatureCard({
+const FeatureCard = ({
   title,
   description,
   icon,
   href,
   actionText = 'Read More',
-}: Readonly<FeatureCardProps>) {
+}: Readonly<FeatureCardProps>) => {
   if (href) {
     return (
       <Link href={href} className='block group h-full'>
@@ -89,4 +89,5 @@ export function FeatureCard({
       actionText={actionText}
     />
   );
-}
+};
+export { FeatureCard };

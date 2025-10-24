@@ -1,19 +1,19 @@
-import PageLayout from '@/components/layout/PageLayout';
-import ContactPage from '@/components/ContactPage';
+import { PageLayout } from '@/components/layout';
+import { ContactPageContent } from '@/components/pages';
 
 export const metadata = {
   title: 'Pricing Plans | SaaSCandy',
   description: 'Choose the perfect plan that fits your needs and budget.',
 };
 
-function Contact() {
+const ContactPage = () => {
   return (
     <PageLayout
       title='Contact Us'
       subtitle='Send us a message or reach out via traditional contact to inquire you with a comprehensive understanding of the best trends.'
     >
-      <ContactPage />
+      <ContactPageContent />
     </PageLayout>
   );
-}
-export default Contact;
+};
+export default ContactPage;

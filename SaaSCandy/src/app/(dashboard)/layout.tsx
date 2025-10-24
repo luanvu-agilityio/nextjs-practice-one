@@ -4,8 +4,8 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-export default function DashboardLayout({
-  children,
-}: Readonly<DashboardLayoutProps>) {
+const DashboardLayout = ({ children }: Readonly<DashboardLayoutProps>) => {
   return <div>{children}</div>;
-}
+};
+
+export default DashboardLayout;

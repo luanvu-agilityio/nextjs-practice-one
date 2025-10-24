@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Header from '@/components/layout/Header';
+import { Header } from '@/components/layout/Header';
 import { useSession } from '@/lib/auth-client';
 
 jest.mock('@/lib/auth-client');

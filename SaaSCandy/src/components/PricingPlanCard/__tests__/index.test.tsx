@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 
-import PricingPlanCard from '../index';
+import { PricingPlanCard } from '../index';
 import { PricingPlan } from '@/types';
 
-jest.mock('../../common', () => ({
+jest.mock('@/components/common', () => ({
   Button: ({
     children,
     variant,
@@ -27,9 +27,8 @@ jest.mock('../../common', () => ({
   }) => <div className={className}>{content}</div>,
 }));
 
-jest.mock('../../icons/Check', () => ({
-  __esModule: true,
-  default: ({ className }: { className?: string }) => (
+jest.mock('@/icons', () => ({
+  CheckIcon: ({ className }: { className?: string }) => (
     <span className={className}>✓</span>
   ),
 }));

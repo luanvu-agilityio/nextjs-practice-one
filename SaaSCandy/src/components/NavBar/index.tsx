@@ -10,7 +10,7 @@ import { IconButton } from '@/components/common/IconButton';
 // Constants
 import { NAV_LINKS } from '@/constants';
 
-function Navbar(): JSX.Element {
+const Navbar = (): JSX.Element => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -86,6 +86,6 @@ function Navbar(): JSX.Element {
       )}
     </nav>
   );
-}
-
+};
+Navbar.displayName = 'Navbar';
 export default Navbar;

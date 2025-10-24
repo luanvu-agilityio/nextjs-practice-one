@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import SignUpPage from '@/app/(auth)/signup/page';
 
-jest.mock('@/components/SignUpForm', () => ({
-  SignUpPageContent: function SignUpPageContent() {
+jest.mock('@/components/pages', () => ({
+  SignUpPageContent: () => {
     return <div data-testid='signup-form'>Sign Up Form</div>;
   },
 }));

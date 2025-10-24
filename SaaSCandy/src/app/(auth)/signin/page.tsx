@@ -1,10 +1,11 @@
-import SignInPageContent from '@/components/SignInForm';
+import { SignInPageContent } from '@/components/pages';
 
-function SignInPage() {
+const SignInPage = () => {
   return (
     <div className='py-16'>
-      <SignInPageContent />;
+      <SignInPageContent />
     </div>
   );
-}
+};
+
 export default SignInPage;

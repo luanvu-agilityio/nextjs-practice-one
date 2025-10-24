@@ -3,7 +3,7 @@ interface DividerProps {
   className?: string;
 }
 
-function Divider({ text = 'OR', className = '' }: Readonly<DividerProps>) {
+const Divider = ({ text = 'OR', className = '' }: Readonly<DividerProps>) => {
   return (
     <div className={`relative flex items-center justify-center ${className}`}>
       <div className='absolute inset-0 flex items-center'>
@@ -14,5 +14,5 @@ function Divider({ text = 'OR', className = '' }: Readonly<DividerProps>) {
       </div>
     </div>
   );
-}
+};
 export { Divider };

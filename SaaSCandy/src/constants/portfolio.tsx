@@ -1,6 +1,4 @@
-import CommentIcon from '@/components/icons/Comment';
-import CrownIcon from '@/components/icons/Crown';
-import GitHub from '@/components/icons/GitHub';
+import { CommentIcon, CrownIcon, GitHub } from '@/icons';
 
 export const features = [
   'Effortless User Management and Access Control',

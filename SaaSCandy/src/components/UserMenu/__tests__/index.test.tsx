@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import UserMenu from '../index';
+import { UserMenu } from '../index';
 import { useSession } from '@/lib/auth-client';
 
 jest.mock('@/lib/auth-client');

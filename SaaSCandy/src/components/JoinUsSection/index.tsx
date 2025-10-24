@@ -11,14 +11,14 @@ import {
   Divider,
   Heading,
   Typography,
+  Section,
+  InputController,
 } from '@/components/common';
-import { InputController } from '@/components/common/InputController';
-import Section from '../common/Section';
 
 // Utils
 import { JoinUsFormData, joinUsSchema } from '@/utils';
 
-function JoinUsSection() {
+const JoinUsSection = () => {
   const { control, handleSubmit } = useForm<JoinUsFormData>({
     resolver: zodResolver(joinUsSchema),
     mode: 'onBlur',
@@ -191,6 +191,6 @@ function JoinUsSection() {
       </Section>
     </>
   );
-}
+};
 
-export default JoinUsSection;
+export { JoinUsSection };

@@ -40,10 +40,10 @@ describe('auth actions', () => {
     const result = await signUpAction(formData);
     expect(result.success).toBeUndefined();
     expect(result.error).toBe('Registration failed');
-    it('signOutAction calls redirect to home', async () => {
-      await signOutAction();
-      expect(redirect).toHaveBeenCalledWith(ROUTES.HOME);
-    });
+  });
+
+  it('signOutAction calls redirect to home', async () => {
+    await signOutAction();
     expect(redirect).toHaveBeenCalledWith(ROUTES.HOME);
   });
 });

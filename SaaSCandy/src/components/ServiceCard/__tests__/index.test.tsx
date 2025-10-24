@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import ServiceCard from '../index';
+import { ServiceCard } from '../index';
 
 jest.mock('../../common', () => ({
   Heading: ({ content, className }: { content: string; className: string }) => (

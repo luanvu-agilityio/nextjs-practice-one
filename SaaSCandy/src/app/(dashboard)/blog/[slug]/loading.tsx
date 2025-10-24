@@ -1,6 +1,6 @@
-import Section from '@/components/common/Section';
+import { Section } from '@/components/common';
 
-function BlogDetailLoading() {
+const BlogDetailLoading = () => {
   return (
     <Section className='bg-white'>
       <div className='animate-pulse'>
@@ -133,6 +133,6 @@ function BlogDetailLoading() {
       </div>
     </Section>
   );
-}
+};
 
 export default BlogDetailLoading;

@@ -1,18 +1,19 @@
-import PageLayout from '@/components/layout/PageLayout';
-import BlogPage from '@/components/BlogPage';
+import { PageLayout } from '@/components/layout';
+import { BlogPageContent } from '@/components';
 
 export const metadata = {
   title: 'Blog | SaaSCandy',
   description: 'Discover articles, case studies and resources from SaaSCandy.',
 };
 
-export default function Blog() {
+const BlogPage = () => {
   return (
     <PageLayout
       title='Blog'
       subtitle='Discover a wealth of insightful materials meticulously crafted to provide you with a comprehensive understanding of the latest trends.'
     >
-      <BlogPage />
+      <BlogPageContent />
     </PageLayout>
   );
-}
+};
+export default BlogPage;

@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
-import Blog from '@/app/(dashboard)/blog/page';
+import BlogPage from '@/app/(dashboard)/blog/page';
 
-jest.mock('@/components/layout/PageLayout', () => {
-  return function PageLayout({
+jest.mock('@/components/layout/PageLayout', () => ({
+  PageLayout: ({
     title,
     subtitle,
     children,
@@ -10,7 +10,7 @@ jest.mock('@/components/layout/PageLayout', () => {
     title: string;
     subtitle: string;
     children: React.ReactNode;
-  }) {
+  }) => {
     return (
       <div data-testid='page-layout'>
         <h1>{title}</h1>
@@ -18,23 +18,23 @@ jest.mock('@/components/layout/PageLayout', () => {
         {children}
       </div>
     );
-  };
-});
+  },
+}));
 
-jest.mock('@/components/BlogPage', () => {
-  return function BlogPage() {
+jest.mock('@/components/pages', () => ({
+  BlogPageContent: () => {
     return <div data-testid='blog-page'>Blog Page Content</div>;
-  };
-});
+  },
+}));
 
 describe('Blog Page - Snapshot Tests', () => {
   it('should match snapshot', () => {
-    const { container } = render(<Blog />);
+    const { container } = render(<BlogPage />);
     expect(container).toMatchSnapshot();
   });
 
   it('should render with correct title and subtitle', () => {
-    const { getByText } = render(<Blog />);
+    const { getByText } = render(<BlogPage />);
 
     expect(getByText('Blog')).toBeInTheDocument();
     expect(
@@ -43,7 +43,7 @@ describe('Blog Page - Snapshot Tests', () => {
   });
 
   it('should render BlogPage component', () => {
-    const { getByTestId } = render(<Blog />);
+    const { getByTestId } = render(<BlogPage />);
 
     expect(getByTestId('blog-page')).toBeInTheDocument();
   });

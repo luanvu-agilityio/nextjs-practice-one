@@ -1,22 +1,19 @@
 import { render, screen } from '@testing-library/react';
-import RootLayoutClient from '..';
+import { RootLayoutClient } from '..';
 import { usePathname } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
 }));
 
-jest.mock('@/components/layout/Header', () => {
-  return function MockHeader() {
+jest.mock('@/components/layout', () => ({
+  Header: () => {
     return <div data-testid='header'>Header</div>;
-  };
-});
-
-jest.mock('@/components/layout/Footer', () => {
-  return function MockFooter() {
+  },
+  Footer: () => {
     return <div data-testid='footer'>Footer</div>;
-  };
-});
+  },
+}));
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
 

@@ -6,8 +6,9 @@ import { usePathname } from 'next/navigation';
 import { ReactQueryProvider, ToastProvider } from '@/providers';
 
 // Components
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import { Header, Footer } from '@/components/layout';
+
+// Constants
 import { ROUTES } from '@/constants';
 
 // Pages that use PageLayout (don't need separate Header)
@@ -20,7 +21,7 @@ const PAGE_LAYOUT_ROUTES = [
   ROUTES.CONTACT,
 ];
 
-function RootLayoutClient({ children }: { children: React.ReactNode }) {
+const RootLayoutClient = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const shouldShowHeader =
     pathname !== '/' &&
@@ -39,5 +40,5 @@ function RootLayoutClient({ children }: { children: React.ReactNode }) {
       </ToastProvider>
     </ReactQueryProvider>
   );
-}
-export default RootLayoutClient;
+};
+export { RootLayoutClient };

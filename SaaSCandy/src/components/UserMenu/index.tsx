@@ -26,7 +26,7 @@ interface UserMenuProps {
   className?: string;
 }
 
-function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
+const UserMenu = ({ className = '' }: Readonly<UserMenuProps>) => {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -161,6 +161,6 @@ function UserMenu({ className = '' }: Readonly<UserMenuProps>) {
       </DropdownMenu>
     </div>
   );
-}
+};
 
-export default UserMenu;
+export { UserMenu };

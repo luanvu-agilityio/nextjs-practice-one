@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Button, Heading, Typography } from '@/components/common';
-import Section from '@/components/common/Section';
 
-function BlogPostNotFound() {
+// Components
+import { Button, Heading, Typography, Section } from '@/components/common';
+
+const BlogPostNotFound = () => {
   return (
     <Section className='bg-white min-h-[60vh] flex items-center justify-center'>
       <div className='text-center max-w-md mx-auto'>
@@ -52,5 +53,5 @@ function BlogPostNotFound() {
       </div>
     </Section>
   );
-}
+};
 export default BlogPostNotFound;

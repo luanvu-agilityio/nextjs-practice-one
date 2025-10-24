@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SignInPage - Snapshot Tests should match snapshot 1`] = `
+<div>
+  <div
+    class="py-16"
+  >
+    <div
+      data-testid="signin-form"
+    >
+      Sign In Form
+    </div>
+  </div>
+</div>
+`;

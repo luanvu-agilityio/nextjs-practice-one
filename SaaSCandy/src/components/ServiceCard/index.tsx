@@ -14,7 +14,7 @@ interface DocCardProps {
   doc: Doc;
 }
 
-function ServiceCard({ index, doc }: Readonly<DocCardProps>) {
+const ServiceCard = ({ index, doc }: Readonly<DocCardProps>) => {
   const { icon, title, description } = doc;
   return (
     <div
@@ -39,5 +39,5 @@ function ServiceCard({ index, doc }: Readonly<DocCardProps>) {
       />
     </div>
   );
-}
-export default ServiceCard;
+};
+export { ServiceCard };

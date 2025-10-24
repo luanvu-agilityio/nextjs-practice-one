@@ -5,8 +5,8 @@ import PortfolioPage from '@/app/(dashboard)/portfolio/page';
 import PricingPage from '@/app/(dashboard)/pricing/page';
 import ServicePage from '@/app/(dashboard)/services/page';
 
-jest.mock('@/components/layout/PageLayout', () => {
-  return function MockPageLayout({
+jest.mock('@/components/layout/PageLayout', () => ({
+  PageLayout: ({
     title,
     subtitle,
     children,
@@ -14,46 +14,30 @@ jest.mock('@/components/layout/PageLayout', () => {
     title: string;
     subtitle: string;
     children: React.ReactNode;
-  }) {
+  }) => {
     return (
-      <div>
+      <div data-testid='page-layout'>
         <h1>{title}</h1>
         <p>{subtitle}</p>
         {children}
       </div>
     );
-  };
-});
+  },
+}));
 
-jest.mock('@/components/ContactPage', () => {
-  return function MockContactPage() {
-    return <div data-testid='contact-page'>Contact Form</div>;
-  };
-});
-
-jest.mock('@/components/DocsContent', () => {
-  return function MockDocsContent() {
-    return <div data-testid='docs-content'>Docs Content</div>;
-  };
-});
-
-jest.mock('@/components/PortfolioPage', () => {
-  return function MockPortfolioPage() {
-    return <div data-testid='portfolio-page'>Portfolio Content</div>;
-  };
-});
-
-jest.mock('@/components/PricingPage', () => {
-  return function MockPricingPage() {
-    return <div data-testid='pricing-page'>Pricing Content</div>;
-  };
-});
-
-jest.mock('@/components/ServicePage', () => {
-  return function MockServicePage() {
-    return <div data-testid='service-page'>Service Content</div>;
-  };
-});
+jest.mock('@/components/pages', () => ({
+  ContactPageContent: () => <div data-testid='contact-page'>Contact Form</div>,
+  DocsContent: () => <div data-testid='docs-content'>Docs Content</div>,
+  PortfolioPageContent: () => (
+    <div data-testid='portfolio-page'>Portfolio Content</div>
+  ),
+  PricingPageContent: () => (
+    <div data-testid='pricing-page'>Pricing Content</div>
+  ),
+  ServicePageContent: () => (
+    <div data-testid='service-page'>Service Content</div>
+  ),
+}));
 
 describe('Contact Page', () => {
   it('should render page with correct title and subtitle', () => {

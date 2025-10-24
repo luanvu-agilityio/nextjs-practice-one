@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import Footer from '@/components/layout/Footer';
+import { Footer } from '@/components/layout';
 
 jest.mock('@/constants', () => ({
   NAV_LINKS: [

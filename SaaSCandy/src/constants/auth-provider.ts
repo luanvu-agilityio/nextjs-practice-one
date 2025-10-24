@@ -1,5 +1,4 @@
-import GitHubIcon from '@/components/icons/GitHubIcon';
-import GoogleIcon from '@/components/icons/GoogleIcon';
+import { GitHubIcon, GoogleIcon } from '@/icons';
 
 export const AUTH_PROVIDERS = [
   {

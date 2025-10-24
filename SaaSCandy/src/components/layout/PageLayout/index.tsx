@@ -1,20 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-client';
 import { User } from 'lucide-react';
 
 // Icons
-import LogoIcon from '@/components/icons/Logo';
-import ThemeSwitcherIcon from '@/components/icons/ThemeSwitcherIcon';
+import { LogoIcon, ThemeSwitcherIcon } from '@/icons';
 
 // Components
 import { Heading, Typography, Button } from '@/components/common';
 import { IconButton } from '@/components/common/IconButton';
 import Navbar from '@/components/NavBar';
-import UserMenu from '@/components/UserMenu';
+import { UserMenu } from '@/components/UserMenu';
 import AuthSectionSkeleton from '../Header/AuthSectionSkeleton';
 import {
   Breadcrumb,
@@ -43,7 +42,7 @@ interface PageLayoutProps {
   contentClassName?: string;
 }
 
-function PageLayout({
+const PageLayout = ({
   title,
   subtitle,
   children,
@@ -51,7 +50,7 @@ function PageLayout({
   className = '',
   headerClassName = '',
   contentClassName = '',
-}: PageLayoutProps) {
+}: PageLayoutProps) => {
   const pathname = usePathname();
   const breadcrumbs = breadcrumbOverride || extractBreadcrumbs(pathname);
   const { data: session, isPending } = useSession();
@@ -204,7 +203,7 @@ function PageLayout({
           <Breadcrumb className='w-full lg:w-auto lg:flex-shrink-0'>
             <BreadcrumbList className='flex-wrap'>
               {breadcrumbs.map((item, index) => (
-                <React.Fragment key={item.label}>
+                <Fragment key={item.label}>
                   <BreadcrumbItem>
                     {item.isActive ? (
                       <BreadcrumbPage className='text-white font-medium text-sm sm:text-xs'>
@@ -222,7 +221,7 @@ function PageLayout({
                   {index < breadcrumbs.length - 1 && (
                     <BreadcrumbSeparator className='text-white' />
                   )}
-                </React.Fragment>
+                </Fragment>
               ))}
             </BreadcrumbList>
           </Breadcrumb>
@@ -235,6 +234,7 @@ function PageLayout({
       </div>
     </div>
   );
-}
+};
 
-export default PageLayout;
+PageLayout.displaName = 'PageLayout';
+export { PageLayout };

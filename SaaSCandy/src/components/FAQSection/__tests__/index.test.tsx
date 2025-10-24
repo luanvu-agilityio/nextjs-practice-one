@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import FAQSection from '@/components/FAQSection';
+import { FAQSection } from '@/components/FAQSection';
 
 jest.mock('@/constants', () => ({
   faqData: [

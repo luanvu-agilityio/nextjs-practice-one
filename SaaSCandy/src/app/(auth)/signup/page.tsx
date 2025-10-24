@@ -1,10 +1,10 @@
-import { SignUpPageContent } from '@/components/SignUpForm';
+import { SignUpPageContent } from '@/components/pages';
 
-function SignUpPage() {
+const SignUpPage = () => {
   return (
     <div className='py-16'>
       <SignUpPageContent />;
     </div>
   );
-}
+};
 export default SignUpPage;

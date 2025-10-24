@@ -2,11 +2,11 @@ import { render } from '@testing-library/react';
 import AccountPage from '@/app/(auth)/account/page';
 
 // Mock the component
-jest.mock('@/components/AccountPageContent', () => {
-  return function AccountPageContent() {
-    return <div data-testid='account-page-content'>Account Page Content</div>;
-  };
-});
+jest.mock('@/components/pages', () => ({
+  AccountPageContent: () => (
+    <div data-testid='account-page-content'>Account Page Content</div>
+  ),
+}));
 
 describe('AccountPage - Snapshot Tests', () => {
   it('should match snapshot', () => {

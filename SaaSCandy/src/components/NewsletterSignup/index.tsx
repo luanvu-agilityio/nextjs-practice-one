@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Heading } from '@/components/common';
-import { Input } from '../common/Input';
+
+// Components
+import { Button, Heading, Input } from '@/components/common';
 
 interface NewsletterSignupProps {
   className?: string;
 }
 
-function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
+const NewsletterSignup = ({ className = '' }: NewsletterSignupProps) => {
   const [email, setEmail] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,6 +41,6 @@ function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
       </form>
     </div>
   );
-}
+};
 
 export { NewsletterSignup };
