@@ -50,6 +50,44 @@ describe('IconButton Snapshot Tests', () => {
 });
 
 describe('IconButton Interactive Tests', () => {
+  describe('Ref and Props', () => {
+    it('should merge custom className', () => {
+      render(
+        <IconButton className='custom-class' data-testid='icon-button-class'>
+          <Plus size={16} />
+        </IconButton>
+      );
+      const button = screen.getByTestId('icon-button-class');
+      expect(button.className).toMatch(/custom-class/);
+    });
+
+    it('should support all size variants', () => {
+      ['sm', 'md', 'lg'].forEach(size => {
+        render(
+          <IconButton size={size as any} data-testid={`icon-button-${size}`}>
+            <Plus size={16} />
+          </IconButton>
+        );
+        const button = screen.getByTestId(`icon-button-${size}`);
+        expect(button).toBeInTheDocument();
+      });
+    });
+
+    it('should pass additional props', () => {
+      render(
+        <IconButton
+          aria-label='plus-button'
+          type='submit'
+          data-testid='icon-button-extra'
+        >
+          <Plus size={16} />
+        </IconButton>
+      );
+      const button = screen.getByTestId('icon-button-extra');
+      expect(button).toHaveAttribute('aria-label', 'plus-button');
+      expect(button).toHaveAttribute('type', 'submit');
+    });
+  });
   describe('Click Behavior', () => {
     it('should call onClick handler when clicked', () => {
       const handleClick = jest.fn();

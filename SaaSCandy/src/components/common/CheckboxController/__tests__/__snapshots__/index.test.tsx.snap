@@ -10,13 +10,15 @@ exports[`CheckboxController renders correctly 1`] = `
     >
       <input
         class="mt-1 undefined"
+        id="checkbox-testCheckbox"
         type="checkbox"
       />
-      <span
+      <label
         class="text-lg text-blue-foreground"
+        for="checkbox-testCheckbox"
       >
         Accept terms
-      </span>
+      </label>
     </div>
   </div>
 </div>

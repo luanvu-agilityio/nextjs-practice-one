@@ -1,3 +1,16 @@
+// For SMS 2FA codes
+export const smsVerificationCode = pgTable('smsVerificationCode', {
+  id: text('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  phone: text('phone').notNull(),
+  code: text('code').notNull(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  verified: boolean('verified').default(false),
+  attempts: text('attempts').default('0'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});
 import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -5,6 +18,10 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
+<<<<<<< Updated upstream
+=======
+  phone: text('phone'), // Optional phone for SMS 2FA
+>>>>>>> Stashed changes
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
   twoFactorEnabled: boolean('twoFactorEnabled').default(false),

@@ -6,6 +6,7 @@ exports[`SignInForm - Snapshot matches snapshot 1`] = `
     class="flex flex-col items-center max-w-[1296px] mx-auto px-4 sm:px-6"
   >
     <div
+<<<<<<< Updated upstream
       class="pb-8 sm:pb-12 text-center"
     >
       <h2>
@@ -31,6 +32,31 @@ exports[`SignInForm - Snapshot matches snapshot 1`] = `
         </ol>
       </nav>
     </div>
+=======
+      data-testid="signin-header"
+    >
+      Header
+    </div>
+    <nav>
+      <ol>
+        <li>
+          <a
+            href="/"
+          >
+            Home
+          </a>
+        </li>
+        <span>
+          /
+        </span>
+        <li>
+          <span>
+            Sign In
+          </span>
+        </li>
+      </ol>
+    </nav>
+>>>>>>> Stashed changes
     <div
       class="py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form"
     >
@@ -73,6 +99,7 @@ exports[`SignInForm - Snapshot matches snapshot 1`] = `
             </button>
           </div>
           <div
+<<<<<<< Updated upstream
             class="text-center space-y-2 sm:space-y-3"
           >
             <button
@@ -91,6 +118,11 @@ exports[`SignInForm - Snapshot matches snapshot 1`] = `
                 Sign up
               </a>
             </div>
+=======
+            data-testid="signin-footer"
+          >
+            Footer
+>>>>>>> Stashed changes
           </div>
         </div>
       </div>

@@ -72,4 +72,55 @@ describe('Dialog Components', () => {
 
     expect(mockOnOpenChange).toHaveBeenCalled();
   });
+  it('applies custom className to DialogContent', () => {
+    const { container } = render(
+      <Dialog open={true}>
+        <DialogContent className='custom-class'>Test</DialogContent>
+      </Dialog>
+    );
+    expect(
+      container.firstChild.querySelector('.custom-class')
+    ).toBeInTheDocument();
+  });
+
+  it('forwards ref to DialogContent', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Dialog open={true}>
+        <DialogContent ref={ref}>Test</DialogContent>
+      </Dialog>
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it('renders DialogClose', () => {
+    render(
+      <Dialog open={true}>
+        <DialogContent>
+          <DialogClose>Close</DialogClose>
+        </DialogContent>
+      </Dialog>
+    );
+    expect(screen.getByText('Close')).toBeInTheDocument();
+  });
+
+  it('renders DialogPortal', () => {
+    const { container } = render(
+      <DialogPortal>
+        <div data-testid='portal-content'>Portal</div>
+      </DialogPortal>
+    );
+    expect(
+      container.querySelector('[data-testid="portal-content"]')
+    ).toBeInTheDocument();
+  });
+
+  it('renders DialogTrigger', () => {
+    const { getByText } = render(
+      <Dialog>
+        <DialogTrigger>Trigger</DialogTrigger>
+      </Dialog>
+    );
+    expect(getByText('Trigger')).toBeInTheDocument();
+  });
 });

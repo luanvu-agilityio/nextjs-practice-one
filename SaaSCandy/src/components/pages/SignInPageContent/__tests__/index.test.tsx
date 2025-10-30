@@ -237,6 +237,22 @@ jest.mock('@/icons', () => ({
     return <svg data-testid='logo-icon' className={className} />;
   },
 }));
+<<<<<<< Updated upstream
+
+jest.mock('@/components/form/SignInForm/index', () => ({
+  SignInForm: ({
+    onSubmit,
+    onSocialSignIn,
+  }: {
+    onSubmit: () => void;
+    onSocialSignIn: (provider: string) => void;
+  }) => (
+    <div data-testid='signin-form'>
+      <button onClick={onSubmit}>Submit</button>
+      <button onClick={() => onSocialSignIn('google')}>
+        Sign in with Google
+      </button>
+=======
 
 jest.mock('@/components/form/SignInForm/index', () => ({
   SignInForm: ({
@@ -255,6 +271,39 @@ jest.mock('@/components/form/SignInForm/index', () => ({
   ),
 }));
 
+jest.mock('@/components/form/TwoFactorForm/index', () => {
+  const TwoFactorForm = ({
+    onVerify,
+    onBack,
+  }: {
+    onVerify: () => void;
+    onBack: () => void;
+  }) => (
+    <div data-testid='twofactor-form'>
+      <button onClick={onVerify}>Verify</button>
+      <button onClick={onBack}>Back</button>
+    </div>
+  );
+  return { TwoFactorForm };
+});
+
+jest.mock('@/components/pages/SignInPageContent/TwoFAMethodSelector', () => ({
+  TwoFAMethodSelector: ({
+    handleSelect2FAMethod,
+    handleSms2FAVerify,
+  }: {
+    handleSelect2FAMethod: (m: string) => void;
+    handleSms2FAVerify: () => void;
+  }) => (
+    <div data-testid='twofamethod-selector'>
+      <button onClick={() => handleSelect2FAMethod('email')}>Email 2FA</button>
+      <button onClick={handleSms2FAVerify}>SMS 2FA</button>
+>>>>>>> Stashed changes
+    </div>
+  ),
+}));
+
+<<<<<<< Updated upstream
 jest.mock('@/components/form/TwoFactorForm/index', () => ({
   TwoFactorForm: ({
     onVerify,
@@ -268,6 +317,14 @@ jest.mock('@/components/form/TwoFactorForm/index', () => ({
       <button onClick={onBack}>Back</button>
     </div>
   ),
+=======
+jest.mock('@/components/pages/SignInPageContent/SignInHeader', () => ({
+  SignInHeader: () => <div data-testid='signin-header'>Header</div>,
+}));
+
+jest.mock('@/components/pages/SignInPageContent/SignInFooter', () => ({
+  SignInFooter: () => <div data-testid='signin-footer'>Footer</div>,
+>>>>>>> Stashed changes
 }));
 
 describe('SignInForm - Snapshot', () => {
@@ -380,10 +437,20 @@ describe('SignInPageContent - Interactive', () => {
     mockSend2FACode.mockResolvedValueOnce({ success: true });
     render(<SignInPageContent />);
     await userEvent.click(screen.getByText('Submit'));
+<<<<<<< Updated upstream
     await waitFor(() =>
       expect(screen.getByTestId('twofactor-form')).toBeInTheDocument()
     );
     await userEvent.click(screen.getByText('Back'));
     expect(screen.getByTestId('signin-form')).toBeInTheDocument();
+=======
+    await waitFor(() => {
+      expect(screen.getByTestId('twofactor-form')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Back'));
+    await waitFor(() => {
+      expect(screen.getByTestId('signin-form')).toBeInTheDocument();
+    });
+>>>>>>> Stashed changes
   });
 });

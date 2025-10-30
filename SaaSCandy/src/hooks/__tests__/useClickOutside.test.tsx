@@ -15,6 +15,55 @@ describe('useOutsideClick Hook', () => {
 
     expect(handler).not.toHaveBeenCalled();
   });
+
+  it('should call handler when clicking outside the ref', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    const ref = { current: div };
+    const handler = jest.fn();
+    renderHook(() => useOutsideClick({ ref, handler }));
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    expect(handler).toHaveBeenCalled();
+    document.body.removeChild(div);
+  });
+
+  it('should not call handler when clicking inside the ref', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    const ref = { current: div };
+    const handler = jest.fn();
+    renderHook(() => useOutsideClick({ ref, handler }));
+    act(() => {
+      div.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    expect(handler).not.toHaveBeenCalled();
+    document.body.removeChild(div);
+  });
+
+  it('should call handler on touchstart outside the ref', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    const ref = { current: div };
+    const handler = jest.fn();
+    renderHook(() => useOutsideClick({ ref, handler }));
+    act(() => {
+      document.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
+    });
+    expect(handler).toHaveBeenCalled();
+    document.body.removeChild(div);
+  });
+
+  it('should not throw if ref.current is null', () => {
+    const ref = { current: null };
+    const handler = jest.fn();
+    renderHook(() => useOutsideClick({ ref, handler }));
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    expect(handler).not.toHaveBeenCalled();
+  });
 });
 
 // useKeyDown Hook Tests

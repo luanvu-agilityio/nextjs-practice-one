@@ -125,4 +125,83 @@ describe('HttpClient', () => {
       );
     });
   });
+
+  describe('internal methods and edge cases', () => {
+    it('should build full URL if path is already a full URL', () => {
+      const url = (client as any).buildUrl('https://other.com/api');
+      expect(url).toBe('https://other.com/api');
+    });
+
+    it('should build full URL from base and relative path', () => {
+      const url = (client as any).buildUrl('/users/1');
+      expect(url).toBe('https://api.example.com/users/1');
+    });
+
+    it('should not include auth header on server-side', async () => {
+      const originalWindow = global.window;
+      // @ts-ignore
+      delete global.window;
+      const headers = await (client as any).getAuthHeader();
+      expect(headers).toEqual({});
+      global.window = originalWindow;
+    });
+
+    it('should set error status and data on failed request', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({ message: 'Server error', details: 'fail' }),
+      } as Response);
+      try {
+        await client.get('fail');
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(Error);
+        expect(err.status).toBe(500);
+        expect(err.data).toEqual({ message: 'Server error', details: 'fail' });
+      }
+    });
+
+    it('should export default http client', async () => {
+      const { http } = require('../index');
+      expect(http).toBeInstanceOf(HttpClient);
+    });
+    it('should handle fetch throwing error in request', async () => {
+      (
+        global.fetch as jest.MockedFunction<typeof fetch>
+      ).mockImplementationOnce(() => {
+        throw new Error('Network error');
+      });
+      await expect(client.get('fail')).rejects.toThrow('Network error');
+    });
+
+    it('should handle fetch throwing non-Error in request', async () => {
+      (
+        global.fetch as jest.MockedFunction<typeof fetch>
+      ).mockImplementationOnce(() => {
+        // @ts-ignore
+        throw 'fail';
+      });
+      try {
+        await client.get('fail');
+      } catch (err: any) {
+        // Should not expect Error instance, just check value and message
+        expect(err).toBe('fail');
+      }
+    });
+
+    it('should trim trailing slashes from baseUrl in constructor', () => {
+      const c = new HttpClient('https://api.example.com////');
+      expect(c.baseUrl).toBe('https://api.example.com');
+    });
+
+    it('should handle response.json returning null', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => null,
+      } as Response);
+      const result = await client.get('users/empty');
+      expect(result).toBeNull();
+    });
+  });
 });

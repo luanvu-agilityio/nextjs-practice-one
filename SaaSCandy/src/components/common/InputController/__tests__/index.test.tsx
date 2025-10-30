@@ -34,4 +34,11 @@ describe('InputController Component', () => {
 
     expect(input).toHaveValue('HELLO');
   });
+
+  it('does not update value if transformValueOnChange returns undefined', () => {
+    render(<TestWrapper transformValueOnChange={() => undefined} />);
+    const input = screen.getByLabelText('Test Input');
+    fireEvent.change(input, { target: { value: 'hello' } });
+    expect(input).toHaveValue('');
+  });
 });

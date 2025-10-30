@@ -1,3 +1,15 @@
+/**
+ * Zod schema for SMS 2FA code validation.
+ * Requires a 6-digit code.
+ */
+export const sms2faSchema = z.object({
+  code: z
+    .string()
+    .length(6, VALIDATION_MESSAGES.PASSWORD_MIN_LENGTH)
+    .regex(/^\d{6}$/, 'Code must be 6 digits'),
+});
+
+export type Sms2FAFormData = z.infer<typeof sms2faSchema>;
 import { z } from 'zod';
 import { VALIDATION_MESSAGES } from '@/constants/messages';
 
