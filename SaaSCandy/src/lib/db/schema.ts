@@ -18,10 +18,7 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-<<<<<<< Updated upstream
-=======
   phone: text('phone'), // Optional phone for SMS 2FA
->>>>>>> Stashed changes
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
   twoFactorEnabled: boolean('twoFactorEnabled').default(false),

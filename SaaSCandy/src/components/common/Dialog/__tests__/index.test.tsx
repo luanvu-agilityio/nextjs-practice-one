@@ -6,7 +6,11 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogClose,
+  DialogPortal,
+  DialogTrigger,
 } from '../index';
+import React from 'react';
 
 describe('Dialog Components', () => {
   it('renders Dialog with content correctly', () => {
@@ -78,9 +82,7 @@ describe('Dialog Components', () => {
         <DialogContent className='custom-class'>Test</DialogContent>
       </Dialog>
     );
-    expect(
-      container.firstChild.querySelector('.custom-class')
-    ).toBeInTheDocument();
+    expect(container.querySelector('.custom-class')).toBeInTheDocument();
   });
 
   it('forwards ref to DialogContent', () => {

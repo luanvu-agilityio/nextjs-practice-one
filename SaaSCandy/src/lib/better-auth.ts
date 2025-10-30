@@ -4,11 +4,7 @@
  * - Uses Drizzle ORM adapter for PostgreSQL.
  * - Enables email/password and social authentication (Google, GitHub).
  * - Supports email verification and password reset via Resend.
-<<<<<<< Updated upstream
- * - Integrates two-factor authentication (2FA) plugin.
-=======
  * - Integrates two-factor authentication (2FA) plugin (supports email and can be extended for SMS).
->>>>>>> Stashed changes
  * - Sends custom verification and reset emails.
  *
  * Exports:
