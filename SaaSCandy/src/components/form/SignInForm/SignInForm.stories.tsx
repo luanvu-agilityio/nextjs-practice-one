@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { SignInForm } from './index';
 import { useForm } from 'react-hook-form';
 import { SignInFormValues } from '@/utils';

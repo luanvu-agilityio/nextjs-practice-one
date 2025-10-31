@@ -4,7 +4,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 // Components
-import { Button, Heading, Typography, Section } from '@/components/common';
+import {
+  Button,
+  Heading,
+  Typography,
+  Section,
+  LazySection,
+} from '@/components/common';
 import { ServiceCard } from '@/components/ServiceCard';
 
 // Icons
@@ -68,12 +74,10 @@ const PortfolioPageContent = () => {
       </Section>
 
       {/* Documentation Section */}
-      <Section
+
+      <LazySection
+        bgImageUrl="url('/images/background/portfolio-background.png')"
         className='bg-blue-background text-white px-4 sm:px-6'
-        style={{
-          backgroundImage: "url('/images/background/portfolio-background.png')",
-          backgroundSize: 'cover',
-        }}
       >
         <div className='space-y-12 sm:space-y-20'>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-0'>
@@ -121,7 +125,7 @@ const PortfolioPageContent = () => {
             />
           </div>
         </div>
-      </Section>
+      </LazySection>
     </>
   );
 };

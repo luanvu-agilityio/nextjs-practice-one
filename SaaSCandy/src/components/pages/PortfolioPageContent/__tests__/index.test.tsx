@@ -21,6 +21,15 @@ const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockPush = jest.fn();
 
 describe('PortfolioPage - Interactive Tests', () => {
+  beforeAll(() => {
+    // @ts-expect-error : Mock window.IntersectionObserver
+    global.IntersectionObserver = class {
+      constructor() {}
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    };
+  });
   beforeEach(() => {
     mockUseRouter.mockReturnValue({
       push: mockPush,

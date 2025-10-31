@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         from: fromPhone,
         to: phone,
       });
-    } catch (_smsError) {
+    } catch (smsError) {
       return NextResponse.json(
         { success: false, error: 'Failed to send SMS' },
         { status: 500 }

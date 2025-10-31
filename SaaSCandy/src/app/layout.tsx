@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-// Google Fonts
 import { Manrope, Ubuntu } from 'next/font/google';
 
 // CSS variables
@@ -9,12 +8,13 @@ import './globals.css';
 // Layout
 import { RootLayoutClient } from '@/providers';
 
-// Client Component
-
+// Google Fonts with optimization
 const manrope = Manrope({
   variable: '--font-primary',
   subsets: ['latin'],
   display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const ubuntu = Ubuntu({
@@ -22,6 +22,8 @@ const ubuntu = Ubuntu({
   subsets: ['latin'],
   weight: ['300', '500'],
   display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
@@ -58,17 +60,12 @@ const RootLayout = ({
   return (
     <html lang='en' suppressHydrationWarning className='overflow-x-hidden'>
       <head>
+        {/* Preload critical image */}
         <link
           rel='preload'
           as='image'
           href='/images/background/homepage.png'
           fetchPriority='high'
-        />
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin='anonymous'
         />
       </head>
       <body className={`${ubuntu.variable} ${manrope.variable} antialiased`}>
@@ -77,4 +74,5 @@ const RootLayout = ({
     </html>
   );
 };
+
 export default RootLayout;

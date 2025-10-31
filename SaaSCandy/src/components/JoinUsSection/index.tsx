@@ -13,6 +13,7 @@ import {
   Typography,
   Section,
   InputController,
+  LazySection,
 } from '@/components/common';
 
 // Utils
@@ -37,12 +38,9 @@ const JoinUsSection = () => {
 
   return (
     <>
-      <Section
-        className='text-white relative overflow-hidden px-4 sm:px-6'
-        style={{
-          backgroundImage: "url('/images/background/join-us.png')",
-          backgroundSize: 'cover',
-        }}
+      <LazySection
+        bgImageUrl='/images/background/join-us.png'
+        className='text-white relative overflow-hidden'
       >
         <div className='max-w-[1296px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16'>
           <div className='space-y-4 sm:space-y-7.5 max-w-full lg:max-w-126.75'>
@@ -133,6 +131,7 @@ const JoinUsSection = () => {
             <CheckboxController
               name='agreeTerms'
               control={control}
+              aria-label='Agree to terms and conditions'
               label={
                 <>
                   You agree to our{' '}
@@ -149,7 +148,7 @@ const JoinUsSection = () => {
             </Button>
           </form>
         </div>
-      </Section>
+      </LazySection>
 
       {/* Trust logos */}
       <Section className='bg-blue-background px-4 sm:px-6'>

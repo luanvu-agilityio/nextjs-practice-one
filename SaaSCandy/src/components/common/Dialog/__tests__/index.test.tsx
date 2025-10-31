@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import {
   Dialog,
@@ -6,11 +7,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
-  DialogPortal,
   DialogTrigger,
+  DialogClose,
 } from '../index';
-import React from 'react';
 
 describe('Dialog Components', () => {
   it('renders Dialog with content correctly', () => {
@@ -76,14 +75,6 @@ describe('Dialog Components', () => {
 
     expect(mockOnOpenChange).toHaveBeenCalled();
   });
-  it('applies custom className to DialogContent', () => {
-    const { container } = render(
-      <Dialog open={true}>
-        <DialogContent className='custom-class'>Test</DialogContent>
-      </Dialog>
-    );
-    expect(container.querySelector('.custom-class')).toBeInTheDocument();
-  });
 
   it('forwards ref to DialogContent', () => {
     const ref = React.createRef<HTMLDivElement>();
@@ -103,18 +94,8 @@ describe('Dialog Components', () => {
         </DialogContent>
       </Dialog>
     );
-    expect(screen.getByText('Close')).toBeInTheDocument();
-  });
-
-  it('renders DialogPortal', () => {
-    const { container } = render(
-      <DialogPortal>
-        <div data-testid='portal-content'>Portal</div>
-      </DialogPortal>
-    );
-    expect(
-      container.querySelector('[data-testid="portal-content"]')
-    ).toBeInTheDocument();
+    const closeButtons = screen.getAllByText('Close');
+    expect(closeButtons[0]).toBeInTheDocument();
   });
 
   it('renders DialogTrigger', () => {

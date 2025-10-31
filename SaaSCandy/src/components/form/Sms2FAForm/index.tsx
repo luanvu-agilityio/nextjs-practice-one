@@ -27,11 +27,7 @@ const Sms2FAForm = ({
   onBack,
   isLoading,
 }: Sms2FAFormProps) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Sms2FAFormData>({
+  const { control, handleSubmit } = useForm<Sms2FAFormData>({
     resolver: zodResolver(sms2faSchema),
     defaultValues: { code },
   });

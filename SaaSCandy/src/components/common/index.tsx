@@ -15,3 +15,4 @@ export * from './DropdownMenu';
 export * from './Dialog';
 export * from './Spinner';
 export * from './ErrorMessage';
+export * from './LazySection';

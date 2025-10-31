@@ -62,9 +62,9 @@ describe('IconButton Interactive Tests', () => {
     });
 
     it('should support all size variants', () => {
-      ['sm', 'md', 'lg'].forEach(size => {
+      (['sm', 'md', 'lg'] as Array<'sm' | 'md' | 'lg'>).forEach(size => {
         render(
-          <IconButton size={size as any} data-testid={`icon-button-${size}`}>
+          <IconButton size={size} data-testid={`icon-button-${size}`}>
             <Plus size={16} />
           </IconButton>
         );

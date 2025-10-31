@@ -169,7 +169,6 @@ describe('API Services', () => {
         ).mockImplementationOnce(() => {
           throw new Error('Network error');
         });
-        const { send2FACode } = require('@/service/AuthService');
         const result = await send2FACode('test@example.com', 'password123');
         expect(result.success).toBe(false);
         expect(result.error).toBe('Network error');
@@ -178,10 +177,9 @@ describe('API Services', () => {
         (
           global.fetch as jest.MockedFunction<typeof fetch>
         ).mockImplementationOnce(() => {
-          // @ts-ignore
+          // @ts-expect-error : should throw fail here
           throw 'fail';
         });
-        const { send2FACode } = require('@/service/AuthService');
         const result = await send2FACode('test@example.com', 'password123');
         expect(result.success).toBe(false);
         expect(result.error).toBe('Unknown error');

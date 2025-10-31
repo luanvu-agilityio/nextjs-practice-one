@@ -2,6 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { JoinUsSection } from '@/components/JoinUsSection';
 
 describe('JoinUsSection - Interactive Tests', () => {
+  beforeAll(() => {
+    // @ts-expect-error : Mock window.IntersectionObserver
+    global.IntersectionObserver = class {
+      constructor() {}
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    };
+  });
   it('should render form with all input fields', () => {
     render(<JoinUsSection />);
 

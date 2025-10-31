@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { showToast } from '../index';
 
 describe('Toast Component', () => {
   it('calls toast.dismiss when close button is clicked', async () => {
-    const dismissSpy = jest.spyOn(require('sonner').toast, 'dismiss');
+    const dismissSpy = jest.spyOn(toast, 'dismiss');
     render(<Toaster />);
     showToast({ title: 'Closable', hasCloseIcon: true });
     // Wait for the close button to appear and click it

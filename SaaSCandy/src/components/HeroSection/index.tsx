@@ -130,16 +130,18 @@ const HeroSection = () => {
       <header className='w-full relative z-10'>
         <div className='max-w-[1296px] mx-auto py-4 px-4 sm:px-6 flex items-center gap-4 sm:gap-14'>
           <Link
-            href={ROUTES.HOME}
-            className='flex items-center gap-2 no-underline'
+            href='/'
+            className='flex items-center gap-2 no-underline flex-shrink-0'
+            aria-label='Homepage'
           >
             <LogoIcon className='w-6 h-6 sm:w-8 sm:h-8' />
+            <span className='sr-only'>Homepage</span>
             <div className='hidden sm:block'>
               <Heading
                 as='h1'
                 size='md'
                 content={
-                  <span className='font-secondary text-primary text-xl sm:text-3xl font-light'>
+                  <span className='font-secondary text-primary text-xl sm:text-2xl lg:text-3xl font-light'>
                     SaaS<span className='font-medium'>Candy</span>
                   </span>
                 }

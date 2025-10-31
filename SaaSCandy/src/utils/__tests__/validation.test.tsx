@@ -3,6 +3,12 @@ import {
   signInSchema,
   signUpSchema,
   changePasswordSchema,
+  sms2faSchema,
+  joinUsSchema,
+  contactSchema,
+  editProfileSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validation';
 
 // Mock auth-client
@@ -74,21 +80,15 @@ describe('validation.ts', () => {
   describe('sms2faSchema', () => {
     it('should validate correct 6-digit code', () => {
       const validData = { code: '123456' };
-      expect(() =>
-        require('../validation').sms2faSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => sms2faSchema.parse(validData)).not.toThrow();
     });
     it('should reject code with non-digits', () => {
       const invalidData = { code: '12a456' };
-      expect(() =>
-        require('../validation').sms2faSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => sms2faSchema.parse(invalidData)).toThrow(z.ZodError);
     });
     it('should reject code with wrong length', () => {
       const invalidData = { code: '12345' };
-      expect(() =>
-        require('../validation').sms2faSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => sms2faSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 
@@ -101,9 +101,7 @@ describe('validation.ts', () => {
         password: 'Password123',
         agreeTerms: true,
       };
-      expect(() =>
-        require('../validation').joinUsSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => joinUsSchema.parse(validData)).not.toThrow();
     });
     it('should reject if terms not agreed', () => {
       const invalidData = {
@@ -113,9 +111,7 @@ describe('validation.ts', () => {
         password: 'Password123',
         agreeTerms: false,
       };
-      expect(() =>
-        require('../validation').joinUsSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => joinUsSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 
@@ -128,9 +124,7 @@ describe('validation.ts', () => {
         projectType: 'Web',
         message: 'This is a valid message.',
       };
-      expect(() =>
-        require('../validation').contactSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => contactSchema.parse(validData)).not.toThrow();
     });
     it('should reject short message', () => {
       const invalidData = {
@@ -140,9 +134,7 @@ describe('validation.ts', () => {
         projectType: 'Web',
         message: 'short',
       };
-      expect(() =>
-        require('../validation').contactSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => contactSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 
@@ -153,40 +145,30 @@ describe('validation.ts', () => {
         lastName: 'Doe',
         email: 'jane@example.com',
       };
-      expect(() =>
-        require('../validation').editProfileSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => editProfileSchema.parse(validData)).not.toThrow();
     });
     it('should validate with optional names', () => {
       const validData = {
         email: 'jane@example.com',
       };
-      expect(() =>
-        require('../validation').editProfileSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => editProfileSchema.parse(validData)).not.toThrow();
     });
     it('should reject invalid email', () => {
       const invalidData = {
         email: 'invalid',
       };
-      expect(() =>
-        require('../validation').editProfileSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => editProfileSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 
   describe('forgotPasswordSchema', () => {
     it('should validate correct email', () => {
       const validData = { email: 'jane@example.com' };
-      expect(() =>
-        require('../validation').forgotPasswordSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => forgotPasswordSchema.parse(validData)).not.toThrow();
     });
     it('should reject empty email', () => {
       const invalidData = { email: '' };
-      expect(() =>
-        require('../validation').forgotPasswordSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => forgotPasswordSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 
@@ -196,27 +178,21 @@ describe('validation.ts', () => {
         newPassword: 'Password123',
         confirmPassword: 'Password123',
       };
-      expect(() =>
-        require('../validation').resetPasswordSchema.parse(validData)
-      ).not.toThrow();
+      expect(() => resetPasswordSchema.parse(validData)).not.toThrow();
     });
     it('should reject non-matching passwords', () => {
       const invalidData = {
         newPassword: 'Password123',
         confirmPassword: 'Password321',
       };
-      expect(() =>
-        require('../validation').resetPasswordSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => resetPasswordSchema.parse(invalidData)).toThrow(z.ZodError);
     });
     it('should reject short password', () => {
       const invalidData = {
         newPassword: 'short',
         confirmPassword: 'short',
       };
-      expect(() =>
-        require('../validation').resetPasswordSchema.parse(invalidData)
-      ).toThrow(z.ZodError);
+      expect(() => resetPasswordSchema.parse(invalidData)).toThrow(z.ZodError);
     });
   });
 });

@@ -10,7 +10,7 @@ const mockConstants = {
 jest.mock('@/constants', () => mockConstants, { virtual: true });
 
 import { render, screen } from '@testing-library/react';
-import { ErrorMessage } from '..';
+import { ErrorMessage, getFriendlyMessage } from '..';
 
 describe('ErrorMessage Component', () => {
   it('matches snapshot with default error', () => {
@@ -58,7 +58,6 @@ describe('ErrorMessage Component', () => {
   });
 
   it('getFriendlyMessage returns default for unknown error', () => {
-    const { getFriendlyMessage } = require('..');
     expect(getFriendlyMessage({})).toBe(
       mockConstants.GENERAL_MESSAGES.SOMETHING_WRONG
     );

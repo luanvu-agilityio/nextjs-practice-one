@@ -92,6 +92,15 @@ jest.mock('@/icons', () => ({
 }));
 
 describe('PricingPage - Interactive Tests', () => {
+  beforeAll(() => {
+    // @ts-expect-error : Mock window.IntersectionObserver
+    global.IntersectionObserver = class {
+      constructor() {}
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    };
+  });
   it('should render pricing section heading', () => {
     render(<PricingPageContent />);
 
