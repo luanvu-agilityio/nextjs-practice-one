@@ -23,8 +23,9 @@ function generateCode() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { phone, email, password } = body;
+    const body = await request.json().catch(() => null);
+    console.log('[send-2fa-sms] POST body:', body);
+    const { phone, email, password } = body || {};
     if (!phone) {
       return NextResponse.json({ error: 'Phone required' }, { status: 400 });
     }
@@ -74,14 +75,37 @@ export async function POST(request: NextRequest) {
     });
     // Send SMS
     try {
+      if (!accountSid || !authToken || !fromPhone) {
+        console.error('[send-2fa-sms] Missing Twilio env vars', {
+          accountSid: !!accountSid,
+          authToken: !!authToken,
+          fromPhone: !!fromPhone,
+        });
+        return NextResponse.json(
+          { success: false, error: 'Twilio configuration missing' },
+          { status: 500 }
+        );
+      }
+
       await client.messages.create({
         body: `Your SaaSCandy verification code is: ${code}`,
         from: fromPhone,
         to: phone,
       });
     } catch (smsError) {
+      // Log Twilio error for debugging
+      console.error('[send-2fa-sms] Twilio send failed:', smsError);
+      // If Twilio provides a message, surface it in the response to help debugging (dev only)
+      const smsErrorMessage =
+        smsError && typeof smsError === 'object' && 'message' in smsError
+          ? (smsError as any).message
+          : String(smsError);
       return NextResponse.json(
-        { success: false, error: 'Failed to send SMS' },
+        {
+          success: false,
+          error: 'Failed to send SMS',
+          details: smsErrorMessage,
+        },
         { status: 500 }
       );
     }
