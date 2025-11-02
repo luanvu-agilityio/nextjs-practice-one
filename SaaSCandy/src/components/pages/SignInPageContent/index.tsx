@@ -136,7 +136,7 @@ const SignInPageContent = () => {
         result = await verify2FACode(userEmail, twoFactorCode);
       } else if (twoFactorMethod === 'sms') {
         // Call SMS 2FA API route
-        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
+        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_SMS, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: userPhone, code: twoFactorCode }),
@@ -207,7 +207,7 @@ const SignInPageContent = () => {
         }
       } else if (twoFactorMethod === 'sms') {
         // Call SMS 2FA API route
-        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
+        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_SMS, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: userPhone }),
@@ -327,7 +327,7 @@ const SignInPageContent = () => {
       return;
     }
     setIsLoading(true);
-    fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
+    fetch(API_ROUTES.AUTH.SEND_2FA_SMS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: userPhone }),

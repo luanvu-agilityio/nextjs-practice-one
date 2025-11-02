@@ -29,6 +29,7 @@ export const API_ROUTES = {
     VERIFY_EMAIL: '/api/auth/verify-email',
     SEND_2FA_CODE: '/api/auth/send-2fa-code',
     VERIFY_2FA_CODE: '/api/auth/verify-2fa-code',
+    SEND_2FA_SMS: '/api/auth/send-2fa-sms',
   },
 };
 
