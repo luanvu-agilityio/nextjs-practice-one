@@ -19,7 +19,7 @@ jest.mock('next/image', () => ({
   },
 }));
 
-const mockUseSession: any = useSession;
+const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 const mockSignOut = signOut as jest.MockedFunction<typeof signOut>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockPush = jest.fn();

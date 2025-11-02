@@ -13,7 +13,7 @@ const ForgotPasswordPageContent = () => {
         className='mb-4'
       />
       <Typography size='md' className='mb-6 text-gray-background'>
-        Enter your email and we'll send you a link to reset your password.
+        Enter your email and we&apos;ll send you a link to reset your password.
       </Typography>
       <ForgotPasswordForm />
     </div>
