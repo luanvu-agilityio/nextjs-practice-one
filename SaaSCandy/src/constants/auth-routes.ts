@@ -30,6 +30,8 @@ export const API_ROUTES = {
     SEND_2FA_CODE: '/api/auth/send-2fa-code',
     VERIFY_2FA_CODE: '/api/auth/verify-2fa-code',
     SEND_2FA_SMS: '/api/auth/send-2fa-sms',
+    SEND_RESET_PASSWORD: '/api/auth/send-reset-password',
+    RESET_PASSWORD: '/api/auth/reset-password',
   },
 };
 

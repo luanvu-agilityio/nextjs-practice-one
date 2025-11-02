@@ -10,11 +10,8 @@ jest.mock('next/server', () => ({
 
 jest.mock('@/lib/db', () => ({
   db: {
-    query: {
-      user: {
-        findFirst: jest.fn(),
-      },
-    },
+    // provide chainable mocks for select().from().where()
+    select: jest.fn(),
     update: jest.fn(),
   },
 }));
@@ -52,38 +49,40 @@ describe('POST /api/auth/forgot-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Email is required');
+    expect(data.error).toBe('Email required');
   });
 
   it('should return 404 when user not found', async () => {
-    (dbForgot.query.user.findFirst as jest.Mock).mockResolvedValue(null);
+    // mock select().from().where() to return empty array (no user)
+    const mockWhere = jest.fn().mockResolvedValue([]);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    (dbForgot.select as jest.Mock).mockReturnValue({ from: mockFrom });
 
-    const request = createMockRequest({
-      email: 'notfound@example.com',
-    });
+    const request = createMockRequest({ email: 'notfound@example.com' });
 
     const response = await ForgotPassword(request);
     const data = await response.json();
 
-    expect(response.status).toBe(404);
-    expect(data.message).toBe('Email not found');
+    // route intentionally returns success to avoid enumeration
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
   });
 
   it('should successfully send reset email', async () => {
-    (dbForgot.query.user.findFirst as jest.Mock).mockResolvedValue({
-      id: 'user-123',
-      email: 'test@example.com',
-    });
+    // mock select().from().where() to return a found user
+    const mockWhere = jest
+      .fn()
+      .mockResolvedValue([{ id: 'user-123', email: 'test@example.com' }]);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    (dbForgot.select as jest.Mock).mockReturnValue({ from: mockFrom });
 
-    const mockWhere = jest.fn().mockResolvedValue({});
-    const mockSet = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockWhereUpdate = jest.fn().mockResolvedValue({});
+    const mockSet = jest.fn().mockReturnValue({ where: mockWhereUpdate });
     (dbForgot.update as jest.Mock).mockReturnValue({ set: mockSet });
 
     (sgMailForgot.send as jest.Mock).mockResolvedValue([{ statusCode: 202 }]);
 
-    const request = createMockRequest({
-      email: 'test@example.com',
-    });
+    const request = createMockRequest({ email: 'test@example.com' });
 
     const response = await ForgotPassword(request);
     const data = await response.json();

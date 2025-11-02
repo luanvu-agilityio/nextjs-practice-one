@@ -120,3 +120,28 @@ export async function verifyEmail(token: string): Promise<ApiResponse> {
     method: 'GET',
   });
 }
+
+/**
+ * Request a password reset email (generate token + send email)
+ */
+export async function requestPasswordReset(
+  email: string
+): Promise<ApiResponse> {
+  return apiRequest(API_ROUTES.AUTH.SEND_RESET_PASSWORD, {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+/**
+ * Reset password using token
+ */
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<ApiResponse> {
+  return apiRequest(API_ROUTES.AUTH.RESET_PASSWORD, {
+    method: 'POST',
+    body: JSON.stringify({ token, newPassword }),
+  });
+}

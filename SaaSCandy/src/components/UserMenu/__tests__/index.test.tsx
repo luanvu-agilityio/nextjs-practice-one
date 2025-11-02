@@ -19,7 +19,7 @@ jest.mock('next/image', () => ({
   },
 }));
 
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
+const mockUseSession: any = useSession;
 const mockSignOut = signOut as jest.MockedFunction<typeof signOut>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockPush = jest.fn();
@@ -43,6 +43,7 @@ describe('Rendering States', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -76,6 +77,7 @@ describe('Rendering States', () => {
         },
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -118,6 +120,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -144,6 +147,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -170,6 +174,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -196,6 +201,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -222,6 +228,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -263,6 +270,7 @@ describe('Avatar Display', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -290,6 +298,7 @@ describe('Avatar Display', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -579,6 +588,7 @@ describe('Snapshot Tests', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
