@@ -25,7 +25,7 @@ import {
 import { LogoIcon } from '@/icons';
 
 // Constants
-import { AUTH_MESSAGES, ROUTES, TOAST_MESSAGES } from '@/constants';
+import { API_ROUTES, AUTH_MESSAGES, ROUTES, TOAST_MESSAGES } from '@/constants';
 
 // Types
 import { TOAST_VARIANTS } from '@/types';
@@ -136,7 +136,7 @@ const SignInPageContent = () => {
         result = await verify2FACode(userEmail, twoFactorCode);
       } else if (twoFactorMethod === 'sms') {
         // Call SMS 2FA API route
-        const res = await fetch('/api/send-2fa-sms', {
+        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: userPhone, code: twoFactorCode }),
@@ -207,7 +207,7 @@ const SignInPageContent = () => {
         }
       } else if (twoFactorMethod === 'sms') {
         // Call SMS 2FA API route
-        const res = await fetch('/api/send-2fa-sms', {
+        const res = await fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: userPhone }),
@@ -327,7 +327,7 @@ const SignInPageContent = () => {
       return;
     }
     setIsLoading(true);
-    fetch('/api/send-2fa-sms', {
+    fetch(API_ROUTES.AUTH.SEND_2FA_CODE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: userPhone }),
