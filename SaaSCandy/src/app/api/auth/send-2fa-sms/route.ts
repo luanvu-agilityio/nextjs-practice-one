@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Generate code
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    // Delete any existing codes for this user/phone
+
     await db
       .delete(schema.smsVerificationCode)
       .where(eq(schema.smsVerificationCode.userId, user.id));
@@ -96,10 +96,15 @@ export async function POST(request: NextRequest) {
       // Log Twilio error for debugging
       console.error('[send-2fa-sms] Twilio send failed:', smsError);
       // If Twilio provides a message, surface it in the response to help debugging (dev only)
-      const smsErrorMessage =
-        smsError && typeof smsError === 'object' && 'message' in smsError
-          ? (smsError as any).message
-          : String(smsError);
+      const smsErrorMessage = (() => {
+        if (smsError instanceof Error) return smsError.message;
+        if (typeof smsError === 'string') return smsError;
+        if (typeof smsError === 'object' && smsError !== null) {
+          const message = (smsError as { message?: unknown }).message;
+          if (typeof message === 'string') return message;
+        }
+        return String(smsError);
+      })();
       return NextResponse.json(
         {
           success: false,
