@@ -210,7 +210,11 @@ const SignInPageContent = () => {
         const res = await fetch(API_ROUTES.AUTH.SEND_2FA_SMS, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: userPhone }),
+          body: JSON.stringify({
+            phone: userPhone,
+            email: userEmail,
+            password: userPassword,
+          }),
         });
         result = await res.json();
         if (result.success) {
