@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, Fragment, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -12,14 +12,6 @@ import { SignInForm, TwoFactorForm, Sms2FAForm } from '@/components/form';
 import { SignInHeader } from './SignInHeader';
 import { SignInFooter } from './SignInFooter';
 import { TwoFAMethodSelector } from './TwoFAMethodSelector';
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/common/Breadcrumb';
 
 // Icons
 import { LogoIcon } from '@/icons';
@@ -32,7 +24,7 @@ import { TOAST_VARIANTS } from '@/types';
 
 // Utils
 import { handleSocialAuth } from '@/utils/social-auth';
-import { extractBreadcrumbs, SignInFormValues, signInSchema } from '@/utils';
+import { SignInFormValues, signInSchema } from '@/utils';
 
 // Service
 import { send2FACode, verify2FACode } from '@/service';
@@ -86,9 +78,9 @@ const SignInPageContent = () => {
       />
     );
   }
-  const pathname = usePathname();
+
   const router = useRouter();
-  const breadcrumbs = extractBreadcrumbs(pathname);
+
   const [isLoading, setIsLoading] = useState(false);
   const [requires2FA, setRequires2FA] = useState(false);
   const [twoFactorMethod, setTwoFactorMethod] = useState<
@@ -365,26 +357,7 @@ const SignInPageContent = () => {
     <div className='flex flex-col items-center max-w-[1296px] mx-auto px-4 sm:px-6'>
       {/* Header Section */}
       <SignInHeader />
-      <Breadcrumb className='justify-center mt-3 sm:mt-4'>
-        <BreadcrumbList>
-          {breadcrumbs.map((item, index) => (
-            <Fragment key={item.label}>
-              <BreadcrumbItem>
-                {item.isActive ? (
-                  <BreadcrumbPage className='text-sm sm:xs'>
-                    {item.label}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink href={item.href} className='text-sm sm:xs'>
-                    {item.label}
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-              {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-            </Fragment>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
+
       {/* Form Section */}
       <div className='py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form'>
         <div className='flex flex-col gap-6 sm:gap-10'>

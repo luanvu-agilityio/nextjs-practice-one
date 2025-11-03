@@ -46,23 +46,6 @@ describe('Header - Interactive Tests', () => {
     expect(screen.getByText('Sign Up')).toBeInTheDocument();
   });
 
-  it('should show loading skeleton when session is pending', () => {
-    mockUseSession.mockReturnValue({
-      data: null,
-      isPending: true,
-      error: null,
-      refetch: function (): void {
-        throw new Error('Function not implemented.');
-      },
-      isRefetching: false,
-    });
-
-    const { container } = render(<Header />);
-
-    const skeletons = container.querySelectorAll('.animate-pulse');
-    expect(skeletons.length).toBeGreaterThan(0);
-  });
-
   it('should toggle mobile auth menu', () => {
     render(<Header />);
 

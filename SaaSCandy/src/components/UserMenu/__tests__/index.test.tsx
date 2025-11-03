@@ -311,7 +311,7 @@ describe('Avatar Display', () => {
 
 describe('Dropdown Menu Interaction', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue({
+    return mockUseSession.mockReturnValue({
       data: {
         user: {
           id: '1',
@@ -329,6 +329,7 @@ describe('Dropdown Menu Interaction', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
   });
 
@@ -421,6 +422,7 @@ describe('Custom Styling', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
   });
 
@@ -457,6 +459,7 @@ describe('Accessibility', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
   });
 
@@ -528,6 +531,7 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     const { container } = render(<UserMenu />);
@@ -553,6 +557,7 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     const { container } = render(<UserMenu />);
@@ -578,6 +583,7 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     const { container } = render(<UserMenu className='test-class' />);
@@ -631,6 +637,7 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -656,6 +663,7 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -682,6 +690,7 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -708,6 +717,7 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
+      isRefetching: false,
     });
 
     render(<UserMenu />);

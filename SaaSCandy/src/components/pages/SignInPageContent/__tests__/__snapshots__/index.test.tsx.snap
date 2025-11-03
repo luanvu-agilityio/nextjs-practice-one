@@ -10,25 +10,6 @@ exports[`SignInForm - Snapshot matches snapshot 1`] = `
     >
       Header
     </div>
-    <nav>
-      <ol>
-        <li>
-          <a
-            href="/"
-          >
-            Home
-          </a>
-        </li>
-        <span>
-          /
-        </span>
-        <li>
-          <span>
-            Sign In
-          </span>
-        </li>
-      </ol>
-    </nav>
     <div
       class="py-8 px-4 sm:py-14 sm:px-16 w-full lg:w-159 rounded-2xl sm:rounded-4xl border border-form-border-color shadow-form"
     >

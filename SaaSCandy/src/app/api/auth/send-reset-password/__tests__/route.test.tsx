@@ -28,6 +28,13 @@ jest.mock('@/constants/email-template', () => ({
   ResetPasswordEmail: jest.fn(() => '<html>Reset</html>'),
 }));
 
+jest.mock('@/lib/better-auth', () => ({
+  auth: {
+    api: {
+      requestPasswordReset: jest.fn(),
+    },
+  },
+}));
 describe('POST /api/auth/forgot-password', () => {
   const createMockRequest = (body: Record<string, unknown>) => {
     return {
@@ -40,6 +47,11 @@ describe('POST /api/auth/forgot-password', () => {
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
     process.env.SENDGRID_API_KEY = 'test-key';
     process.env.SENDGRID_FROM_EMAIL = 'test@example.com';
+    const { auth } = require('@/lib/better-auth');
+    (auth.api.requestPasswordReset as jest.Mock).mockResolvedValue({
+      ok: true,
+      message: 'Reset requested',
+    });
   });
 
   it('should return 400 when email is missing', async () => {
@@ -89,7 +101,6 @@ describe('POST /api/auth/forgot-password', () => {
 
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.message).toBe('Reset email sent');
-    expect(sgMailForgot.send).toHaveBeenCalled();
+    expect(data.message).toBe('Reset requested');
   });
 });

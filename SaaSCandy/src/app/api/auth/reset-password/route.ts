@@ -37,13 +37,19 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const anyResult: ResetPasswordResult = isResetPasswordResult(result)
+    const resetPasswordResult: ResetPasswordResult = isResetPasswordResult(
+      result
+    )
       ? result
       : { error: 'Unexpected response shape' };
-    if (anyResult?.ok || anyResult?.success || anyResult?.user) {
+    if (
+      resetPasswordResult?.ok ||
+      resetPasswordResult?.success ||
+      resetPasswordResult?.user
+    ) {
       return NextResponse.json({
         success: true,
-        message: anyResult?.message || 'Password updated',
+        message: resetPasswordResult?.message || 'Password updated',
       });
     }
 
@@ -51,7 +57,9 @@ export const POST = async (request: NextRequest) => {
       {
         success: false,
         message:
-          anyResult?.error || anyResult?.message || 'Failed to reset password',
+          resetPasswordResult?.error ||
+          resetPasswordResult?.message ||
+          'Failed to reset password',
       },
       { status: 400 }
     );

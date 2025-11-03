@@ -428,8 +428,6 @@ describe('SignInPageContent - Additional Coverage', () => {
   it('renders logo and breadcrumbs', () => {
     render(<SignInPageContent />);
     expect(screen.getByTestId('logo-icon')).toBeInTheDocument();
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Sign In')).toBeInTheDocument();
   });
 
   it('shows error toast if 2FA code is invalid', async () => {

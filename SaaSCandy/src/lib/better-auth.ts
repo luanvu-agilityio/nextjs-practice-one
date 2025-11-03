@@ -55,6 +55,14 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, token }) => {
       const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 
+      // DEV: log the token and resetUrl so local testing can pick up the token
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[better-auth] sendResetPassword token:', token);
+        // eslint-disable-next-line no-console
+        console.log('[better-auth] resetUrl:', resetUrl);
+      }
+
       await sgMail.send({
         from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
         to: user.email,

@@ -13,20 +13,15 @@ import Navbar from '@/components/NavBar';
 import { Button, Heading } from '@/components/common';
 import { IconButton } from '@/components/common/IconButton';
 import { UserMenu } from '@/components/UserMenu';
-import AuthSectionSkeleton from './AuthSectionSkeleton';
 
 // Constants
 import { ROUTES } from '@/constants';
 
 const Header = (): JSX.Element => {
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
   const renderAuthSection = () => {
-    if (isPending) {
-      return <AuthSectionSkeleton />;
-    }
-
     if (session?.user) {
       return <UserMenu />;
     }

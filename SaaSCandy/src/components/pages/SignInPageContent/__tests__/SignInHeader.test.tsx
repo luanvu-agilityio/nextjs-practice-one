@@ -21,6 +21,17 @@ jest.mock('@/constants/messages', () => ({
   },
 }));
 
+jest.mock('@/utils', () => ({
+  signInSchema: jest.requireActual('zod').z.object({
+    email: jest.requireActual('zod').z.string().email(),
+    password: jest.requireActual('zod').z.string().min(1),
+  }),
+  extractBreadcrumbs: jest.fn(() => [
+    { label: 'Home', href: '/', isActive: false },
+    { label: 'Sign In', href: '/signin', isActive: true },
+  ]),
+}));
+
 describe('SignInHeader', () => {
   it('renders heading with correct text', () => {
     render(<SignInHeader />);

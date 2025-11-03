@@ -30,20 +30,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const anyResult: ResetResult = isResetResult(result)
-      ? result
+    const resetResult: ResetResult = isResetResult(result)
+      ? (result as ResetResult)
       : { message: typeof result === 'string' ? result : undefined };
 
-    if (anyResult?.ok || anyResult?.success || anyResult?.status === true) {
+    if (
+      resetResult?.ok ||
+      resetResult?.success ||
+      resetResult?.status === true
+    ) {
       return NextResponse.json({
         success: true,
-        message: anyResult?.message || 'Reset email sent',
+        message: resetResult?.message || 'Reset email sent',
       });
     }
 
     return NextResponse.json({
-      success: true,
-      message: anyResult?.message || 'Reset email sent',
+      success: false,
+      message: resetResult?.message || 'Failed to send reset email',
     });
   } catch (error: unknown) {
     console.error('[send-reset-password] error', error);
