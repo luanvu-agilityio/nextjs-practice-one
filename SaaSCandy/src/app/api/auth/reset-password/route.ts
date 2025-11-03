@@ -10,6 +10,10 @@ export const POST = async (request: NextRequest) => {
     const { token, newPassword } = body ?? {};
 
     if (!token || !newPassword || typeof newPassword !== 'string') {
+      console.warn('[reset-password] missing payload', {
+        token: !!token,
+        hasNewPassword: !!newPassword,
+      });
       return NextResponse.json(
         { success: false, message: 'Token and new password required' },
         { status: 400 }
@@ -19,6 +23,17 @@ export const POST = async (request: NextRequest) => {
     // fetch user by token
     const foundUser = await db.query.user.findFirst({
       where: eq(user.resetToken, token),
+    });
+
+    console.log('[reset-password] lookup result', {
+      tokenProvided: !!token,
+      foundUserId: foundUser?.id ?? null,
+      resetTokenPresent: foundUser?.resetToken ? true : false,
+      // only preview part of the hash to avoid logging full secret
+      passwordHashPreview: foundUser?.password
+        ? foundUser.password.slice(0, 10) + '...'
+        : null,
+      resetTokenExpiresRaw: foundUser?.resetTokenExpires ?? null,
     });
 
     if (!foundUser) {
@@ -41,6 +56,7 @@ export const POST = async (request: NextRequest) => {
       console.warn('[reset-password] token expired', {
         userId: foundUser.id,
         expiresRaw,
+        expiresDate: expiresDate?.toISOString() ?? null,
       });
       return NextResponse.json(
         { success: false, message: 'Invalid or expired token' },
@@ -50,6 +66,10 @@ export const POST = async (request: NextRequest) => {
 
     // hash new password
     const hashedPassword = await hash(newPassword);
+    console.log('[reset-password] created new hash preview', {
+      userId: foundUser.id,
+      hashedPasswordPreview: hashedPassword.slice(0, 10) + '...',
+    });
 
     // perform update
     await db
@@ -67,6 +87,13 @@ export const POST = async (request: NextRequest) => {
       where: eq(user.id, foundUser.id),
     });
 
+    console.log('[reset-password] after update lookup', {
+      userId: updatedUser?.id ?? null,
+      passwordHashPreview: updatedUser?.password
+        ? updatedUser.password.slice(0, 10) + '...'
+        : null,
+    });
+
     if (!updatedUser) {
       console.error('[reset-password] failed to re-fetch user after update', {
         userId: foundUser.id,
@@ -78,7 +105,19 @@ export const POST = async (request: NextRequest) => {
     }
 
     // ensure password hash actually changed
-    if (updatedUser.password === foundUser.password) {
+    const hashChanged = updatedUser.password !== foundUser.password;
+    console.log('[reset-password] hash comparison', {
+      userId: foundUser.id,
+      beforePreview: foundUser.password
+        ? foundUser.password.slice(0, 10) + '...'
+        : null,
+      afterPreview: updatedUser.password
+        ? updatedUser.password.slice(0, 10) + '...'
+        : null,
+      hashChanged,
+    });
+
+    if (!hashChanged) {
       console.error('[reset-password] password hash unchanged after update', {
         userId: foundUser.id,
       });
