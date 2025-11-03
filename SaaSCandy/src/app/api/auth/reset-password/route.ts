@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hash } from '@node-rs/argon2';
-import { db } from '@/lib/db';
-import { eq, and } from 'drizzle-orm';
-import { user, account } from '@/lib/db/schema';
+import { auth } from '@/lib/better-auth';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -16,67 +13,48 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // find user by reset token
-    const foundUser = await db.query.user.findFirst({
-      where: eq(user.resetToken, token),
+    const result = await auth.api.resetPassword({
+      body: { token, newPassword },
     });
 
-    if (!foundUser) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid or expired token' },
-        { status: 400 }
+    type ResetPasswordResult = {
+      ok?: boolean;
+      success?: boolean;
+      user?: unknown;
+      message?: string;
+      error?: string;
+    };
+
+    function isResetPasswordResult(obj: unknown): obj is ResetPasswordResult {
+      if (typeof obj !== 'object' || obj === null) return false;
+      const o = obj as Record<string, unknown>;
+      return (
+        'ok' in o ||
+        'success' in o ||
+        'user' in o ||
+        'message' in o ||
+        'error' in o
       );
     }
 
-    // token expiry check (defensive)
-    const expiresDate = foundUser.resetTokenExpires
-      ? new Date(foundUser.resetTokenExpires)
-      : null;
-    if (
-      !expiresDate ||
-      Number.isNaN(expiresDate.getTime()) ||
-      Date.now() > expiresDate.getTime()
-    ) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid or expired token' },
-        { status: 400 }
-      );
+    const anyResult: ResetPasswordResult = isResetPasswordResult(result)
+      ? result
+      : { error: 'Unexpected response shape' };
+    if (anyResult?.ok || anyResult?.success || anyResult?.user) {
+      return NextResponse.json({
+        success: true,
+        message: anyResult?.message || 'Password updated',
+      });
     }
 
-    // hash new password
-    const hashed = await hash(newPassword);
-
-    const updated = await db
-      .update(account)
-      .set({
-        password: hashed,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(account.userId, foundUser.id),
-          eq(account.providerId, 'credential')
-        )
-      );
-
-    // clear reset token on user record as well
-    await db
-      .update(user)
-      .set({
-        resetToken: null,
-        resetTokenExpires: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(user.id, foundUser.id));
-
-    console.log(
-      '[reset-password] userId',
-      foundUser.id,
-      'account update result:',
-      updated
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          anyResult?.error || anyResult?.message || 'Failed to reset password',
+      },
+      { status: 400 }
     );
-
-    return NextResponse.json({ success: true, message: 'Password updated' });
   } catch (err: unknown) {
     console.error('[reset-password] error', err);
     const message = err instanceof Error ? err.message : 'Unknown error';

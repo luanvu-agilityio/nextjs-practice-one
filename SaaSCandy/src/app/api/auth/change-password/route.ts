@@ -12,89 +12,67 @@
  * Response: { success: boolean, message: string }
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { hash, verify } from '@node-rs/argon2';
-import { eq } from 'drizzle-orm';
-
-// Libs
 import { auth } from '@/lib/better-auth';
-
-// DB
-import { db } from '@/lib/db';
-
-// DB Schema
-import { account } from '@/lib/db/schema';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
-
-    if (!session?.user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { currentPassword, newPassword } = body;
+    const { currentPassword, newPassword } = body ?? {};
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
-        { message: 'Current password and new password are required' },
-        { status: 400 }
-      );
-    }
-
-    // Find the credential account (email/password)
-    const userAccounts = await db.query.account.findMany({
-      where: eq(account.userId, session.user.id),
-    });
-
-    const credentialAccount = userAccounts.find(
-      acc => acc.providerId === 'credential'
-    );
-
-    if (!credentialAccount || !credentialAccount.password) {
-      return NextResponse.json(
         {
-          message:
-            'Password authentication not enabled. You may have signed in with Google/GitHub.',
+          success: false,
+          message: 'Current password and new password are required',
         },
         { status: 400 }
       );
     }
 
-    // Verify current password
-    const isValid = await verify(credentialAccount.password, currentPassword);
+    const result = (await auth.api.changePassword({
+      headers: request.headers,
+      body: { currentPassword, newPassword },
+    })) as unknown;
 
-    if (!isValid) {
-      return NextResponse.json(
-        { message: 'Current password is incorrect' },
-        { status: 400 }
-      );
-    }
-
-    // Hash new password
-    const hashedPassword = await hash(newPassword);
-
-    // Log values before update
-    const updateData = {
-      password: hashedPassword,
-      updatedAt: new Date(),
+    type ChangePasswordResponse = {
+      user?: unknown;
+      token?: string;
+      ok?: boolean;
+      message?: string;
+      error?: string;
+      [key: string]: unknown;
     };
 
-    // Update password in database
-    await db
-      .update(account)
-      .set(updateData)
-      .where(eq(account.id, credentialAccount.id));
+    const authResult = result as ChangePasswordResponse;
 
-    return NextResponse.json({
-      message: 'Password updated successfully',
-      success: true,
-    });
+    if (authResult?.user || authResult?.token || authResult?.ok) {
+      return NextResponse.json({
+        success: true,
+        message:
+          typeof authResult.message === 'string'
+            ? authResult.message
+            : 'Password changed',
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          (typeof authResult.error === 'string'
+            ? authResult.error
+            : undefined) ||
+          (typeof authResult.message === 'string'
+            ? authResult.message
+            : undefined) ||
+          'Failed to change password',
+      },
+      { status: 400 }
+    );
   } catch (error) {
     return NextResponse.json(
       {
+        success: false,
         message:
           error instanceof Error ? error.message : 'Failed to change password',
       },
