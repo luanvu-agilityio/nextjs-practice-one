@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sgMail from '@sendgrid/mail';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import * as schema from '@/lib/db/schema';
-import { ResetPasswordEmail } from '@/constants/email-template';
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+import { auth } from '@/lib/better-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,39 +12,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by email
-    const users = await db
-      .select()
-      .from(schema.user)
-      .where(eq(schema.user.email, email));
-    const user = users[0];
-    if (!user) {
-      // Do not reveal user existence - return success to avoid enumeration
-      return NextResponse.json({ success: true });
+    const result = await auth.api.requestPasswordReset({ body: { email } });
+
+    interface ResetResult {
+      ok?: boolean;
+      success?: boolean;
+      status?: boolean | number;
+      message?: string;
+      [key: string]: unknown;
     }
 
-    // Generate reset token and expiry (1 hour)
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    function isResetResult(obj: unknown): obj is ResetResult {
+      return (
+        typeof obj === 'object' &&
+        obj !== null &&
+        ('ok' in obj || 'success' in obj || 'status' in obj || 'message' in obj)
+      );
+    }
 
-    // Persist token on user
-    await db
-      .update(schema.user)
-      .set({ resetToken: token, resetTokenExpires: expiresAt })
-      .where(eq(schema.user.id, user.id));
+    const anyResult: ResetResult = isResetResult(result)
+      ? result
+      : { message: typeof result === 'string' ? result : undefined };
 
-    // Build reset URL
-    const resetUrl = `${process.env.BETTER_AUTH_URL || ''}/reset-password?token=${token}`;
+    if (anyResult?.ok || anyResult?.success || anyResult?.status === true) {
+      return NextResponse.json({
+        success: true,
+        message: anyResult?.message || 'Reset email sent',
+      });
+    }
 
-    // Send email using SendGrid
-    await sgMail.send({
-      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-      to: email,
-      subject: 'Reset your password - SaaSCandy',
-      html: ResetPasswordEmail({ resetUrl }),
+    return NextResponse.json({
+      success: true,
+      message: anyResult?.message || 'Reset email sent',
     });
-
-    return NextResponse.json({ success: true, message: 'Reset email sent' });
   } catch (error: unknown) {
     console.error('[send-reset-password] error', error);
     const msg = error instanceof Error ? error.message : String(error);

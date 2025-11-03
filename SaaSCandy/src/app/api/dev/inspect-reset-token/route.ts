@@ -18,21 +18,32 @@ export async function GET(request: NextRequest) {
 
     const url = new URL(request.url);
     const token = url.searchParams.get('token') ?? '';
+    const email = url.searchParams.get('email') ?? '';
 
-    if (!token) {
+    if (!token && !email) {
       return NextResponse.json(
-        { success: false, message: 'token query required' },
+        { success: false, message: 'token or email query required' },
         { status: 400 }
       );
     }
 
-    const foundUser = await db.query.user.findFirst({
-      where: eq(user.resetToken, token),
-    });
+    let foundUser = null;
+    if (token) {
+      foundUser = await db.query.user.findFirst({
+        where: eq(user.resetToken, token),
+      });
+    } else if (email) {
+      foundUser = await db.query.user.findFirst({
+        where: eq(user.email, email),
+      });
+    }
 
     if (!foundUser) {
       return NextResponse.json(
-        { success: false, message: 'Token not found' },
+        {
+          success: false,
+          message: token ? 'Token not found' : 'User not found',
+        },
         { status: 404 }
       );
     }
