@@ -17,7 +17,10 @@ export const user = pgTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  password: text('password').notNull(),
+  // Password is stored on the `account` table for credential providers.
+  // Keep this nullable to avoid insert failures when the auth adapter
+  // creates a user record without a password field.
+  password: text('password'),
   phone: text('phone'), // Optional phone for SMS 2FA
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
