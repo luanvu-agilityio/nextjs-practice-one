@@ -46,7 +46,6 @@ export const POST = async (request: NextRequest) => {
     // hash new password
     const hashed = await hash(newPassword);
 
-    // update credential account (this is what Better Auth uses to verify passwords)
     const updated = await db
       .update(account)
       .set({
@@ -70,7 +69,6 @@ export const POST = async (request: NextRequest) => {
       })
       .where(eq(user.id, foundUser.id));
 
-    // logging for debug (will appear in server logs)
     console.log(
       '[reset-password] userId',
       foundUser.id,
