@@ -6,3 +6,5 @@ export * from './EditProfileModal';
 export * from './TwoFactorForm';
 export * from './ForgotPasswordForm';
 export * from './Sms2FAForm';
+export * from './ForgotPasswordForm';
+export * from './ResetPasswordForm';

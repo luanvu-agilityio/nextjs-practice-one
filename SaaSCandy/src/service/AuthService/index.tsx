@@ -140,8 +140,11 @@ export async function resetPassword(
   token: string,
   newPassword: string
 ): Promise<ApiResponse> {
+  const usedToken = token ?? '';
+
   return apiRequest(API_ROUTES.AUTH.RESET_PASSWORD, {
     method: 'POST',
-    body: JSON.stringify({ token, newPassword }),
+    body: JSON.stringify({ token: usedToken, newPassword }),
+    headers: { 'Content-Type': 'application/json' },
   });
 }

@@ -3,7 +3,7 @@ import { FeatureCard } from './index';
 import { BookIcon } from '@/icons';
 
 const meta: Meta<typeof FeatureCard> = {
-  title: 'Common/FeaturedCard',
+  title: 'Components/FeaturedCard',
   component: FeatureCard,
 };
 export default meta;

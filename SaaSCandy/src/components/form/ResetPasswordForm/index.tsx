@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSearchParams, useRouter } from 'next/navigation';
 
 // Components
 import {
@@ -10,12 +9,29 @@ import {
   ErrorMessage,
   Button,
   InputController,
+  getFriendlyMessage,
 } from '@/components/common';
 
 // Utils
 import { ResetPasswordFormData, resetPasswordSchema } from '@/utils/validation';
 
-const ResetPasswordForm = () => {
+// Service
+import { resetPassword } from '@/service';
+
+// Types
+import { TOAST_VARIANTS } from '@/types';
+
+type ResetPasswordFormProps = {
+  token?: string;
+  onSuccess?: () => void;
+  onError?: (message?: string) => void;
+};
+
+const ResetPasswordForm = ({
+  token,
+  onSuccess,
+  onError,
+}: ResetPasswordFormProps) => {
   const {
     control,
     handleSubmit,
@@ -24,35 +40,40 @@ const ResetPasswordForm = () => {
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { newPassword: '', confirmPassword: '' },
   });
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const token = searchParams.get('token') || '';
 
   const onSubmit = async ({ newPassword }: { newPassword: string }) => {
-    const res = await fetch('/api/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ token, newPassword }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await res.json();
-    if (data.success) {
-      showToast({
-        title: 'Password Updated',
-        description: 'You can now sign in.',
-        variant: 'success',
-      });
-      router.push('/signin');
-    } else {
+    try {
+      const data = await resetPassword(token ?? '', newPassword);
+
+      if (data.success) {
+        showToast({
+          title: 'Password Updated',
+          description: 'You can now sign in.',
+          variant: TOAST_VARIANTS.SUCCESS,
+        });
+        onSuccess?.();
+      } else {
+        const msg = data.message ?? 'Failed to reset password';
+        showToast({
+          title: 'Error',
+          description: getFriendlyMessage(msg),
+          variant: TOAST_VARIANTS.ERROR,
+        });
+        onError?.(msg);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
       showToast({
         title: 'Error',
-        description: data.message,
-        variant: 'error',
+        description: getFriendlyMessage(msg),
+        variant: TOAST_VARIANTS.ERROR,
       });
+      onError?.(msg);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <InputController
         name='newPassword'
         control={control}
@@ -75,7 +96,9 @@ const ResetPasswordForm = () => {
       {errors.confirmPassword && (
         <ErrorMessage error={errors.confirmPassword.message} />
       )}
-      <Button type='submit'>Change Password</Button>
+      <Button type='submit' className='mt-6'>
+        Change Password
+      </Button>
     </form>
   );
 };

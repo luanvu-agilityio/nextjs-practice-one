@@ -10,5 +10,16 @@ export default meta;
 type Story = StoryObj<typeof ResetPasswordForm>;
 
 export const Default: Story = {
-  render: () => <ResetPasswordForm />,
+  render: () => (
+    <div style={{ padding: 20, maxWidth: 420 }}>
+      <ResetPasswordForm
+        token='storybook-token'
+        onSuccess={() => {
+          // Storybook friendly success handler
+          // eslint-disable-next-line no-console
+          console.log('Reset success from story');
+        }}
+      />
+    </div>
+  ),
 };

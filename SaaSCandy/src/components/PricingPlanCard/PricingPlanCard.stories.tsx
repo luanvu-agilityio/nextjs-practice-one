@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { PricingPlanCard } from './index';
 
 const meta: Meta<typeof PricingPlanCard> = {
-  title: 'Common/PricingPlanCard',
+  title: 'Components/PricingPlanCard',
   component: PricingPlanCard,
 };
 export default meta;

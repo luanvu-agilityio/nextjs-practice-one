@@ -13,6 +13,12 @@ import {
   forgotPasswordSchema,
 } from '@/utils/validation';
 
+// Constant
+import { API_ROUTES } from '@/constants';
+
+// Types
+import { TOAST_VARIANTS } from '@/types';
+
 const ForgotPasswordForm = () => {
   const {
     control,
@@ -24,7 +30,7 @@ const ForgotPasswordForm = () => {
   });
 
   const onSubmit = async ({ email }: { email: string }) => {
-    const res = await fetch('/api/auth/send-reset-password', {
+    const res = await fetch(API_ROUTES.AUTH.SEND_RESET_PASSWORD, {
       method: 'POST',
       body: JSON.stringify({ email }),
       headers: { 'Content-Type': 'application/json' },
@@ -34,19 +40,19 @@ const ForgotPasswordForm = () => {
       showToast({
         title: 'Email Sent',
         description: 'Check your inbox',
-        variant: 'success',
+        variant: TOAST_VARIANTS.SUCCESS,
       });
     } else {
       showToast({
         title: 'Error',
         description: data.message,
-        variant: 'error',
+        variant: TOAST_VARIANTS.ERROR,
       });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <InputController
         name='email'
         control={control}

@@ -3,7 +3,7 @@ import { ServiceCard } from './index';
 import { BookIcon } from '@/icons';
 
 const meta: Meta<typeof ServiceCard> = {
-  title: 'Common/ServiceCard',
+  title: 'Components/ServiceCard',
   component: ServiceCard,
 };
 export default meta;

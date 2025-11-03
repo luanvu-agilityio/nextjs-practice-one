@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { BlogCard } from './index';
 
 const meta: Meta<typeof BlogCard> = {
-  title: 'Common/BlogCard',
+  title: 'Components/BlogCard',
   component: BlogCard,
 };
 export default meta;

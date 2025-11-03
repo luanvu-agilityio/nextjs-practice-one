@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Share } from './index';
 
 const meta: Meta<typeof Share> = {
-  title: 'Common/Share',
+  title: 'Components/Share',
   component: Share,
 };
 export default meta;

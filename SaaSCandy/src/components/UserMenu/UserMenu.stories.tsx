@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { UserMenu } from './index';
 
 const meta: Meta<typeof UserMenu> = {
-  title: 'Common/UserMenu',
+  title: 'Components/UserMenu',
   component: UserMenu,
 };
 export default meta;
