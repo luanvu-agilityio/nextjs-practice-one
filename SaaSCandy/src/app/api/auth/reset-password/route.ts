@@ -64,7 +64,13 @@ export const POST = async (request: NextRequest) => {
       { status: 400 }
     );
   } catch (err: unknown) {
-    console.error('[reset-password] error', err);
+    try {
+      const { error: logError } = await import('@/lib/logger');
+      logError('[reset-password] error', err);
+    } catch {
+      /* noop */
+    }
+
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ success: false, message }, { status: 500 });
   }

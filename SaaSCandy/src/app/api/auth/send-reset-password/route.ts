@@ -50,7 +50,13 @@ export async function POST(request: NextRequest) {
       message: resetResult?.message || 'Failed to send reset email',
     });
   } catch (error: unknown) {
-    console.error('[send-reset-password] error', error);
+    try {
+      const { error: logError } = await import('@/lib/logger');
+      logError('[send-reset-password] error', error);
+    } catch {
+      /* noop */
+    }
+
     const msg = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { success: false, error: 'Failed to send reset email', details: msg },
