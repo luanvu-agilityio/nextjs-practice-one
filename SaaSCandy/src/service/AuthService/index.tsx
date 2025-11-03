@@ -145,6 +145,5 @@ export async function resetPassword(
   return apiRequest(API_ROUTES.AUTH.RESET_PASSWORD, {
     method: 'POST',
     body: JSON.stringify({ token: usedToken, newPassword }),
-    headers: { 'Content-Type': 'application/json' },
   });
 }
