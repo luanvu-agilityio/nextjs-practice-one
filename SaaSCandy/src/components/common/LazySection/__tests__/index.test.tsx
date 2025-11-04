@@ -8,7 +8,7 @@ const mockDisconnect = jest.fn();
 
 describe('LazySection', () => {
   beforeEach(() => {
-    mockIntersectionObserver.mockImplementation(_callback => ({
+    mockIntersectionObserver.mockImplementation(() => ({
       observe: mockObserve,
       disconnect: mockDisconnect,
       unobserve: jest.fn(),
@@ -77,7 +77,7 @@ describe('LazySection', () => {
       </LazySection>
     );
 
-    const innerDiv = container.querySelector('.max-w-\\[1296px\\]');
+    const innerDiv = container.querySelector(String.raw`.max-w-\[1296px\]`);
     expect(innerDiv).toHaveClass('custom-container-class');
   });
 

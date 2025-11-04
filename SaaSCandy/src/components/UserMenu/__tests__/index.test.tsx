@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserMenu } from '@/components/UserMenu';
-import { useSession, signOut } from '@/lib/auth-client';
+import { useSession } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants';
 
@@ -20,7 +20,7 @@ jest.mock('next/image', () => ({
 }));
 
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
-const mockSignOut = signOut as jest.MockedFunction<typeof signOut>;
+
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockPush = jest.fn();
 const mockRefresh = jest.fn();
@@ -43,7 +43,6 @@ describe('Rendering States', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
-      isRefetching: false,
       error: null,
       refetch: jest.fn(),
     });
@@ -77,7 +76,7 @@ describe('Rendering States', () => {
         },
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -120,7 +119,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -147,7 +146,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -174,7 +173,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -201,7 +200,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -228,7 +227,7 @@ describe('Display Name and Initials', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -270,7 +269,7 @@ describe('Avatar Display', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -298,7 +297,7 @@ describe('Avatar Display', () => {
           {} as (typeof mockUseSession.mock.results)[0]['value']['data']['session'],
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -329,7 +328,6 @@ describe('Dropdown Menu Interaction', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
   });
 
@@ -422,7 +420,6 @@ describe('Custom Styling', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
   });
 
@@ -459,7 +456,6 @@ describe('Accessibility', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
   });
 
@@ -531,7 +527,6 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     const { container } = render(<UserMenu />);
@@ -557,7 +552,6 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     const { container } = render(<UserMenu />);
@@ -583,7 +577,6 @@ describe('Snapshot Tests', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     const { container } = render(<UserMenu className='test-class' />);
@@ -594,7 +587,7 @@ describe('Snapshot Tests', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -637,7 +630,6 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -663,7 +655,6 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -690,7 +681,6 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(<UserMenu />);
@@ -717,7 +707,6 @@ describe('Edge Cases', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(<UserMenu />);

@@ -24,18 +24,18 @@ async function showClientToast(level: 'info' | 'error', args: AnyArgs) {
       description: message,
       variant: level === 'error' ? 'error' : 'info',
     });
-  } catch (e) {
-    // swallow - avoid console usage
+  } catch {
+    // TODO: send this error to a remote logging service here.
   }
 }
 
 export const logger = {
   info: (...args: AnyArgs) => {
-    if (typeof window === 'undefined') return; // no-op on server
+    if (globalThis.window === undefined) return;
     void showClientToast('info', args);
   },
   error: (...args: AnyArgs) => {
-    if (typeof window === 'undefined') return; // no-op on server
+    if (globalThis.window === undefined) return;
     void showClientToast('error', args);
   },
 };

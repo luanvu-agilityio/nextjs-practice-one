@@ -21,12 +21,10 @@ jest.mock('@/components/common', () => ({
   InputController: ({
     name,
     label,
-    control,
     ...props
   }: {
     name: string;
     label: string;
-    control: unknown;
   } & Record<string, unknown>) => (
     <div>
       <label htmlFor={name}>{label}</label>

@@ -15,8 +15,6 @@ export const Default: Story = {
       <ResetPasswordForm
         token='storybook-token'
         onSuccess={() => {
-          // Storybook friendly success handler
-          // eslint-disable-next-line no-console
           console.log('Reset success from story');
         }}
       />

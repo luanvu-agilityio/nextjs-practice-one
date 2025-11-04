@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -111,7 +111,7 @@ const SignInPageContent = () => {
   };
 
   const handleTwoFactorVerification = async () => {
-    if (!twoFactorCode || twoFactorCode.length !== 6) {
+    if (twoFactorCode?.length !== 6) {
       showToast({
         title: AUTH_MESSAGES.SIGN_IN.invalidCodeTitle || 'Invalid Code',
         description:
@@ -268,7 +268,7 @@ const SignInPageContent = () => {
 
   const handleTwoFactorCode = (e: ChangeEvent<HTMLInputElement>) => {
     //  Only allow numbers and limit to 6 digits
-    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    const value = e.target.value.replaceAll(/\D/g, '').slice(0, 6);
     setTwoFactorCode(value);
   };
 
@@ -293,18 +293,18 @@ const SignInPageContent = () => {
       setIsLoading(true);
       send2FACode(userEmail, userPassword)
         .then(result => {
-          if (!result.success) {
+          if (result.success) {
+            showToast({
+              title: AUTH_MESSAGES.SIGN_IN.smsCodeSentTitle,
+              description: 'Check your email for the code',
+              variant: TOAST_VARIANTS.SUCCESS,
+            });
+          } else {
             showToast({
               title: AUTH_MESSAGES.SIGN_IN.smsCodeErrorTitle,
               description:
                 result.error || AUTH_MESSAGES.SIGN_IN.smsCodeErrorDescription,
               variant: TOAST_VARIANTS.ERROR,
-            });
-          } else {
-            showToast({
-              title: AUTH_MESSAGES.SIGN_IN.smsCodeSentTitle,
-              description: 'Check your email for the code',
-              variant: TOAST_VARIANTS.SUCCESS,
             });
           }
         })
@@ -334,21 +334,21 @@ const SignInPageContent = () => {
     })
       .then(res => res.json())
       .then(result => {
-        if (!result.success) {
-          showToast({
-            title: AUTH_MESSAGES.SIGN_IN.smsCodeErrorTitle,
-            description:
-              result.error || AUTH_MESSAGES.SIGN_IN.smsCodeErrorDescription,
-            variant: TOAST_VARIANTS.ERROR,
-          });
-        } else {
+        if (result.success) {
           showToast({
             title: AUTH_MESSAGES.SIGN_IN.smsCodeSentTitle,
             description: AUTH_MESSAGES.SIGN_IN.smsCodeSentDescription,
             variant: TOAST_VARIANTS.SUCCESS,
           });
           setTwoFactorMethod('sms');
+          return;
         }
+        showToast({
+          title: AUTH_MESSAGES.SIGN_IN.smsCodeErrorTitle,
+          description:
+            result.error || AUTH_MESSAGES.SIGN_IN.smsCodeErrorDescription,
+          variant: TOAST_VARIANTS.ERROR,
+        });
       })
       .finally(() => setIsLoading(false));
   };

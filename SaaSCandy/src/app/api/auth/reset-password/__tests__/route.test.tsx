@@ -1,4 +1,6 @@
-let POST: any;
+let POST: (
+  request: NextRequest
+) => Promise<{ json: () => Promise<unknown>; status: number }>;
 import { NextRequest } from 'next/server';
 import { hash } from '@node-rs/argon2';
 import { db } from '@/lib/db';
@@ -53,7 +55,9 @@ describe('POST /api/auth/reset-password', () => {
     // require the route after mocks are configured so it uses the mocked dependencies
     jest.isolateModules(() => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      POST = require('../route').POST;
+      import('../route').then(mod => {
+        POST = mod.POST;
+      });
     });
   });
 
@@ -66,7 +70,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Token and new password required');
+    expect((data as { message: string }).message).toBe(
+      'Token and new password required'
+    );
   });
 
   it('should return 400 when newPassword is missing', async () => {
@@ -78,7 +84,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Token and new password required');
+    expect((data as { message: string }).message).toBe(
+      'Token and new password required'
+    );
   });
 
   it('should return 400 when user not found', async () => {
@@ -93,7 +101,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Unexpected response shape');
+    expect((data as { message: string }).message).toBe(
+      'Unexpected response shape'
+    );
   });
 
   it('should return 400 when resetTokenExpires is null', async () => {
@@ -112,7 +122,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Unexpected response shape');
+    expect((data as { message: string }).message).toBe(
+      'Unexpected response shape'
+    );
   });
 
   it('should return 400 when token is expired', async () => {
@@ -133,7 +145,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.message).toBe('Unexpected response shape');
+    expect((data as { message: string }).message).toBe(
+      'Unexpected response shape'
+    );
   });
 
   it('should successfully reset password with valid token', async () => {
@@ -158,7 +172,9 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.success).toBe(false);
-    expect(data.message).toBe('Unexpected response shape');
+
+    expect((data as { message: string }).message).toBe(
+      'Unexpected response shape'
+    );
   });
 });

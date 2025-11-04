@@ -1,8 +1,7 @@
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
-import { hash, verify } from '@node-rs/argon2';
+import { hash } from '@node-rs/argon2';
 import { auth } from '@/lib/better-auth';
-import { db } from '@/lib/db';
 
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
@@ -56,13 +55,6 @@ describe('/api/auth/change-password', () => {
 
   const mockSession = {
     user: { id: 'user-123', email: 'test@example.com' },
-  };
-
-  const mockCredentialAccount = {
-    id: 'account-123',
-    userId: 'user-123',
-    providerId: 'credential',
-    password: 'hashed-old-password',
   };
 
   beforeEach(() => {
