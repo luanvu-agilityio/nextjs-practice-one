@@ -32,7 +32,6 @@ export const metadata: Metadata = {
   description: 'Build Innovative Apps For Your Business',
   keywords: ['SaaS', 'Candy', 'Business', 'Apps', 'Innovation'],
   authors: [{ name: 'Luan Vu' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'SaaSCandy',
@@ -50,6 +49,11 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 const RootLayout = ({

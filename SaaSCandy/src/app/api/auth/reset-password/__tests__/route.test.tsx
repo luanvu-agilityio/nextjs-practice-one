@@ -3,7 +3,6 @@ let POST: (
 ) => Promise<{ json: () => Promise<unknown>; status: number }>;
 import { NextRequest } from 'next/server';
 import { hash } from '@node-rs/argon2';
-import { db } from '@/lib/db';
 import { auth } from '@/lib/better-auth';
 
 jest.mock('next/server', () => ({
