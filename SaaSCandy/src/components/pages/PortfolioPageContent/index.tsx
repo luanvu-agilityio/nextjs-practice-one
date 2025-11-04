@@ -28,14 +28,20 @@ const PortfolioPageContent = () => {
     <>
       {/* Features Section */}
       <Section className='px-4 sm:px-6'>
-        <div className='flex flex-col lg:flex-row justify-center gap-8 lg:gap-33.5 items-center'>
+        <div className='flex flex-col lg:flex-row justify-center gap-8 lg:gap-33.5 items-center relative w-full  rounded-xl overflow-hidden'>
           {/* Dashboard Image */}
           <Image
             src='/images/hero/stats.png'
             alt='stats image'
-            className='bg-cover w-full  lg:w-159 h-auto lg:h-126.75 rounded-xl'
-            width={636}
-            height={507}
+            width={686}
+            height={515}
+            sizes='(min-width:1024px) 636px, 100vw'
+            style={{
+              width: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              objectPosition: '12% 50%',
+            }}
           />
 
           {/* Features List */}

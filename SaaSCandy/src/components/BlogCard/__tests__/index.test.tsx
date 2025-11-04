@@ -3,7 +3,9 @@ import { BlogCard } from '../index';
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
+  default: (props: Record<string, unknown>) => (
+    <img {...props} alt='Next Image' />
+  ),
 }));
 
 jest.mock('next/link', () => ({

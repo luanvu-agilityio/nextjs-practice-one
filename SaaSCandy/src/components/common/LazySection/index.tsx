@@ -49,7 +49,7 @@ const LazySection = ({
   return (
     <section
       ref={ref}
-      className={`py-12 sm:py-16 ${className}`}
+      className={`py-12 sm:py-16 px-4 sm:px-6 ${className}`}
       style={{
         ...style,
         backgroundSize: bgImageUrl ? 'cover' : undefined,
@@ -58,9 +58,7 @@ const LazySection = ({
         backgroundImage: undefined, // Start with no image
       }}
     >
-      <div
-        className={`max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 ${containerClassName}`}
-      >
+      <div className={`max-w-[1296px] mx-auto  lg:px-0 ${containerClassName}`}>
         {(title || subtitle) && (
           <div className={`mb-8 sm:mb-12 ${centered ? 'text-center' : ''}`}>
             {title && (

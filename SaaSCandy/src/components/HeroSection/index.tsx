@@ -19,14 +19,14 @@ import {
   IconButton,
 } from '@/components/common';
 import Navbar from '../NavBar';
-import AuthSectionSkeleton from '../layout/Header/AuthSectionSkeleton';
+
 import { UserMenu } from '../UserMenu';
 
 // Constants
 import { ROUTES } from '@/constants';
 
 const HeroSection = () => {
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
@@ -35,10 +35,6 @@ const HeroSection = () => {
   };
 
   const renderAuthSection = () => {
-    if (isPending) {
-      return <AuthSectionSkeleton />;
-    }
-
     if (session?.user) {
       return <UserMenu />;
     }

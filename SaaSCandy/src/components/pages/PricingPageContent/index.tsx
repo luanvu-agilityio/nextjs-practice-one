@@ -27,7 +27,7 @@ const PricingPageContent = () => {
 
       <LazySection
         bgImageUrl="url('/images/background/pricing-background.png')"
-        className='bg-gray-50 px-4 sm:px-6'
+        className='bg-gray-50  sm:px-6'
       >
         <div className='space-y-12 sm:space-y-20'>
           <div className='flex flex-col items-center justify-between text-center gap-8 sm:gap-15'>

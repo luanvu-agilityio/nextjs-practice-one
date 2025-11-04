@@ -143,6 +143,11 @@ html {
     button {
       min-height: 44px;
     }
+
+    .btn {
+      min-height: 25px;
+      min-width: 48px;
+    }
   }
 }
 

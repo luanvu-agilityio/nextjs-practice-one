@@ -194,7 +194,7 @@ const PageLayout = ({
               <Typography
                 size='lg'
                 content={subtitle}
-                className='text-gray-background leading-relaxed max-w-full lg:max-w-132 sm:text-lg'
+                className='text-gray-background leading-relaxed max-w-full lg:max-w-132 sm:text-lg min-h-21'
               />
             )}
           </div>

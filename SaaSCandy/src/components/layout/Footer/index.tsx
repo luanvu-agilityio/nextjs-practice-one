@@ -22,7 +22,7 @@ const Footer = (): JSX.Element => {
 
   return (
     <footer className='bg-dark-blue w-full'>
-      <div className='max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 py-12 sm:py-16 lg:py-17.5'>
+      <div className='max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-4 py-12 sm:py-16 lg:py-17.5'>
         {/* Main Footer Content */}
         <div className='flex flex-col lg:flex-row justify-between gap-12 lg:gap-33'>
           {/* Brand Section */}
