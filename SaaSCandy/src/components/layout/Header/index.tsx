@@ -1,6 +1,6 @@
 'use client';
 
-import { JSX, useState } from 'react';
+import { JSX, memo, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-client';
 import { User } from 'lucide-react';
@@ -17,7 +17,7 @@ import { UserMenu } from '@/components/UserMenu';
 // Constants
 import { ROUTES } from '@/constants';
 
-const Header = (): JSX.Element => {
+const Header = memo((): JSX.Element => {
   const { data: session } = useSession();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
@@ -135,7 +135,7 @@ const Header = (): JSX.Element => {
       </div>
     </header>
   );
-};
+});
 
 Header.displayName = 'Header';
 export { Header };

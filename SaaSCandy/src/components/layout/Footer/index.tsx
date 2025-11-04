@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, JSX } from 'react';
+import { useState, JSX, memo } from 'react';
 import Link from 'next/link';
 
 // Components
@@ -13,7 +13,7 @@ import { ChevronDown } from 'lucide-react';
 // Constants
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants';
 
-const Footer = (): JSX.Element => {
+const Footer = memo((): JSX.Element => {
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -355,7 +355,7 @@ const Footer = (): JSX.Element => {
       </Link>
     </footer>
   );
-};
+});
 
 Footer.displayName = 'Footer';
 export { Footer };
