@@ -95,4 +95,45 @@ describe('ResetPasswordForm', () => {
       expect(screen.getByText(/password/i)).toBeInTheDocument();
     });
   });
+
+  it('renders password inputs and submit button', () => {
+    render(<ResetPasswordForm />);
+
+    expect(screen.getByLabelText(/New Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Confirm Password/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Change Password/i })
+    ).toBeInTheDocument();
+  });
+
+  it('has correct placeholder text', () => {
+    render(<ResetPasswordForm />);
+
+    expect(
+      screen.getByPlaceholderText('Enter new password')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Confirm new password')
+    ).toBeInTheDocument();
+  });
+
+  it('password inputs are required', () => {
+    render(<ResetPasswordForm />);
+
+    expect(screen.getByTestId('newPassword')).toBeRequired();
+    expect(screen.getByTestId('confirmPassword')).toBeRequired();
+  });
+
+  it('password inputs have type password', () => {
+    render(<ResetPasswordForm />);
+
+    expect(screen.getByTestId('newPassword')).toHaveAttribute(
+      'type',
+      'password'
+    );
+    expect(screen.getByTestId('confirmPassword')).toHaveAttribute(
+      'type',
+      'password'
+    );
+  });
 });

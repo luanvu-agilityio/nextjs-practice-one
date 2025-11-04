@@ -20,6 +20,7 @@ import { POST as ForgotPassword } from '../route';
 import sgMailForgot from '@sendgrid/mail';
 import { db as dbForgot } from '@/lib/db';
 import { NextRequest } from 'next/server';
+import { auth } from '@/lib/better-auth';
 
 jest.mock('@sendgrid/mail');
 jest.mock('@/lib/db');
@@ -46,9 +47,7 @@ describe('POST /api/auth/forgot-password', () => {
     jest.clearAllMocks();
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
     process.env.SENDGRID_API_KEY = 'test-key';
-    process.env.SENDGRID_FROM_EMAIL = 'test@example.com';
-    const { auth } = require('@/lib/better-auth');
-    (auth.api.requestPasswordReset as jest.Mock).mockResolvedValue({
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockResolvedValue({
       ok: true,
       message: 'Reset requested',
     });
@@ -102,5 +101,43 @@ describe('POST /api/auth/forgot-password', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.message).toBe('Reset requested');
+  });
+  it('should return 400 if request.json throws', async () => {
+    const request = {
+      json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
+    } as unknown as NextRequest;
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Email required');
+    expect(data.details).toBe(undefined);
+  });
+
+  it('should return 500 if requestPasswordReset throws', async () => {
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockImplementation(
+      () => {
+        throw new Error('API error');
+      }
+    );
+    const request = createMockRequest({ email: 'test@example.com' });
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Failed to send reset email');
+    expect(data.details).toBe('API error');
+  });
+
+  it('should handle unexpected result shape', async () => {
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockResolvedValue({
+      foo: 'bar',
+    });
+    const request = createMockRequest({ email: 'test@example.com' });
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(false);
+    expect(data.message).toBe('Failed to send reset email');
   });
 });

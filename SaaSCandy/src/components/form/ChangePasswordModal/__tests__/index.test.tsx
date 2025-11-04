@@ -107,4 +107,50 @@ describe('ChangePasswordModal', () => {
     fireEvent.click(screen.getByText('Cancel'));
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
+  it('renders correctly when open', () => {
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+    expect(screen.getByTestId('dialog')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter current password')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter new password')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Confirm new password')
+    ).toBeInTheDocument();
+    screen.getAllByText('Change Password').forEach(element => {
+      expect(element).toBeInTheDocument();
+    });
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+  });
+
+  it('does not render when open is false', () => {
+    const { queryByTestId } = render(
+      <ChangePasswordModal
+        open={false}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+    expect(queryByTestId('dialog')).not.toBeInTheDocument();
+  });
+
+  it('calls onOpenChange and resets on cancel', () => {
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+  });
 });

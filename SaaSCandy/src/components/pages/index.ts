@@ -11,3 +11,4 @@ export * from './PortfolioPageContent';
 export * from './PricingPageContent';
 export * from './ServicePageContent';
 export * from './ServiceDetailPageContent';
+export * from './ResetPasswordPageContent';

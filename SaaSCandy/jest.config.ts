@@ -7,6 +7,7 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   testEnvironment: 'jsdom',
+
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 
   // Module name mapping

@@ -4,6 +4,7 @@ let POST: (
 import { NextRequest } from 'next/server';
 import { hash } from '@node-rs/argon2';
 import { db } from '@/lib/db';
+import { auth } from '@/lib/better-auth';
 
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
@@ -54,127 +55,160 @@ describe('POST /api/auth/reset-password', () => {
     (hash as jest.Mock).mockResolvedValue('hashed-new-password');
     // require the route after mocks are configured so it uses the mocked dependencies
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       import('../route').then(mod => {
         POST = mod.POST;
       });
     });
   });
 
-  it('should return 400 when token is missing', async () => {
-    const request = createMockRequest({
-      newPassword: 'newPassword123',
-    });
-
+  it('returns 400 if token is missing', async () => {
+    const request = createMockRequest({ newPassword: 'newPassword123' });
     const response = await POST(request);
     const data = await response.json();
-
     expect(response.status).toBe(400);
     expect((data as { message: string }).message).toBe(
       'Token and new password required'
     );
   });
 
-  it('should return 400 when newPassword is missing', async () => {
+  it('returns 400 if newPassword is missing', async () => {
+    const request = createMockRequest({ token: 'reset-token-123' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect((data as { message: string }).message).toBe(
+      'Token and new password required'
+    );
+  });
+
+  it('returns 400 if newPassword is not a string', async () => {
     const request = createMockRequest({
       token: 'reset-token-123',
+      newPassword: 12345,
     });
-
     const response = await POST(request);
     const data = await response.json();
-
     expect(response.status).toBe(400);
     expect((data as { message: string }).message).toBe(
       'Token and new password required'
     );
   });
 
-  it('should return 400 when user not found', async () => {
-    (db.query.user.findFirst as jest.Mock).mockResolvedValue(null);
-
+  it('returns 200 and success if resetPassword returns ok', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      ok: true,
+      message: 'Password updated',
+    });
     const request = createMockRequest({
-      token: 'invalid-token',
+      token: 'reset-token-123',
       newPassword: 'newPassword123',
     });
-
     const response = await POST(request);
     const data = await response.json();
+    expect(response.status).toBe(200);
+    expect((data as { success: boolean }).success).toBe(true);
+    expect((data as { message: string }).message).toBe('Password updated');
+  });
 
+  it('returns 200 and success if resetPassword returns success', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      success: true,
+      message: 'Password updated',
+    });
+    const request = createMockRequest({
+      token: 'reset-token-123',
+      newPassword: 'newPassword123',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect((data as { success: boolean }).success).toBe(true);
+    expect((data as { message: string }).message).toBe('Password updated');
+  });
+
+  it('returns 200 and success if resetPassword returns user', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      user: { id: 'user-1' },
+      message: 'Password updated',
+    });
+    const request = createMockRequest({
+      token: 'reset-token-123',
+      newPassword: 'newPassword123',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect((data as { success: boolean }).success).toBe(true);
+    expect((data as { message: string }).message).toBe('Password updated');
+  });
+
+  it('returns 400 if resetPassword returns error', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      error: 'Reset failed',
+    });
+    const request = createMockRequest({
+      token: 'reset-token-123',
+      newPassword: 'newPassword123',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect((data as { success: boolean }).success).toBe(false);
+    expect((data as { message: string }).message).toBe('Reset failed');
+  });
+
+  it('returns 400 if resetPassword returns message only', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      message: 'Something went wrong',
+    });
+    const request = createMockRequest({
+      token: 'reset-token-123',
+      newPassword: 'newPassword123',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect((data as { success: boolean }).success).toBe(false);
+    expect((data as { message: string }).message).toBe('Something went wrong');
+  });
+
+  it('returns 400 if resetPassword returns unexpected shape', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
+      foo: 'bar',
+    });
+    const request = createMockRequest({
+      token: 'reset-token-123',
+      newPassword: 'newPassword123',
+    });
+    const response = await POST(request);
+    const data = await response.json();
     expect(response.status).toBe(400);
     expect((data as { message: string }).message).toBe(
       'Unexpected response shape'
     );
   });
 
-  it('should return 400 when resetTokenExpires is null', async () => {
-    (db.query.user.findFirst as jest.Mock).mockResolvedValue({
-      id: 'user-123',
-      resetToken: 'valid-token',
-      resetTokenExpires: null,
-    });
-
-    const request = createMockRequest({
-      token: 'valid-token',
-      newPassword: 'newPassword123',
-    });
-
+  it('returns 500 if request.json throws', async () => {
+    const request = {
+      json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
+    } as unknown as NextRequest;
     const response = await POST(request);
     const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect((data as { message: string }).message).toBe(
-      'Unexpected response shape'
-    );
+    expect(response.status).toBe(500);
+    expect((data as { message: string }).message).toBe('Invalid JSON');
   });
 
-  it('should return 400 when token is expired', async () => {
-    const expiredDate = new Date(Date.now() - 3600000); // 1 hour ago
-
-    (db.query.user.findFirst as jest.Mock).mockResolvedValue({
-      id: 'user-123',
-      resetToken: 'expired-token',
-      resetTokenExpires: expiredDate,
+  it('returns 500 if unexpected error thrown', async () => {
+    (auth.api.resetPassword as unknown as jest.Mock).mockImplementation(() => {
+      throw new Error('Unexpected error');
     });
-
     const request = createMockRequest({
-      token: 'expired-token',
+      token: 'reset-token-123',
       newPassword: 'newPassword123',
     });
-
     const response = await POST(request);
     const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect((data as { message: string }).message).toBe(
-      'Unexpected response shape'
-    );
-  });
-
-  it('should successfully reset password with valid token', async () => {
-    const futureDate = new Date(Date.now() + 3600000); // 1 hour from now
-
-    (db.query.user.findFirst as jest.Mock).mockResolvedValue({
-      id: 'user-123',
-      resetToken: 'valid-token',
-      resetTokenExpires: futureDate,
-    });
-
-    const mockWhere = jest.fn().mockResolvedValue({});
-    const mockSet = jest.fn().mockReturnValue({ where: mockWhere });
-    (db.update as jest.Mock).mockReturnValue({ set: mockSet });
-
-    const request = createMockRequest({
-      token: 'valid-token',
-      newPassword: 'newSecurePassword123',
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-
-    expect((data as { message: string }).message).toBe(
-      'Unexpected response shape'
-    );
+    expect(response.status).toBe(500);
+    expect((data as { message: string }).message).toBe('Unexpected error');
   });
 });

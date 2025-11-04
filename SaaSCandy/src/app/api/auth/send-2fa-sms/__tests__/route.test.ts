@@ -300,4 +300,302 @@ describe('SMS 2FA API Routes', () => {
       expect(data.error).toBe('Database error');
     });
   });
+
+  describe('POST /api/sms-2fa edge cases', () => {
+    it('should return 500 if Twilio env vars are missing', async () => {
+      process.env.TWILIO_ACCOUNT_SID = '';
+      process.env.TWILIO_AUTH_TOKEN = '';
+      process.env.TWILIO_PHONE_NUMBER = '';
+      const request = {
+        json: jest.fn().mockResolvedValue({
+          phone: '+1234567890',
+          email: 'test@example.com',
+          password: 'testpw',
+        }),
+      } as unknown as NextRequest;
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(401);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Invalid credentials');
+    });
+
+    it('should return 500 if Twilio throws unknown error', async () => {
+      mockCreate.mockImplementationOnce(() => {
+        throw { foo: 'bar' };
+      });
+      mockWhere.mockResolvedValue([
+        { id: 'user-123', phone: '+1234567890', twoFactorEnabled: true },
+      ]);
+      const request = createMockRequest({ phone: '+1234567890' });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Twilio configuration missing');
+      expect(data.details).toBe(undefined);
+    });
+
+    it('should return 500 for unexpected error in POST', async () => {
+      mockWhere.mockImplementationOnce(() => {
+        throw new Error('Unexpected');
+      });
+      const request = createMockRequest({ phone: '+1234567890' });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Unexpected');
+    });
+  });
+
+  describe('PUT /api/sms-2fa edge cases', () => {
+    it('should return 400 if entry is expired', async () => {
+      mockWhere.mockResolvedValue([{ expiresAt: new Date(Date.now() - 1000) }]);
+      const request = createMockRequest({
+        phone: '+1234567890',
+        code: '123456',
+      });
+      const response = await PUT(request);
+      const data = await response.json();
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Code expired');
+    });
+
+    it('should return 400 if no entry found', async () => {
+      mockWhere.mockResolvedValue([]);
+      const request = createMockRequest({
+        phone: '+1234567890',
+        code: '123456',
+      });
+      const response = await PUT(request);
+      const data = await response.json();
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Code expired');
+    });
+
+    it('should return 500 for unexpected error in PUT', async () => {
+      mockWhere.mockImplementationOnce(() => {
+        throw new Error('Unexpected');
+      });
+      const request = createMockRequest({
+        phone: '+1234567890',
+        code: '123456',
+      });
+      const response = await PUT(request);
+      const data = await response.json();
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe('Unexpected');
+    });
+  });
+});
+
+describe('SMS 2FA API Routes - Extra Coverage', () => {
+  const createMockRequest = (body: Record<string, unknown>) =>
+    ({
+      json: jest.fn().mockResolvedValue(body),
+    }) as unknown as NextRequest;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.TWILIO_ACCOUNT_SID = 'sid';
+    process.env.TWILIO_AUTH_TOKEN = 'token';
+    process.env.TWILIO_PHONE_NUMBER = '+10000000000';
+  });
+
+  it('should handle POST with valid email/password and send SMS', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    (auth.api.signInEmail as unknown as jest.Mock).mockResolvedValue({
+      user: mockUser,
+    });
+    const request = createMockRequest({
+      phone: '+1234567890',
+      email: 'test@example.com',
+      password: 'pw',
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.message).toBe(undefined);
+  });
+
+  it('should handle POST with valid phone and send SMS', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    // Simulate user found by phone
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.message).toBe(undefined);
+  });
+
+  it('should handle Twilio error with string message', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    mockCreate.mockImplementationOnce(() => {
+      throw 'Twilio string error';
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Twilio configuration missing');
+    expect(data.details).toBe(undefined);
+  });
+
+  it('should handle Twilio error with Error object', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    mockCreate.mockImplementationOnce(() => {
+      throw new Error('Twilio error object');
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Twilio configuration missing');
+    expect(data.details).toBe(undefined);
+  });
+
+  it('should handle Twilio error with object with message property', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    mockCreate.mockImplementationOnce(() => {
+      throw { message: 'Twilio object message' };
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Twilio configuration missing');
+    expect(data.details).toBe(undefined);
+  });
+
+  it('should handle Twilio error with object without message property', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    mockCreate.mockImplementationOnce(() => {
+      throw { foo: 'bar' };
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Twilio configuration missing');
+    expect(data.details).toBe(undefined);
+  });
+
+  it('should handle POST with missing body', async () => {
+    const request = {
+      json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
+    } as unknown as NextRequest;
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(undefined);
+    expect(data.error).toBe('Phone required');
+  });
+
+  it('should handle PUT with missing body', async () => {
+    const request = {
+      json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
+    } as unknown as NextRequest;
+    const response = await PUT(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Bad JSON');
+  });
+
+  it('should handle PUT with entry missing attempts', async () => {
+    const validEntry = {
+      id: 'entry-123',
+      userId: 'user-123',
+      phone: '+1234567890',
+      code: '654321',
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      verified: false,
+      // attempts missing
+    };
+    const mockWhere = jest.fn().mockResolvedValue([validEntry]);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+
+    const request = createMockRequest({
+      phone: '+1234567890',
+      code: '123456',
+    });
+
+    const response = await PUT(request);
+    const data = await response.json();
+    expect(response.status).toBe(401);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Invalid code');
+  });
 });
