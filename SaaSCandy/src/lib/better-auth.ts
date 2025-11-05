@@ -15,8 +15,10 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { twoFactor } from 'better-auth/plugins';
 import sgMail from '@sendgrid/mail';
+import * as argon2 from 'argon2';
+import { eq } from 'drizzle-orm';
 
-import { db } from './db';
+import { db, user as userTable } from './db';
 import {
   ResetPasswordEmail,
   VerificationEmail,
@@ -52,12 +54,26 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, token }) => {
+    sendResetPassword: async ({ user: authUser, token }) => {
+      try {
+        const hashed = await argon2.hash(token);
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+        await db
+          .update(userTable)
+          .set({ resetToken: hashed, resetTokenExpires: expiresAt })
+          .where(eq(userTable.id, authUser.id))
+          .execute();
+      } catch (e) {
+        // log but do not throw — avoid leaking or breaking UX
+        console.error('failed saving reset token', e);
+      }
+
       const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 
       await sgMail.send({
         from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-        to: user.email,
+        to: authUser.email,
         subject: 'Reset your password - SaaSCandy',
         html: ResetPasswordEmail({ resetUrl }),
       });

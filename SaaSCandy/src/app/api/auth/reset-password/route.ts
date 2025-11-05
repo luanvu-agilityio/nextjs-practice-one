@@ -1,5 +1,7 @@
+import argon2 from 'argon2';
+import { db, user as userTable } from '@/lib/db';
+import { isNotNull, and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/better-auth';
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -13,56 +15,52 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const result = await auth.api.resetPassword({
-      body: { token, newPassword },
-    });
+    const candidates = await db
+      .select()
+      .from(userTable)
+      .where(
+        and(
+          isNotNull(userTable.resetToken),
+          isNotNull(userTable.resetTokenExpires)
+        )
+      )
+      .limit(50)
+      .execute();
 
-    type ResetPasswordResult = {
-      ok?: boolean;
-      success?: boolean;
-      user?: unknown;
-      message?: string;
-      error?: string;
-    };
+    let matchedUser: (typeof candidates)[number] | null = null;
+    for (const u of candidates) {
+      if (!u.resetToken || !u.resetTokenExpires) continue;
+      if (new Date(u.resetTokenExpires) < new Date()) continue;
+      try {
+        if (await argon2.verify(u.resetToken, token)) {
+          matchedUser = u;
+          break;
+        }
+      } catch {
+        // ignore malformed hash
+      }
+    }
 
-    function isResetPasswordResult(obj: unknown): obj is ResetPasswordResult {
-      if (typeof obj !== 'object' || obj === null) return false;
-      const o = obj as Record<string, unknown>;
-      return (
-        'ok' in o ||
-        'success' in o ||
-        'user' in o ||
-        'message' in o ||
-        'error' in o
+    if (!matchedUser) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid or expired token' },
+        { status: 400 }
       );
     }
 
-    const resetPasswordResult: ResetPasswordResult = isResetPasswordResult(
-      result
-    )
-      ? result
-      : { error: 'Unexpected response shape' };
-    if (
-      resetPasswordResult?.ok ||
-      resetPasswordResult?.success ||
-      resetPasswordResult?.user
-    ) {
-      return NextResponse.json({
-        success: true,
-        message: resetPasswordResult?.message || 'Password updated',
-      });
-    }
+    const passwordHash = await argon2.hash(newPassword);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          resetPasswordResult?.error ||
-          resetPasswordResult?.message ||
-          'Failed to reset password',
-      },
-      { status: 400 }
-    );
+    await db
+      .update(userTable)
+      .set({
+        password: passwordHash,
+        resetToken: null,
+        resetTokenExpires: null,
+      })
+      .where(eq(userTable.id, matchedUser.id))
+      .execute();
+
+    return NextResponse.json({ success: true, message: 'Password updated' });
   } catch (err: unknown) {
     try {
       const { error: logError } = await import('@/lib/logger');
