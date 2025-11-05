@@ -51,15 +51,12 @@ const ResetPasswordForm = ({
   });
 
   const onSubmit = async ({ newPassword }: { newPassword: string }) => {
-    console.log('[ResetPasswordForm] 🔐 Submitting password reset');
     setIsSubmitting(true);
 
     try {
       const data = await resetPassword(token ?? '', newPassword);
 
       if (data.success) {
-        console.log('[ResetPasswordForm] ✅ Password reset successful');
-
         // Reset form to initial state
         reset();
 
@@ -74,15 +71,9 @@ const ResetPasswordForm = ({
 
         // Redirect to sign-in page after a short delay
         setTimeout(() => {
-          console.log('[ResetPasswordForm] ℹ️ Redirecting to sign-in page');
           router.push(ROUTES.SIGN_IN);
         }, 2000);
       } else {
-        console.log(
-          '[ResetPasswordForm] ❌ Password reset failed:',
-          data.message
-        );
-
         const msg = data.message ?? 'Failed to reset password';
         showToast({
           title: 'Error',
@@ -93,8 +84,6 @@ const ResetPasswordForm = ({
         setIsSubmitting(false);
       }
     } catch (err: unknown) {
-      console.error('[ResetPasswordForm] ❌ Exception:', err);
-
       const msg = err instanceof Error ? err.message : 'Unknown error';
       showToast({
         title: 'Error',

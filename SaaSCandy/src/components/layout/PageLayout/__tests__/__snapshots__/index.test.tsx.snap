@@ -263,7 +263,7 @@ exports[`PageLayout - Snapshot Tests should match snapshot 1`] = `
             Test Page
           </h2>
           <p
-            class="text-lg text-gray-background leading-relaxed max-w-full lg:max-w-132 sm:text-lg"
+            class="text-lg text-gray-background leading-relaxed max-w-full lg:max-w-132 sm:text-lg min-h-21"
             role="paragraph"
           >
             Test subtitle

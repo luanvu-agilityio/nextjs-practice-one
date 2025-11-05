@@ -7,7 +7,7 @@ exports[`HeroSection Snapshot Tests should match snapshot when session is pendin
     style="background-image: url("/images/background/homepage.png"); background-size: cover; padding: 0px;"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <header
         class="w-full relative z-10"
@@ -129,9 +129,60 @@ exports[`HeroSection Snapshot Tests should match snapshot when session is pendin
               />
             </svg>
             <div
-              data-testid="auth-skeleton"
+              class="hidden sm:flex items-center gap-2 sm:gap-4"
             >
-              Loading...
+              <a
+                class="no-underline"
+                href="/signin"
+              >
+                <button
+                  class="inline-flex items-center justify-center font-semibold text-md leading-none tracking-normal rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white text-orange-background border border-orange-background hover:bg-orange-background hover:text-white focus-visible:ring-primary px-4 py-2.5"
+                >
+                  Sign In
+                </button>
+              </a>
+              <a
+                class="no-underline"
+                href="/signup"
+              >
+                <button
+                  class="inline-flex items-center justify-center font-semibold text-md leading-none tracking-normal rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-orange-background text-white hover:opacity-90 focus-visible:ring-primary px-4 py-2.5"
+                >
+                  Sign Up
+                </button>
+              </a>
+            </div>
+            <div
+              class="mobile-auth-toggle relative"
+            >
+              <button
+                aria-label="Toggle auth menu"
+                class="cursor-pointer inline-flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed button-animation bg-transparent border-none hover:opacity-90 w-6 h-6 text-primary p-0"
+                data-testid="icon-button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-user w-6 h-6"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+                  />
+                  <circle
+                    cx="12"
+                    cy="7"
+                    r="4"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -190,7 +241,7 @@ exports[`HeroSection Snapshot Tests should match snapshot when user is logged in
     style="background-image: url("/images/background/homepage.png"); background-size: cover; padding: 0px;"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <header
         class="w-full relative z-10"
@@ -373,7 +424,7 @@ exports[`HeroSection Snapshot Tests should match snapshot when user is not logge
     style="background-image: url("/images/background/homepage.png"); background-size: cover; padding: 0px;"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <header
         class="w-full relative z-10"

@@ -3,11 +3,11 @@
 exports[`LazySection should match snapshot with all props 1`] = `
 <div>
   <section
-    class="py-12 sm:py-16 custom-section"
+    class="py-12 sm:py-16 px-4 sm:px-6 custom-section"
     style="padding: 20px; background-size: cover; background-repeat: no-repeat; background-position: center;"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 custom-container"
+      class="max-w-[1296px] mx-auto  lg:px-0 custom-container"
     >
       <div
         class="mb-8 sm:mb-12 text-center"
@@ -37,10 +37,10 @@ exports[`LazySection should match snapshot with all props 1`] = `
 exports[`LazySection should match snapshot with minimal props 1`] = `
 <div>
   <section
-    class="py-12 sm:py-16 "
+    class="py-12 sm:py-16 px-4 sm:px-6 "
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <div>
         Minimal content

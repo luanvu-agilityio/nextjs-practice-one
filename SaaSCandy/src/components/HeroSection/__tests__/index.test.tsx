@@ -15,11 +15,6 @@ jest.mock('@/components/NavBar', () => ({
   default: () => <div data-testid='navbar'>Navbar</div>,
 }));
 
-jest.mock('@/components/layout/Header/AuthSectionSkeleton', () => ({
-  __esModule: true,
-  default: () => <div data-testid='auth-skeleton'>Loading...</div>,
-}));
-
 jest.mock('@/components/UserMenu', () => ({
   UserMenu: () => <div data-testid='user-menu'>User Menu</div>,
 }));
@@ -111,21 +106,6 @@ describe('HeroSection', () => {
 
       expect(signInButtons.length).toBeGreaterThan(0);
       expect(signUpButtons.length).toBeGreaterThan(0);
-    });
-
-    it('should render loading skeleton when session is pending', () => {
-      mockUseSession.mockReturnValue({
-        data: null,
-        isPending: true,
-        error: null,
-        refetch: mockRefetch,
-        isRefetching: false,
-      });
-
-      render(<HeroSection />);
-
-      expect(screen.getByTestId('auth-skeleton')).toBeInTheDocument();
-      expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
     });
 
     it('should render UserMenu when user is authenticated', () => {

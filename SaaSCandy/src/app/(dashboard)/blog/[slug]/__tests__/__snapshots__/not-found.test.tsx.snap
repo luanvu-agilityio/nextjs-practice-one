@@ -6,7 +6,7 @@ exports[`BlogPostNotFound - Snapshot Tests should match snapshot 1`] = `
     class="py-12 sm:py-16 bg-white min-h-[60vh] flex items-center justify-center"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <div
         class="text-center max-w-md mx-auto"

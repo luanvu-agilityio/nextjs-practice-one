@@ -246,3 +246,15 @@ export const ResetPasswordEmail = ({ resetUrl }: { resetUrl: string }) => `
 </body>
 </html>
 `;
+
+export const PasswordChangedAlertEmail = () => `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #6366f1;">Password Changed Successfully</h2>
+              <p>Your password has been changed successfully.</p>
+              <p>If you didn't make this change, please contact support immediately.</p>
+              <p style="margin-top: 30px; color: #666;">
+                Best regards,<br/>
+                SaaSCandy Team
+              </p>
+            </div>
+          `;

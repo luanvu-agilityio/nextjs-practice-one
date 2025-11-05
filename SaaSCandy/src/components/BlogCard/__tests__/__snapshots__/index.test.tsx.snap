@@ -13,7 +13,7 @@ exports[`BlogCard renders correctly with image 1`] = `
         class="w-full overflow-hidden"
       >
         <img
-          alt="Test Blog Title"
+          alt="Next Image"
           class="object-cover w-full h-48 sm:h-60 lg:h-71 group-hover:scale-105 transition-transform duration-300"
           height="284"
           src="/test-image.jpg"

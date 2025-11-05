@@ -6,7 +6,7 @@ exports[`BlogListLoading - Snapshot Tests should match snapshot 1`] = `
     class="py-12 sm:py-16 bg-white"
   >
     <div
-      class="max-w-[1296px] mx-auto px-4 sm:px-6 lg:px-0 "
+      class="max-w-[1296px] mx-auto  lg:px-0 "
     >
       <div
         class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"

@@ -18,6 +18,7 @@ import sgMail from '@sendgrid/mail';
 
 import { db } from './db';
 import {
+  PasswordChangedAlertEmail,
   ResetPasswordEmail,
   VerificationEmail,
 } from '@/constants/email-template';
@@ -52,78 +53,25 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    resetPasswordTokenExpiresIn: 3600, // 1 hour in seconds
+    resetPasswordTokenExpiresIn: 3600, // 1 hour
     sendResetPassword: async ({ user: authUser, token }) => {
-      // Manually construct the reset URL (same pattern as email verification)
       const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 
-      console.log(
-        '[better-auth] 🔐 sendResetPassword - User:',
-        authUser.email,
-        '(ID:',
-        authUser.id,
-        ')'
-      );
-      console.log(
-        '[better-auth] ℹ️ Token stored in verification table by Better Auth'
-      );
-      console.log('[better-auth] 🔗 Reset URL constructed:', resetUrl);
-      console.log(
-        '[better-auth] 🔗 Token value:',
-        token.substring(0, 15) + '...'
-      );
-
-      try {
-        await sgMail.send({
-          from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-          to: authUser.email,
-          subject: 'Reset your password - SaaSCandy',
-          html: ResetPasswordEmail({ resetUrl }),
-        });
-
-        console.log(
-          '[better-auth] ✅ Reset email sent successfully to:',
-          authUser.email
-        );
-      } catch (error) {
-        console.error('[better-auth] ❌ Failed to send reset email:', error);
-        throw error;
-      }
+      await sgMail.send({
+        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+        to: authUser.email,
+        subject: 'Reset your password - SaaSCandy',
+        html: ResetPasswordEmail({ resetUrl }),
+      });
     },
     onPasswordReset: async ({ user }) => {
       // Send confirmation email after successful password reset
-      console.log(
-        '[better-auth] 🔄 Password reset successful for user:',
-        user.email
-      );
-
-      try {
-        await sgMail.send({
-          from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-          to: user.email,
-          subject: 'Password Changed Successfully - SaaSCandy',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #6366f1;">Password Changed Successfully</h2>
-              <p>Your password has been changed successfully.</p>
-              <p>If you didn't make this change, please contact support immediately.</p>
-              <p style="margin-top: 30px; color: #666;">
-                Best regards,<br/>
-                SaaSCandy Team
-              </p>
-            </div>
-          `,
-        });
-        console.log(
-          '[better-auth] ✅ Password change confirmation email sent to:',
-          user.email
-        );
-      } catch (error) {
-        console.error(
-          '[better-auth] ❌ Failed to send confirmation email:',
-          error
-        );
-      }
+      await sgMail.send({
+        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+        to: user.email,
+        subject: 'Password Changed Successfully - SaaSCandy',
+        html: PasswordChangedAlertEmail(),
+      });
     },
   },
 

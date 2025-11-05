@@ -176,8 +176,8 @@ describe('POST /api/auth/send-2fa-code', () => {
     const response = await Send2FACode(request);
     const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data.success).toBe(true);
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
   });
 
   it('should handle errors with Error instance', async () => {

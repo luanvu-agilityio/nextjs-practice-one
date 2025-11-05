@@ -39,55 +39,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[send-2fa] 🔐 2FA code request for email:', email);
-    console.log('[send-2fa] ℹ️ Verifying credentials before sending code...');
-
-    // Query user and account to see stored password hashes before sign-in attempt
-    try {
-      const userRow = await db
-        .select()
-        .from(schema.user)
-        .where(eq(schema.user.email, email))
-        .limit(1)
-        .execute();
-      const accountRows = userRow[0]
-        ? await db
-            .select()
-            .from(schema.account)
-            .where(eq(schema.account.userId, userRow[0].id))
-            .execute()
-        : [];
-      console.log(
-        '[send-2fa] user.password (first 20):',
-        userRow[0]?.password?.substring(0, 20) + '...'
-      );
-      accountRows.forEach((acc, i) => {
-        console.log(
-          `[send-2fa] account[${i}] providerId:`,
-          acc.providerId,
-          'password (first 20):',
-          acc.password?.substring(0, 20) + '...'
-        );
-      });
-    } catch (e) {
-      console.error(
-        '[send-2fa] error querying user/account before sign-in:',
-        e
-      );
-    }
-
     const signInResult = await auth.api.signInEmail({
       body: { email, password },
     });
 
-    console.log(
-      '[send-2fa] signInResult:',
-      !!signInResult?.user ? 'SUCCESS' : 'FAILED'
-    );
-
     // If sign-in fails, return error
     if (!signInResult?.user) {
-      console.error('[send-2fa] sign-in failed for email:', email);
       return NextResponse.json(
         { success: false, error: 'Invalid email or password' },
         { status: 401 }
@@ -96,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     // If successful, proceed with sending 2FA code
     const user = signInResult.user;
-    console.log('[send-2fa] sign-in successful for user:', user.id);
 
     // Generate 6-digit code
     const code = generateCode();
@@ -120,25 +76,18 @@ export async function POST(request: NextRequest) {
     });
 
     // Send email with code
-    try {
-      const result = await sgMail.send({
-        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-        to: email,
-        subject: 'Your SaaSCandy Login Code',
-        html: TwoFactorEmail({ code, userName: user.name || 'User' }),
-      });
+    await sgMail.send({
+      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+      to: email,
+      subject: 'Your SaaSCandy Login Code',
+      html: TwoFactorEmail({ code, userName: user.name || 'User' }),
+    });
 
-      console.log('Email sent:', result);
-    } catch (emailError) {
-      console.error('Email send failed:', emailError);
-      // Continue anyway for demo purposes
-    }
     return NextResponse.json({
       success: true,
       message: 'Login code sent to your email',
     });
   } catch (error: unknown) {
-    console.error('Send 2FA error:', error);
     const errMessage = error instanceof Error ? error.message : 'Unknown error';
 
     return NextResponse.json(

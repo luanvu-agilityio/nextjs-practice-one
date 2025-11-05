@@ -183,7 +183,7 @@ describe('POST /api/auth/reset-password', () => {
     const data = await response.json();
     expect(response.status).toBe(400);
     expect((data as { message: string }).message).toBe(
-      'Unexpected response shape'
+      'Invalid or expired token'
     );
   });
 
@@ -194,7 +194,9 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(request);
     const data = await response.json();
     expect(response.status).toBe(500);
-    expect((data as { message: string }).message).toBe('Invalid JSON');
+    expect((data as { message: string }).message).toBe(
+      'Something went wrong. Please try again.'
+    );
   });
 
   it('returns 500 if unexpected error thrown', async () => {
@@ -208,6 +210,8 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(request);
     const data = await response.json();
     expect(response.status).toBe(500);
-    expect((data as { message: string }).message).toBe('Unexpected error');
+    expect((data as { message: string }).message).toBe(
+      'Something went wrong. Please try again.'
+    );
   });
 });
