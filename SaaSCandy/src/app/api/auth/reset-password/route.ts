@@ -1,99 +1,91 @@
-import argon2 from 'argon2';
-import { db, user as userTable, account as accountTable } from '@/lib/db';
-import { isNotNull, and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/better-auth';
 
+/**
+ * API route for resetting a user's password using a token.
+ *
+ * Better Auth handles:
+ * - Token verification from verification table
+ * - Password hashing (scrypt by default)
+ * - Updating account.password (providerId='credential')
+ * - Token cleanup
+ * - Triggering onPasswordReset callback
+ */
 export const POST = async (request: NextRequest) => {
   try {
     const body = await request.json();
     const { token, newPassword } = body ?? {};
 
+    console.log('[reset-password] 🔐 Password reset request received');
+    console.log(
+      '[reset-password] Token (first 10 chars):',
+      token?.substring(0, 10) + '...'
+    );
+
     if (!token || !newPassword || typeof newPassword !== 'string') {
+      console.log('[reset-password] ❌ Missing required fields');
       return NextResponse.json(
         { success: false, message: 'Token and new password required' },
         { status: 400 }
       );
     }
 
-    const candidates = await db
-      .select()
-      .from(userTable)
-      .where(
-        and(
-          isNotNull(userTable.resetToken),
-          isNotNull(userTable.resetTokenExpires)
-        )
-      )
-      .limit(50)
-      .execute();
+    console.log('[reset-password] ℹ️ Calling Better Auth resetPassword API');
 
-    let matchedUser: (typeof candidates)[number] | null = null;
-    for (const u of candidates) {
-      if (!u.resetToken || !u.resetTokenExpires) continue;
-      if (new Date(u.resetTokenExpires) < new Date()) continue;
-      try {
-        if (await argon2.verify(u.resetToken, token)) {
-          matchedUser = u;
-          break;
-        }
-      } catch {
-        // ignore malformed hash
-      }
+    const result = await auth.api.resetPassword({
+      body: { token, newPassword },
+    });
+
+    interface ResetResult {
+      user?: unknown;
+      ok?: boolean;
+      success?: boolean;
+      status?: boolean | number;
+      message?: string;
+      error?: string;
+      [key: string]: unknown;
     }
 
-    if (!matchedUser) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid or expired token' },
-        { status: 400 }
+    const resetResult = result as ResetResult;
+
+    if (
+      resetResult?.user ||
+      resetResult?.ok ||
+      resetResult?.success ||
+      resetResult?.status === true
+    ) {
+      console.log('[reset-password] ✅ Password reset successful');
+      console.log(
+        '[reset-password] ℹ️ Better Auth handled all updates and notifications'
       );
+
+      return NextResponse.json({
+        success: true,
+        message: resetResult?.message || 'Password updated successfully',
+      });
     }
 
-    const passwordHash = await argon2.hash(newPassword);
+    console.log(
+      '[reset-password] ❌ Reset failed:',
+      resetResult?.error || resetResult?.message
+    );
 
-    await db
-      .update(userTable)
-      .set({
-        password: passwordHash,
-        resetToken: null,
-        resetTokenExpires: null,
-      })
-      .where(eq(userTable.id, matchedUser.id))
-      .execute();
-
-    // Also update the Better Auth credential record (account table) so
-    // sign-in uses the new password. Better Auth verifies credentials
-    // from the `account` table with providerId = 'credential'.
-    try {
-      await db
-        .update(accountTable)
-        .set({ password: passwordHash })
-        .where(
-          and(
-            eq(accountTable.userId, matchedUser.id),
-            eq(accountTable.providerId, 'credential')
-          )
-        )
-        .execute();
-    } catch (e) {
-      // Log and continue — we don't want to leak details to the client.
-      try {
-        const { error: logError } = await import('@/lib/logger');
-        logError('[reset-password] failed updating account table', e);
-      } catch {
-        /* noop */
-      }
-    }
-
-    return NextResponse.json({ success: true, message: 'Password updated' });
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          resetResult?.error ||
+          resetResult?.message ||
+          'Invalid or expired token',
+      },
+      { status: 400 }
+    );
   } catch (err: unknown) {
-    try {
-      const { error: logError } = await import('@/lib/logger');
-      logError('[reset-password] error', err);
-    } catch {
-      /* noop */
-    }
+    console.error('[reset-password] ❌ Exception:', err);
 
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: 'Failed to reset password' },
+      { status: 500 }
+    );
   }
 };

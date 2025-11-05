@@ -25,8 +25,8 @@ export const user = pgTable('user', {
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
   twoFactorEnabled: boolean('twoFactorEnabled').default(false),
-  resetToken: text('resetToken'),
-  resetTokenExpires: timestamp('resetTokenExpires'),
+  // Note: resetToken and resetTokenExpires removed - Better Auth uses verification table
+  // TODO: Run migration to drop these columns: drizzle-kit generate && drizzle-kit push
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });

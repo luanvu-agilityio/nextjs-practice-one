@@ -63,17 +63,28 @@ function SignUpPageContent() {
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
+    console.log('[SignUpForm] 📝 Sign up form submitted');
+    console.log('[SignUpForm] Email:', data.email, 'Name:', data.name);
+
     setIsLoading(true);
     setUserEmail(data.email);
 
     try {
+      console.log('[SignUpForm] ℹ️ Calling Better Auth signUp.email API');
+
       const result = await signUp.email({
         email: data.email,
         password: data.password,
         name: data.name,
       });
 
+      console.log(
+        '[SignUpForm] ℹ️ Sign up result:',
+        result.error ? 'ERROR' : 'SUCCESS'
+      );
+
       if (result.error) {
+        console.log('[SignUpForm] ❌ Sign up failed:', result.error.message);
         showToast({
           title: TOAST_MESSAGES.SIGN_UP.ERROR.title,
           description:
@@ -86,6 +97,11 @@ function SignUpPageContent() {
         return;
       }
 
+      console.log('[SignUpForm] ✅ Account created successfully');
+      console.log('[SignUpForm] ℹ️ Verification email sent to:', data.email);
+
+      setEmailSent(true);
+
       showToast({
         title: 'Account Created!',
         description: 'Please check your email to verify your account.',
@@ -95,7 +111,7 @@ function SignUpPageContent() {
 
       setIsLoading(false);
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('[SignUpForm] ❌ Exception:', error);
       showToast({
         title: TOAST_MESSAGES.SIGN_UP.ERROR.title,
         description: TOAST_MESSAGES.SIGN_UP.ERROR.description,

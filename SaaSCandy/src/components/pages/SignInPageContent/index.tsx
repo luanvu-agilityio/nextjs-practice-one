@@ -103,10 +103,15 @@ const SignInPageContent = () => {
   });
 
   const onSubmit = async (data: SignInFormValues) => {
+    console.log('[SignInForm] 🔐 Sign in form submitted');
+    console.log('[SignInForm] Email:', data.email);
+
     setIsLoading(true);
     setUserEmail(data.email);
     setUserPassword(data.password);
     setRequires2FA(true);
+
+    console.log('[SignInForm] ℹ️ Proceeding to 2FA selection');
     setIsLoading(false);
   };
 

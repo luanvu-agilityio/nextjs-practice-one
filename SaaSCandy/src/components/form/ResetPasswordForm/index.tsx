@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -18,6 +20,9 @@ import { ResetPasswordFormData, resetPasswordSchema } from '@/utils/validation';
 // Service
 import { resetPassword } from '@/service';
 
+// Constants
+import { ROUTES } from '@/constants';
+
 // Types
 import { TOAST_VARIANTS } from '@/types';
 
@@ -32,9 +37,13 @@ const ResetPasswordForm = ({
   onSuccess,
   onError,
 }: ResetPasswordFormProps) => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -42,17 +51,38 @@ const ResetPasswordForm = ({
   });
 
   const onSubmit = async ({ newPassword }: { newPassword: string }) => {
+    console.log('[ResetPasswordForm] 🔐 Submitting password reset');
+    setIsSubmitting(true);
+
     try {
       const data = await resetPassword(token ?? '', newPassword);
 
       if (data.success) {
+        console.log('[ResetPasswordForm] ✅ Password reset successful');
+
+        // Reset form to initial state
+        reset();
+
         showToast({
           title: 'Password Updated',
-          description: 'You can now sign in.',
+          description:
+            'Your password has been changed successfully. Redirecting to sign in...',
           variant: TOAST_VARIANTS.SUCCESS,
         });
+
         onSuccess?.();
+
+        // Redirect to sign-in page after a short delay
+        setTimeout(() => {
+          console.log('[ResetPasswordForm] ℹ️ Redirecting to sign-in page');
+          router.push(ROUTES.SIGN_IN);
+        }, 2000);
       } else {
+        console.log(
+          '[ResetPasswordForm] ❌ Password reset failed:',
+          data.message
+        );
+
         const msg = data.message ?? 'Failed to reset password';
         showToast({
           title: 'Error',
@@ -60,8 +90,11 @@ const ResetPasswordForm = ({
           variant: TOAST_VARIANTS.ERROR,
         });
         onError?.(msg);
+        setIsSubmitting(false);
       }
     } catch (err: unknown) {
+      console.error('[ResetPasswordForm] ❌ Exception:', err);
+
       const msg = err instanceof Error ? err.message : 'Unknown error';
       showToast({
         title: 'Error',
@@ -69,6 +102,7 @@ const ResetPasswordForm = ({
         variant: TOAST_VARIANTS.ERROR,
       });
       onError?.(msg);
+      setIsSubmitting(false);
     }
   };
 
@@ -80,6 +114,7 @@ const ResetPasswordForm = ({
         label='New Password'
         placeholder='Enter new password'
         type='password'
+        disabled={isSubmitting}
         required
       />
       <InputController
@@ -88,6 +123,7 @@ const ResetPasswordForm = ({
         label='Confirm Password'
         placeholder='Confirm new password'
         type='password'
+        disabled={isSubmitting}
         required
       />
       {errors.newPassword && (
@@ -96,8 +132,8 @@ const ResetPasswordForm = ({
       {errors.confirmPassword && (
         <ErrorMessage error={errors.confirmPassword.message} />
       )}
-      <Button type='submit' className='mt-6'>
-        Change Password
+      <Button type='submit' className='mt-6' disabled={isSubmitting}>
+        {isSubmitting ? 'Updating Password...' : 'Change Password'}
       </Button>
     </form>
   );

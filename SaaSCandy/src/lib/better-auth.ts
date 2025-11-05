@@ -15,10 +15,8 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { twoFactor } from 'better-auth/plugins';
 import sgMail from '@sendgrid/mail';
-import * as argon2 from 'argon2';
-import { eq } from 'drizzle-orm';
 
-import { db, user as userTable } from './db';
+import { db } from './db';
 import {
   ResetPasswordEmail,
   VerificationEmail,
@@ -54,50 +52,71 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user: authUser, token }) => {
+    resetPasswordTokenExpiresIn: 3600, // 1 hour in seconds
+    sendResetPassword: async ({ user: authUser, url }) => {
+      console.log(
+        '[better-auth] 🔐 sendResetPassword - User:',
+        authUser.email,
+        '(ID:',
+        authUser.id,
+        ')'
+      );
+      console.log(
+        '[better-auth] ℹ️ Token stored in verification table by Better Auth'
+      );
+      console.log('[better-auth] 🔗 Reset URL:', url);
+
       try {
-        // Debug: log when callback runs (only in non-production)
-        if (process.env.NODE_ENV !== 'production') {
-          console.debug('[better-auth] sendResetPassword called for user:', authUser.id);
-        }
-        const hashed = await argon2.hash(token);
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        await sgMail.send({
+          from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+          to: authUser.email,
+          subject: 'Reset your password - SaaSCandy',
+          html: ResetPasswordEmail({ resetUrl: url }),
+        });
 
-        await db
-          .update(userTable)
-          .set({ resetToken: hashed, resetTokenExpires: expiresAt })
-          .where(eq(userTable.id, authUser.id))
-          .execute();
-
-        // Verify write (debug only) — read back the user row and log presence of token
-        if (process.env.NODE_ENV !== 'production') {
-          try {
-            const res = await db
-              .select()
-              .from(userTable)
-              .where(eq(userTable.id, authUser.id))
-              .limit(1)
-              .execute();
-            const row = res?.[0];
-            console.debug('[better-auth] post-update user.resetToken present?:', !!row?.resetToken);
-            console.debug('[better-auth] post-update user.resetTokenExpires:', row?.resetTokenExpires);
-          } catch (e) {
-            console.debug('[better-auth] failed to re-read user after update', e);
-          }
-        }
-      } catch (e) {
-        // log but do not throw — avoid leaking or breaking UX
-        console.error('failed saving reset token', e);
+        console.log(
+          '[better-auth] ✅ Reset email sent successfully to:',
+          authUser.email
+        );
+      } catch (error) {
+        console.error('[better-auth] ❌ Failed to send reset email:', error);
+        throw error;
       }
+    },
+    onPasswordReset: async ({ user }) => {
+      // Send confirmation email after successful password reset
+      console.log(
+        '[better-auth] 🔄 Password reset successful for user:',
+        user.email
+      );
 
-      const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
-
-      await sgMail.send({
-        from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-        to: authUser.email,
-        subject: 'Reset your password - SaaSCandy',
-        html: ResetPasswordEmail({ resetUrl }),
-      });
+      try {
+        await sgMail.send({
+          from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+          to: user.email,
+          subject: 'Password Changed Successfully - SaaSCandy',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #6366f1;">Password Changed Successfully</h2>
+              <p>Your password has been changed successfully.</p>
+              <p>If you didn't make this change, please contact support immediately.</p>
+              <p style="margin-top: 30px; color: #666;">
+                Best regards,<br/>
+                SaaSCandy Team
+              </p>
+            </div>
+          `,
+        });
+        console.log(
+          '[better-auth] ✅ Password change confirmation email sent to:',
+          user.email
+        );
+      } catch (error) {
+        console.error(
+          '[better-auth] ❌ Failed to send confirmation email:',
+          error
+        );
+      }
     },
   },
 

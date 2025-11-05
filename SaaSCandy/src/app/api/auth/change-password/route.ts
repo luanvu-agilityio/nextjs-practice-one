@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { currentPassword, newPassword } = body ?? {};
 
+    console.log('[change-password] 🔐 Password change request received');
+
     if (!currentPassword || !newPassword) {
+      console.log('[change-password] ❌ Missing required fields');
       return NextResponse.json(
         {
           success: false,
@@ -28,6 +31,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log('[change-password] ℹ️ Calling Better Auth changePassword API');
 
     const result = (await auth.api.changePassword({
       headers: request.headers,
@@ -46,14 +51,20 @@ export async function POST(request: NextRequest) {
     const authResult = result as ChangePasswordResponse;
 
     if (authResult?.user || authResult?.token || authResult?.ok) {
+      console.log('[change-password] ✅ Password changed successfully');
       return NextResponse.json({
         success: true,
         message:
           typeof authResult.message === 'string'
             ? authResult.message
-            : 'Password changed',
+            : 'Password changed successfully',
       });
     }
+
+    console.log(
+      '[change-password] ❌ Password change failed:',
+      authResult?.error || authResult?.message
+    );
 
     return NextResponse.json(
       {
@@ -70,6 +81,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
+    console.error('[change-password] ❌ Exception:', error);
     return NextResponse.json(
       {
         success: false,
