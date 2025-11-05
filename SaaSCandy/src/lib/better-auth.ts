@@ -53,8 +53,10 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 3600, // 1 hour in seconds
-    resetPasswordPath: '/reset-password', // Frontend page URL (not API route)
-    sendResetPassword: async ({ user: authUser, url }) => {
+    sendResetPassword: async ({ user: authUser, token }) => {
+      // Manually construct the reset URL (same pattern as email verification)
+      const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
+
       console.log(
         '[better-auth] 🔐 sendResetPassword - User:',
         authUser.email,
@@ -65,10 +67,10 @@ export const auth = betterAuth({
       console.log(
         '[better-auth] ℹ️ Token stored in verification table by Better Auth'
       );
-      console.log('[better-auth] 🔗 Reset URL generated:', url);
+      console.log('[better-auth] 🔗 Reset URL constructed:', resetUrl);
       console.log(
-        '[better-auth] 🔗 Token in URL:',
-        url.includes('token=') ? 'YES ✅' : 'NO ❌'
+        '[better-auth] 🔗 Token value:',
+        token.substring(0, 15) + '...'
       );
 
       try {
@@ -76,7 +78,7 @@ export const auth = betterAuth({
           from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
           to: authUser.email,
           subject: 'Reset your password - SaaSCandy',
-          html: ResetPasswordEmail({ resetUrl: url }),
+          html: ResetPasswordEmail({ resetUrl }),
         });
 
         console.log(
