@@ -56,6 +56,10 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     sendResetPassword: async ({ user: authUser, token }) => {
       try {
+        // Debug: log when callback runs (only in non-production)
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug('[better-auth] sendResetPassword called for user:', authUser.id);
+        }
         const hashed = await argon2.hash(token);
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
@@ -64,6 +68,23 @@ export const auth = betterAuth({
           .set({ resetToken: hashed, resetTokenExpires: expiresAt })
           .where(eq(userTable.id, authUser.id))
           .execute();
+
+        // Verify write (debug only) — read back the user row and log presence of token
+        if (process.env.NODE_ENV !== 'production') {
+          try {
+            const res = await db
+              .select()
+              .from(userTable)
+              .where(eq(userTable.id, authUser.id))
+              .limit(1)
+              .execute();
+            const row = res?.[0];
+            console.debug('[better-auth] post-update user.resetToken present?:', !!row?.resetToken);
+            console.debug('[better-auth] post-update user.resetTokenExpires:', row?.resetTokenExpires);
+          } catch (e) {
+            console.debug('[better-auth] failed to re-read user after update', e);
+          }
+        }
       } catch (e) {
         // log but do not throw — avoid leaking or breaking UX
         console.error('failed saving reset token', e);

@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import { db, user as userTable } from '@/lib/db';
+import { db, user as userTable, account as accountTable } from '@/lib/db';
 import { isNotNull, and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -59,6 +59,30 @@ export const POST = async (request: NextRequest) => {
       })
       .where(eq(userTable.id, matchedUser.id))
       .execute();
+
+    // Also update the Better Auth credential record (account table) so
+    // sign-in uses the new password. Better Auth verifies credentials
+    // from the `account` table with providerId = 'credential'.
+    try {
+      await db
+        .update(accountTable)
+        .set({ password: passwordHash })
+        .where(
+          and(
+            eq(accountTable.userId, matchedUser.id),
+            eq(accountTable.providerId, 'credential')
+          )
+        )
+        .execute();
+    } catch (e) {
+      // Log and continue — we don't want to leak details to the client.
+      try {
+        const { error: logError } = await import('@/lib/logger');
+        logError('[reset-password] failed updating account table', e);
+      } catch {
+        /* noop */
+      }
+    }
 
     return NextResponse.json({ success: true, message: 'Password updated' });
   } catch (err: unknown) {

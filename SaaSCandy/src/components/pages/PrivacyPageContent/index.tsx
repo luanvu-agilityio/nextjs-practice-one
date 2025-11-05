@@ -27,7 +27,7 @@ const PrivacyPageContent = () => {
         <Section
           key={section.id}
           title={section.title}
-          className='sm:py-4'
+          className='py-4 sm:py-4'
           headerClassName='mb-4 sm:mb-4'
         >
           {section.paragraphs?.map((p, idx) => (
