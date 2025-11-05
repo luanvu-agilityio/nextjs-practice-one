@@ -53,6 +53,7 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 3600, // 1 hour in seconds
+    resetPasswordPath: '/reset-password', // Frontend page URL (not API route)
     sendResetPassword: async ({ user: authUser, url }) => {
       console.log(
         '[better-auth] 🔐 sendResetPassword - User:',
@@ -64,7 +65,11 @@ export const auth = betterAuth({
       console.log(
         '[better-auth] ℹ️ Token stored in verification table by Better Auth'
       );
-      console.log('[better-auth] 🔗 Reset URL:', url);
+      console.log('[better-auth] 🔗 Reset URL generated:', url);
+      console.log(
+        '[better-auth] 🔗 Token in URL:',
+        url.includes('token=') ? 'YES ✅' : 'NO ❌'
+      );
 
       try {
         await sgMail.send({
