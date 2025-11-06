@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm run build-storybook",
+  "buildCommand": "pnpm run vercel-build",
   "outputDirectory": "storybook-static",
   "installCommand": "pnpm install"
 }
