@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+import React from 'react';
+import { render } from '@testing-library/react';
 import { getAllServices, getServiceBySlug } from '@/helpers';
 import {
   generateStaticParams,
@@ -15,8 +17,8 @@ jest.mock('@/helpers', () => ({
   getServiceBySlug: jest.fn(),
 }));
 
-jest.mock('@/components/layout/PageLayout', () => ({
-  MockPageLayout: ({
+jest.mock('@/components/layout', () => ({
+  PageLayout: ({
     title,
     subtitle,
     children,
@@ -127,5 +129,31 @@ describe('ServicePage', () => {
     expect(mockGetServiceBySlug).toHaveBeenCalledWith('missing');
     expect(mockNotFound).toHaveBeenCalled();
     expect(result).toBeNull();
+  });
+
+  it('renders the page when service exists', () => {
+    mockGetServiceBySlug.mockReturnValue({
+      slug: 'foo',
+      title: 'Service Title',
+      subtitle: 'Service Subtitle',
+      description: 'desc',
+      whatItDoes: { title: '', description: '', image: '' },
+      features: [],
+      icon: '',
+    });
+
+    const { container } = render(
+      // render the component returned by the page function
+      // ServicePage is a React component; call it and render the result
+      ServicePage({ params: { slug: 'foo' } }) as unknown as React.ReactElement
+    );
+
+    expect(mockGetServiceBySlug).toHaveBeenCalledWith('foo');
+    // our mocked PageLayout renders the title in an h1
+    expect(container.querySelector('h1')?.textContent).toBe('Service Title');
+    // the ServiceDetailPageContent mock renders a test id
+    expect(
+      container.querySelector('[data-testid="service-detail"]')?.textContent
+    ).toBe('Service Title');
   });
 });

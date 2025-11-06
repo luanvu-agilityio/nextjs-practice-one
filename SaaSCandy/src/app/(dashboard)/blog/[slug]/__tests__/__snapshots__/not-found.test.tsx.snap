@@ -33,13 +33,13 @@ exports[`BlogPostNotFound - Snapshot Tests should match snapshot 1`] = `
           </div>
           <h2
             aria-level="2"
-            class="text-5xl font-semibold text-gray-900 mb-4"
+            class="text-5xl font-semibold text-primary mb-4"
             role="heading"
           >
             Blog Post Not Found
           </h2>
           <p
-            class="text-md text-gray-600 mb-6"
+            class="text-md text-gray-background mb-6"
             role="paragraph"
           >
             The blog post you're looking for doesn't exist or may have been moved. Let's get you back to reading great content!

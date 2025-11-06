@@ -7,13 +7,13 @@ exports[`ContentRenderer - Snapshot Tests should match snapshot with all block t
   >
     <h2
       aria-level="2"
-      class="text-gray-900 font-bold mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl"
+      class="text-gray-primary font-bold mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl"
       role="heading"
     >
       Test Heading
     </h2>
     <p
-      class="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-xs lg:text-lg"
+      class="text-gray-background mb-3 sm:mb-4 text-sm sm:text-xs lg:text-lg"
       role="paragraph"
     >
       Test paragraph content
@@ -22,23 +22,23 @@ exports[`ContentRenderer - Snapshot Tests should match snapshot with all block t
       class="mb-3 sm:mb-4 pl-4 sm:pl-6 space-y-1 sm:space-y-2"
     >
       <li
-        class="text-gray-600 text-sm sm:text-xs"
+        class="text-gray-background text-sm sm:text-xs"
       >
         Item 1
       </li>
       <li
-        class="text-gray-600 text-sm sm:text-xs"
+        class="text-gray-background text-sm sm:text-xs"
       >
         Item 2
       </li>
       <li
-        class="text-gray-600 text-sm sm:text-xs"
+        class="text-gray-background text-sm sm:text-xs"
       >
         Item 3
       </li>
     </ul>
     <blockquote
-      class="border-l-4 border-primary pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 italic text-gray-700 bg-gray-50 rounded-r"
+      class="border-l-4 border-primary pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 italic text-gray-foreground bg-inactive-background rounded-r"
     >
       <p
         class="text-sm sm:text-xs"
@@ -47,7 +47,7 @@ exports[`ContentRenderer - Snapshot Tests should match snapshot with all block t
         "Test quote"
       </p>
       <cite
-        class="text-xs sm:text-sm text-gray-500"
+        class="text-xs sm:text-sm text-gray-background"
       >
         — 
         Test Author
@@ -69,14 +69,14 @@ exports[`ContentRenderer - Snapshot Tests should match snapshot with all block t
         width="800"
       />
       <p
-        class="text-xs sm:text-sm text-gray-500 text-center mt-2 italic"
+        class="text-xs sm:text-sm text-gray-background text-center mt-2 italic"
         role="paragraph"
       >
         Test caption
       </p>
     </div>
     <pre
-      class="bg-gray-900 text-gray-100 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm"
+      class="bg-primary text-inactive-background p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm"
     >
       <code
         class="language-javascript"

@@ -58,4 +58,14 @@ describe('Share', () => {
       'custom-class'
     );
   });
+
+  it('uses window.location.href when no url prop provided (client)', () => {
+    render(<Share title='Test Title' />);
+
+    const twitterLink = screen.getByText('Twitter').closest('a');
+    expect(twitterLink).toHaveAttribute(
+      'href',
+      expect.stringContaining(encodeURIComponent(window.location.href))
+    );
+  });
 });

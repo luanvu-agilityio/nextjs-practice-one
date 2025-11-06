@@ -47,7 +47,6 @@ describe('PageLayout - Snapshot Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
-      isRefetching: false,
     });
     mockUsePathname.mockReturnValue('/services');
   });
@@ -92,7 +91,6 @@ describe('PageLayout - Interactive Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
-      isRefetching: false,
     });
     mockUsePathname.mockReturnValue('/services');
   });
@@ -156,6 +154,95 @@ describe('PageLayout - Interactive Tests', () => {
     expect(subtitleElement).not.toBeInTheDocument();
   });
 
+  it('should show Sign In and Sign Up when unauthenticated', () => {
+    // default beforeEach sets session to null
+    render(
+      <PageLayout title='Test Page'>
+        <div>Test Content</div>
+      </PageLayout>
+    );
+
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
+    expect(screen.getByText('Sign Up')).toBeInTheDocument();
+  });
+
+  it('should close mobile auth dropdown when backdrop is clicked', () => {
+    render(
+      <PageLayout title='Test Page'>
+        <div>Test Content</div>
+      </PageLayout>
+    );
+
+    const toggleButton = screen.getByLabelText('Toggle auth menu');
+    // open
+    fireEvent.click(toggleButton);
+
+    const backdrop = document.querySelector('.fixed.inset-0') as Element | null;
+    expect(backdrop).toBeInTheDocument();
+
+    // click backdrop to close
+    if (backdrop) fireEvent.click(backdrop);
+
+    const backdropAfter = document.querySelector('.fixed.inset-0');
+    expect(backdropAfter).toBeNull();
+  });
+
+  it('clicking Sign In in mobile dropdown closes the menu', () => {
+    render(
+      <PageLayout title='Test Page'>
+        <div>Test Content</div>
+      </PageLayout>
+    );
+
+    const toggleButton = screen.getByLabelText('Toggle auth menu');
+    fireEvent.click(toggleButton);
+
+    // the dropdown container is rendered with absolute positioning classes
+    const dropdown = document.querySelector('.absolute.right-0.top-full');
+    expect(dropdown).toBeInTheDocument();
+
+    // find the Sign In link inside the dropdown and click it (Link has the onClick handler)
+    const signInLink = dropdown?.querySelector(
+      'a[href="/signin"]'
+    ) as HTMLAnchorElement | null;
+    expect(signInLink).toBeTruthy();
+    if (signInLink) fireEvent.click(signInLink);
+
+    // after clicking, the backdrop (and dropdown) should be removed
+    const backdropAfter = document.querySelector('.fixed.inset-0');
+    expect(backdropAfter).toBeNull();
+    const dropdownAfter = document.querySelector('.absolute.right-0.top-full');
+    expect(dropdownAfter).toBeNull();
+  });
+
+  it('clicking Sign Up in mobile dropdown closes the menu', () => {
+    render(
+      <PageLayout title='Test Page'>
+        <div>Test Content</div>
+      </PageLayout>
+    );
+
+    const toggleButton = screen.getByLabelText('Toggle auth menu');
+    fireEvent.click(toggleButton);
+
+    // the dropdown container is rendered with absolute positioning classes
+    const dropdown = document.querySelector('.absolute.right-0.top-full');
+    expect(dropdown).toBeInTheDocument();
+
+    // find the Sign Up link inside the dropdown and click it (Link has the onClick handler)
+    const signUpLink = dropdown?.querySelector(
+      'a[href="/signup"]'
+    ) as HTMLAnchorElement | null;
+    expect(signUpLink).toBeTruthy();
+    if (signUpLink) fireEvent.click(signUpLink);
+
+    // after clicking, the backdrop (and dropdown) should be removed
+    const backdropAfter = document.querySelector('.fixed.inset-0');
+    expect(backdropAfter).toBeNull();
+    const dropdownAfter = document.querySelector('.absolute.right-0.top-full');
+    expect(dropdownAfter).toBeNull();
+  });
+
   it('should render UserMenu when authenticated', () => {
     mockUseSession.mockReturnValue({
       data: {
@@ -182,7 +269,6 @@ describe('PageLayout - Interactive Tests', () => {
       refetch: function (): void {
         throw new Error('Function not implemented.');
       },
-      isRefetching: false,
     });
 
     render(

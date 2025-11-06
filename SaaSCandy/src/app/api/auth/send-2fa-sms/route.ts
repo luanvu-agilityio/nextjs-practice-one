@@ -12,10 +12,15 @@ import { eq } from 'drizzle-orm';
 import * as schema from '@/lib/db/schema';
 import { auth } from '@/lib/better-auth';
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const fromPhone = process.env.TWILIO_PHONE_NUMBER;
-const client = twilio(accountSid, authToken);
+function getFromPhone() {
+  return process.env.TWILIO_PHONE_NUMBER;
+}
+
+function getTwilioClient() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  return twilio(accountSid, authToken);
+}
 
 function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -75,6 +80,9 @@ export async function POST(request: NextRequest) {
     });
     // Send SMS
     try {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const fromPhone = getFromPhone();
       if (!accountSid || !authToken || !fromPhone) {
         console.error('[send-2fa-sms] Missing Twilio env vars', {
           accountSid: !!accountSid,
@@ -87,7 +95,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await client.messages.create({
+      await getTwilioClient().messages.create({
         body: `Your SaaSCandy verification code is: ${code}`,
         from: fromPhone,
         to: phone,

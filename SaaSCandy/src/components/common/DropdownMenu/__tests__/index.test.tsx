@@ -1,43 +1,92 @@
-import { render } from '@testing-library/react';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
   DropdownMenuShortcut,
 } from '../index';
 
-describe('DropdownMenu', () => {
-  it('matches snapshot', () => {
-    const { container } = render(
+describe('DropdownMenu (common)', () => {
+  it('opens content when trigger is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(
       <DropdownMenu>
         <DropdownMenuTrigger>Open</DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>First</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
-    expect(container).toMatchSnapshot();
+
+    // content should not be visible initially
+    expect(screen.queryByText('First')).not.toBeInTheDocument();
+
+    await user.click(screen.getByText('Open'));
+
+    expect(await screen.findByText('First')).toBeInTheDocument();
   });
 
-  it('renders Label with inset', () => {
-    const { getByText } = render(
-      <DropdownMenuLabel inset>LabelInset</DropdownMenuLabel>
+  it('applies inset class when inset prop is provided on item', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem inset>Inset Item</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
-    expect(getByText('LabelInset')).toBeInTheDocument();
+
+    await user.click(screen.getByText('Open'));
+    const item = await screen.findByText('Inset Item');
+    expect(item).toHaveClass('pl-8');
   });
 
-  it('renders Separator', () => {
-    const { container } = render(<DropdownMenuSeparator />);
-    expect(container.firstChild).toHaveClass('bg-gray-background');
+  it('renders shortcut element and preserves provided text', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>
+            Action
+            <DropdownMenuShortcut>Ctrl+K</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+
+    await user.click(screen.getByText('Open'));
+    expect(await screen.findByText('Ctrl+K')).toBeInTheDocument();
   });
 
-  it('renders Shortcut', () => {
+  it('renders checkbox item indicator when checked', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuCheckboxItem checked>Checked</DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+
+    await user.click(screen.getByText('Open'));
+    const item = await screen.findByText('Checked');
+    // the indicator contains an svg element (the Check icon)
+    expect(item.querySelector('svg')).toBeTruthy();
+  });
+
+  it('renders Label, Separator and Shortcut standalone', () => {
     const { getByText } = render(
       <DropdownMenuShortcut>Ctrl+S</DropdownMenuShortcut>
     );

@@ -7,7 +7,7 @@ exports[`Tags Component matches snapshot 1`] = `
   >
     <h3
       aria-level="3"
-      class="font-semibold text-gray-900 mb-2 sm:mb-3 text-lg sm:text-xl"
+      class="font-semibold text-primary mb-2 sm:mb-3 text-lg sm:text-xl"
       role="heading"
     >
       Tags
@@ -17,7 +17,7 @@ exports[`Tags Component matches snapshot 1`] = `
     >
       <li>
         <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
+          class="text-xs sm:text-sm text-gray-background capitalize"
         >
           - 
           javascript
@@ -25,7 +25,7 @@ exports[`Tags Component matches snapshot 1`] = `
       </li>
       <li>
         <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
+          class="text-xs sm:text-sm text-gray-background capitalize"
         >
           - 
           react
@@ -33,7 +33,7 @@ exports[`Tags Component matches snapshot 1`] = `
       </li>
       <li>
         <span
-          class="text-xs sm:text-sm text-gray-600 capitalize"
+          class="text-xs sm:text-sm text-gray-background capitalize"
         >
           - 
           typescript

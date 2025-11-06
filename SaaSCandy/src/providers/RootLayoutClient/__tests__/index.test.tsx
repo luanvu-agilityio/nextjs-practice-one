@@ -59,4 +59,30 @@ describe('RootLayoutClient', () => {
 
     expect(screen.queryByTestId('header')).not.toBeInTheDocument();
   });
+
+  it('should render header for blog sub-pages (e.g. /blog/post-slug)', () => {
+    mockUsePathname.mockReturnValue('/blog/my-post');
+
+    render(
+      <RootLayoutClient>
+        <div>Content</div>
+      </RootLayoutClient>
+    );
+
+    // blog sub-pages should show the header
+    expect(screen.getByTestId('header')).toBeInTheDocument();
+  });
+
+  it('should render header when pathname is undefined', () => {
+    // simulate no pathname (e.g., during certain tests/environments)
+    mockUsePathname.mockReturnValue(undefined as unknown as string);
+
+    render(
+      <RootLayoutClient>
+        <div>Content</div>
+      </RootLayoutClient>
+    );
+
+    expect(screen.getByTestId('header')).toBeInTheDocument();
+  });
 });

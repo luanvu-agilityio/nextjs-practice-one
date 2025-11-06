@@ -65,4 +65,19 @@ describe('ContentRenderer - Snapshot Tests', () => {
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper).toHaveClass('custom-class');
   });
+
+  it('ignores unknown block types and does not render them', () => {
+    const invalidBlock = {
+      id: '7',
+      type: 'unknown',
+      content: {},
+    } as unknown as ContentBlock;
+    const { container } = render(
+      <ContentRenderer blocks={[...mockBlocks, invalidBlock]} />
+    );
+
+    const wrapper = container.firstChild as HTMLElement;
+    // the unknown block should not produce an additional child element
+    expect(wrapper.children.length).toBe(mockBlocks.length);
+  });
 });

@@ -14,7 +14,7 @@ import { Heading, Typography, Button } from '@/components/common';
 import { IconButton } from '@/components/common/IconButton';
 import Navbar from '@/components/NavBar';
 import { UserMenu } from '@/components/UserMenu';
-import AuthSectionSkeleton from '../Header/AuthSectionSkeleton';
+
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -53,14 +53,10 @@ const PageLayout = ({
 }: PageLayoutProps) => {
   const pathname = usePathname();
   const breadcrumbs = breadcrumbOverride || extractBreadcrumbs(pathname);
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
   const renderAuthSection = () => {
-    if (isPending) {
-      return <AuthSectionSkeleton />;
-    }
-
     if (session?.user) {
       return <UserMenu />;
     }

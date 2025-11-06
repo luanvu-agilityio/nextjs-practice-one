@@ -2,9 +2,22 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ResetPasswordForm } from '../index';
 import React from 'react';
 
+// Bypass zod validation in tests so handleSubmit always runs.
+jest.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => (values: unknown) => ({
+    values,
+    errors: {} as Record<string, unknown>,
+  }),
+}));
+
+// Expose mocks so tests can assert on calls
+const mockShowToast = jest.fn();
+const mockResetPassword = jest.fn();
+const mockPush = jest.fn();
+
 // Mock dependencies
 jest.mock('@/components/common', () => ({
-  showToast: jest.fn(),
+  showToast: (...args: unknown[]) => mockShowToast(...args),
   ErrorMessage: ({ error }: { error: string }) => <div>{error}</div>,
   Button: (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...props}>{props.children}</button>
@@ -51,6 +64,11 @@ jest.mock('@/components/common', () => ({
       />
     );
   },
+  getFriendlyMessage: (m: string) => m,
+}));
+
+jest.mock('@/service', () => ({
+  resetPassword: (...args: unknown[]) => mockResetPassword(...args),
 }));
 
 jest.mock('next/navigation', () => ({
@@ -58,7 +76,7 @@ jest.mock('next/navigation', () => ({
     get: (key: string) => (key === 'token' ? 'test-token' : ''),
   }),
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -135,5 +153,73 @@ describe('ResetPasswordForm', () => {
       'type',
       'password'
     );
+  });
+
+  it('submits successfully and redirects to sign in', async () => {
+    jest.useFakeTimers();
+
+    const onSuccess = jest.fn();
+    mockResetPassword.mockResolvedValueOnce({ success: true });
+
+    render(<ResetPasswordForm token='tkn' onSuccess={onSuccess} />);
+
+    fireEvent.change(screen.getByLabelText(/New Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+
+    // advance timers to trigger redirect
+    jest.runAllTimers();
+    expect(mockPush).toHaveBeenCalledWith('/signin');
+    expect(onSuccess).toHaveBeenCalled();
+
+    jest.useRealTimers();
+  });
+
+  it('shows friendly error and calls onError when resetPassword returns failure', async () => {
+    const onError = jest.fn();
+    mockResetPassword.mockResolvedValueOnce({
+      success: false,
+      message: 'boom',
+    });
+
+    render(<ResetPasswordForm token='tkn' onError={onError} />);
+
+    fireEvent.change(screen.getByLabelText(/New Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+    expect(onError).toHaveBeenCalledWith('boom');
+  });
+
+  it('handles thrown error from resetPassword and calls onError', async () => {
+    const onError = jest.fn();
+    mockResetPassword.mockRejectedValueOnce(new Error('network'));
+
+    render(<ResetPasswordForm token='tkn' onError={onError} />);
+
+    fireEvent.change(screen.getByLabelText(/New Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: 'StrongPass123!' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+    expect(onError).toHaveBeenCalledWith('network');
   });
 });

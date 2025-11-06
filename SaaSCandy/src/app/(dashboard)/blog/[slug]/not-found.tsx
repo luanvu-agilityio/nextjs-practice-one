@@ -28,10 +28,10 @@ const BlogPostNotFound = () => {
             as='h2'
             size='xl'
             content='Blog Post Not Found'
-            className='text-gray-900 mb-4'
+            className='text-primary mb-4'
           />
 
-          <Typography className='text-gray-600 mb-6'>
+          <Typography className='text-gray-background mb-6'>
             The blog post you&apos;re looking for doesn&apos;t exist or may have
             been moved. Let&apos;s get you back to reading great content!
           </Typography>

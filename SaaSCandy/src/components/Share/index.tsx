@@ -17,7 +17,8 @@ const Share = ({
   title = '',
   className = '',
 }: Readonly<ShareProps>) => {
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : url;
+  const shareUrl =
+    globalThis.window === undefined ? url : globalThis.window.location.href;
 
   const shareLinks = [
     {

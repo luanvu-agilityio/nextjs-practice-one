@@ -80,7 +80,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
           <div className='border-t pt-6 sm:pt-8 mb-6 sm:mb-8'>
             <Heading
               as='h3'
-              className='text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4'
+              className='text-xl sm:text-2xl font-bold text-primary mb-3 sm:mb-4'
               content='Tags'
             />
             <Tags tags={post?.tags ?? []} />
@@ -90,7 +90,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
           <div className='border-t pt-6 sm:pt-8 mb-6 sm:mb-8 lg:hidden'>
             <Heading
               as='h3'
-              className='text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4'
+              className='text-xl sm:text-2xl font-bold text-primary mb-3 sm:mb-4'
               content='Share'
             />
             <ul className='space-y-2'>
@@ -99,7 +99,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-sm sm:text-xs text-gray-600 hover:text-gray-900 transition-colors'
+                  className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'
                 >
                   Facebook
                 </Link>
@@ -109,7 +109,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-sm sm:text-xs text-gray-600 hover:text-gray-900 transition-colors'
+                  className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'
                 >
                   Twitter
                 </Link>
@@ -119,7 +119,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-sm sm:text-xs text-gray-600 hover:text-gray-900 transition-colors'
+                  className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'
                 >
                   LinkedIn
                 </Link>

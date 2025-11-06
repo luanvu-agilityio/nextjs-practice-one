@@ -66,14 +66,14 @@ const LazySection = ({
                 as='h2'
                 size='3xl'
                 content={title}
-                className='text-gray-900 font-bold mb-3 sm:mb-4 text-2xl sm:text-4xl lg:text-5xl'
+                className='text-primary font-bold mb-3 sm:mb-4 text-2xl sm:text-4xl lg:text-5xl'
               />
             )}
             {subtitle && (
               <Typography
                 size='lg'
                 content={subtitle}
-                className='text-gray-600 leading-relaxed max-w-3xl mx-auto sm:text-lg'
+                className='text-gray-background leading-relaxed max-w-3xl mx-auto sm:text-lg'
               />
             )}
           </div>

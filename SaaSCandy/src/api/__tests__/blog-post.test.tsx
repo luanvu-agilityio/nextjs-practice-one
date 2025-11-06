@@ -218,6 +218,13 @@ describe('blogService', () => {
       expect(result[0].title).toContain('Test');
     });
 
+    it('should find posts by tag match', async () => {
+      jest.spyOn(BlogHttpClient.prototype, 'get').mockResolvedValue([mockPost]);
+      const result = await blogService.searchPosts('blog');
+      expect(result).toHaveLength(1);
+      expect(result[0].tags).toContain('blog');
+    });
+
     it('should return empty array when no matches found', async () => {
       jest.spyOn(BlogHttpClient.prototype, 'get').mockResolvedValue([]);
       const result = await blogService.searchPosts('nonexistent');

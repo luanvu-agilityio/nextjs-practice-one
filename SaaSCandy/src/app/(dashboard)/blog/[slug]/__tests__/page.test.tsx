@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import * as helpers from '@/helpers';
 import BlogPostPage, { generateMetadata } from '../page';
+import React from 'react';
+import { render } from '@testing-library/react';
 
 jest.mock('@/helpers', () => ({
   getPostBySlug: jest.fn(),
@@ -11,7 +13,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 jest.mock('@/components/pages', () => ({
-  BlogPostPageDetailContent: () => <div>BlogPostDetailPage</div>,
+  BlogPostDetailPageContent: () => <div>BlogPostDetailPage</div>,
 }));
 
 describe('BlogPostPage', () => {
@@ -21,6 +23,18 @@ describe('BlogPostPage', () => {
     (helpers.getPostBySlug as jest.Mock).mockResolvedValue(null);
     await BlogPostPage({ params });
     expect(notFound).toHaveBeenCalled();
+  });
+
+  it('renders BlogPostDetailPageContent when post exists', async () => {
+    (helpers.getPostBySlug as jest.Mock).mockResolvedValue({
+      title: 'Test Title',
+      excerpt: 'Test Excerpt',
+    });
+
+    const result = await BlogPostPage({ params });
+    const { getByText } = render(result as unknown as React.ReactElement);
+    // our mocked BlogPostPageDetailContent returns this text
+    expect(getByText('BlogPostDetailPage')).toBeDefined();
   });
 });
 

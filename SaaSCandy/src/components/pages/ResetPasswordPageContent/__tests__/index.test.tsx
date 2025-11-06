@@ -1,5 +1,6 @@
 import ResetPasswordPageContent from '../index';
 import { render, screen } from '@testing-library/react';
+import { showToast } from '@/components/common';
 
 import React from 'react';
 
@@ -98,5 +99,16 @@ describe('ResetPasswordPageContent', () => {
 
     const heading = screen.getByRole('heading', { level: 2 });
     expect(heading).toHaveClass('mb-4');
+  });
+
+  it('calls showToast and navigates to sign-in on successful reset', () => {
+    render(<ResetPasswordPageContent />);
+
+    // Trigger the mocked form's onSuccess handler
+    const trigger = screen.getByText('Trigger Success');
+    trigger.click();
+
+    expect(showToast).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith('/sign-in');
   });
 });

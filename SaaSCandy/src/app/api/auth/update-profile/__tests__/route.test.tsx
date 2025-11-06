@@ -149,6 +149,54 @@ describe('/api/auth/update-profile', () => {
     expect(data.message).toBe('Email already in use');
   });
 
+  it('should update profile when email is unchanged', async () => {
+    const { auth } = await import('@/lib/better-auth');
+    (auth.api.getSession as unknown as jest.Mock).mockResolvedValue({
+      user: { id: '1', email: 'test@example.com' },
+    });
+
+    const { db } = await import('@/lib/db');
+    // when checking existing user for new email, return null (not found)
+    (db.query.user.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const request = {
+      json: jest.fn().mockResolvedValue({ name: 'Updated User' }),
+      headers: new Headers(),
+    } as unknown as NextRequest;
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.message).toBe('Profile updated successfully');
+    expect(data.success).toBe(true);
+  });
+
+  it('should update profile when changing to a new unique email', async () => {
+    const { auth } = await import('@/lib/better-auth');
+    (auth.api.getSession as unknown as jest.Mock).mockResolvedValue({
+      user: { id: '1', email: 'old@example.com' },
+    });
+
+    const { db } = await import('@/lib/db');
+    // simulate existingUser check returns null (email not taken)
+    (db.query.user.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const request = {
+      json: jest
+        .fn()
+        .mockResolvedValue({ name: 'New Name', email: 'new@example.com' }),
+      headers: new Headers(),
+    } as unknown as NextRequest;
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.message).toBe('Profile updated successfully');
+    expect(data.success).toBe(true);
+  });
+
   it('should handle unexpected errors', async () => {
     const { auth } = await import('@/lib/better-auth');
     (auth.api.getSession as unknown as jest.Mock).mockImplementation(() => {

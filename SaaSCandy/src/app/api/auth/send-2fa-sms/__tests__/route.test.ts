@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server';
-
-import { POST, PUT } from '../route';
 import { db } from '@/lib/db';
 import { auth } from '@/lib/better-auth';
 import twilio from 'twilio';
+import { POST, PUT } from '../route';
 
 jest.mock('next/server', () => ({
   NextResponse: {
@@ -69,6 +68,18 @@ const mockSet = jest.fn();
 (db.delete as jest.Mock) = mockDelete;
 (db.update as jest.Mock) = mockUpdate;
 
+// Simple thin wrappers to call the statically-imported handlers. Route module
+// now evaluates Twilio env vars lazily at call time, so tests can set
+// process.env before invoking handlers and also mutate the imported `db`
+// mock at runtime.
+const callPOST = async (request: NextRequest) => {
+  return POST(request as unknown as NextRequest);
+};
+
+const callPUT = async (request: NextRequest) => {
+  return PUT(request as unknown as NextRequest);
+};
+
 describe('SMS 2FA API Routes', () => {
   const createMockRequest = (body: Record<string, unknown>) => {
     return {
@@ -100,7 +111,7 @@ describe('SMS 2FA API Routes', () => {
   describe('POST /api/sms-2fa', () => {
     it('should return 400 if phone is missing', async () => {
       const request = createMockRequest({});
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -117,7 +128,7 @@ describe('SMS 2FA API Routes', () => {
         password: 'wrongpassword',
       });
 
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(401);
@@ -132,7 +143,7 @@ describe('SMS 2FA API Routes', () => {
         phone: '+1234567890',
       });
 
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -155,7 +166,7 @@ describe('SMS 2FA API Routes', () => {
         phone: '+1234567890',
       });
 
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(500);
@@ -170,7 +181,7 @@ describe('SMS 2FA API Routes', () => {
 
       mockWhere.mockRejectedValue(new Error('Database error'));
 
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(500);
@@ -182,7 +193,7 @@ describe('SMS 2FA API Routes', () => {
   describe('PUT /api/sms-2fa', () => {
     it('should return 400 if phone or code is missing', async () => {
       const request = createMockRequest({ phone: '+1234567890' });
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -207,7 +218,7 @@ describe('SMS 2FA API Routes', () => {
         code: '123456',
       });
 
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -233,7 +244,7 @@ describe('SMS 2FA API Routes', () => {
         code: '654321',
       });
 
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(401);
@@ -260,7 +271,7 @@ describe('SMS 2FA API Routes', () => {
         code: '123456',
       });
 
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -276,7 +287,7 @@ describe('SMS 2FA API Routes', () => {
         code: '123456',
       });
 
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -292,7 +303,7 @@ describe('SMS 2FA API Routes', () => {
         code: '123456',
       });
 
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
 
       expect(response.status).toBe(500);
@@ -313,7 +324,7 @@ describe('SMS 2FA API Routes', () => {
           password: 'testpw',
         }),
       } as unknown as NextRequest;
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(401);
       expect(data.success).toBe(false);
@@ -328,7 +339,7 @@ describe('SMS 2FA API Routes', () => {
         { id: 'user-123', phone: '+1234567890', twoFactorEnabled: true },
       ]);
       const request = createMockRequest({ phone: '+1234567890' });
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
@@ -341,7 +352,7 @@ describe('SMS 2FA API Routes', () => {
         throw new Error('Unexpected');
       });
       const request = createMockRequest({ phone: '+1234567890' });
-      const response = await POST(request);
+      const response = await callPOST(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
@@ -356,7 +367,7 @@ describe('SMS 2FA API Routes', () => {
         phone: '+1234567890',
         code: '123456',
       });
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(400);
       expect(data.success).toBe(false);
@@ -369,7 +380,7 @@ describe('SMS 2FA API Routes', () => {
         phone: '+1234567890',
         code: '123456',
       });
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(400);
       expect(data.success).toBe(false);
@@ -384,7 +395,7 @@ describe('SMS 2FA API Routes', () => {
         phone: '+1234567890',
         code: '123456',
       });
-      const response = await PUT(request);
+      const response = await callPUT(request as unknown as NextRequest);
       const data = await response.json();
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
@@ -421,7 +432,7 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
       email: 'test@example.com',
       password: 'pw',
     });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
@@ -443,11 +454,72 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     (db.select as jest.Mock) = mockSelect;
 
     const request = createMockRequest({ phone: '+1234567890' });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
-    expect(response.status).toBe(500);
-    expect(data.success).toBe(false);
-    expect(data.message).toBe(undefined);
+    // With Twilio env present and mocks successful we expect a success response
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('SMS code sent');
+    expect(mockCreate).toHaveBeenCalled();
+  });
+
+  it('should successfully send SMS when email+password are valid', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    (auth.api.signInEmail as unknown as jest.Mock).mockResolvedValue({
+      user: mockUser,
+    });
+
+    process.env.TWILIO_ACCOUNT_SID = 'sid';
+    process.env.TWILIO_AUTH_TOKEN = 'token';
+    process.env.TWILIO_PHONE_NUMBER = '+10000000000';
+    const { POST: dynamicPOST } = await import('../route');
+    const request = createMockRequest({
+      phone: '+1234567890',
+      email: 'test@example.com',
+      password: 'pw',
+    });
+    const response = await dynamicPOST(request as unknown as NextRequest);
+    const data = await response.json();
+
+    // when Twilio and DB mocks are happy, we expect a success response
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('SMS code sent');
+    expect(mockDelete).toHaveBeenCalled();
+    expect(mockInsert).toHaveBeenCalled();
+    expect(mockCreate).toHaveBeenCalled();
+  });
+
+  it('should successfully send SMS when user is found by phone', async () => {
+    const mockUser = {
+      id: 'user-234',
+      email: 'phoneuser@example.com',
+      phone: '+19876543210',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhereLocal = jest.fn().mockResolvedValue(mockUsers);
+    const mockFromLocal = jest.fn().mockReturnValue({ where: mockWhereLocal });
+    const mockSelectLocal = jest.fn().mockReturnValue({ from: mockFromLocal });
+    (db.select as jest.Mock) = mockSelectLocal;
+
+    process.env.TWILIO_ACCOUNT_SID = 'sid';
+    process.env.TWILIO_AUTH_TOKEN = 'token';
+    process.env.TWILIO_PHONE_NUMBER = '+10000000000';
+    const { POST: dynamicPOST2 } = await import('../route');
+    const request = createMockRequest({ phone: '+19876543210' });
+    const response = await dynamicPOST2(request as unknown as NextRequest);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('SMS code sent');
+    expect(mockCreate).toHaveBeenCalled();
   });
 
   it('should handle Twilio error with string message', async () => {
@@ -467,12 +539,12 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     });
 
     const request = createMockRequest({ phone: '+1234567890' });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Twilio configuration missing');
-    expect(data.details).toBe(undefined);
+    expect(data.error).toBe('Failed to send SMS');
+    expect(data.details).toBe('Twilio string error');
   });
 
   it('should handle Twilio error with Error object', async () => {
@@ -492,12 +564,12 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     });
 
     const request = createMockRequest({ phone: '+1234567890' });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Twilio configuration missing');
-    expect(data.details).toBe(undefined);
+    expect(data.error).toBe('Failed to send SMS');
+    expect(data.details).toBe('Twilio error object');
   });
 
   it('should handle Twilio error with object with message property', async () => {
@@ -517,12 +589,12 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     });
 
     const request = createMockRequest({ phone: '+1234567890' });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Twilio configuration missing');
-    expect(data.details).toBe(undefined);
+    expect(data.error).toBe('Failed to send SMS');
+    expect(data.details).toBe('Twilio object message');
   });
 
   it('should handle Twilio error with object without message property', async () => {
@@ -542,19 +614,20 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     });
 
     const request = createMockRequest({ phone: '+1234567890' });
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
-    expect(data.error).toBe('Twilio configuration missing');
-    expect(data.details).toBe(undefined);
+    expect(data.error).toBe('Failed to send SMS');
+    // details should be present (stringified object)
+    expect(data.details).toBeDefined();
   });
 
   it('should handle POST with missing body', async () => {
     const request = {
       json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
     } as unknown as NextRequest;
-    const response = await POST(request);
+    const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(400);
     expect(data.success).toBe(undefined);
@@ -565,7 +638,7 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     const request = {
       json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
     } as unknown as NextRequest;
-    const response = await PUT(request);
+    const response = await callPUT(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
@@ -592,7 +665,7 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
       code: '123456',
     });
 
-    const response = await PUT(request);
+    const response = await callPUT(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.success).toBe(false);

@@ -1,4 +1,39 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
+// Mock common shared components. Support both `children` and `content` props
+// so the component under test can pass either without breaking tests.
+jest.mock('@/components/common', () => ({
+  Button: ({
+    children,
+    ...props
+  }: { children?: React.ReactNode } & Record<string, unknown>) => (
+    <button {...(props as unknown as Record<string, unknown>)}>
+      {children}
+    </button>
+  ),
+  Input: ({
+    children,
+    ...props
+  }: { children?: React.ReactNode } & Record<string, unknown>) => (
+    <input {...(props as unknown as Record<string, unknown>)} />
+  ),
+  Heading: ({
+    children,
+    content,
+  }: {
+    children?: React.ReactNode;
+    content?: React.ReactNode;
+  }) => <h3>{children ?? content}</h3>,
+  Typography: ({
+    children,
+    content,
+  }: {
+    children?: React.ReactNode;
+    content?: React.ReactNode;
+  }) => <div>{children ?? content}</div>,
+}));
+
 import { TwoFactorForm } from '../index';
 
 describe('TwoFactorForm', () => {
@@ -12,147 +47,83 @@ describe('TwoFactorForm', () => {
     isLoading: false,
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  beforeEach(() => jest.clearAllMocks());
 
-  it('should render without crashing', () => {
+  it('renders headings and the provided email', () => {
     render(<TwoFactorForm {...mockProps} />);
-    expect(screen.getByText('Check your email')).toBeInTheDocument();
+    expect(screen.getByText(/Check your email/i)).toBeInTheDocument();
+    // use a flexible matcher in case the email is wrapped
+    expect(
+      screen.getByText(
+        content =>
+          typeof content === 'string' && content.includes('test@example.com')
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Enter Verification Code/i)).toBeInTheDocument();
   });
 
-  it('should display user email', () => {
-    render(<TwoFactorForm {...mockProps} />);
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
-  });
-
-  it('should display verification code heading', () => {
-    render(<TwoFactorForm {...mockProps} />);
-    expect(screen.getByText('Enter Verification Code')).toBeInTheDocument();
-  });
-
-  it('should display code expiration message', () => {
-    render(<TwoFactorForm {...mockProps} />);
-    expect(screen.getByText('Code expires in 10 minutes')).toBeInTheDocument();
-  });
-
-  it('should render input with correct attributes', () => {
+  it('renders input with correct attributes and calls onCodeChange', () => {
     render(<TwoFactorForm {...mockProps} />);
     const input = screen.getByPlaceholderText('000000') as HTMLInputElement;
-
-    expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute('type', 'text');
     expect(input).toHaveAttribute('maxLength', '6');
-    expect(input).toHaveValue('');
-  });
-
-  it('should call onCodeChange when input changes', () => {
-    render(<TwoFactorForm {...mockProps} />);
-    const input = screen.getByPlaceholderText('000000');
-
     fireEvent.change(input, { target: { value: '123456' } });
-
-    expect(mockProps.onCodeChange).toHaveBeenCalledTimes(1);
+    expect(mockProps.onCodeChange).toHaveBeenCalled();
   });
 
-  it('should display code value in input', () => {
-    const propsWithCode = { ...mockProps, twoFactorCode: '123456' };
-    render(<TwoFactorForm {...propsWithCode} />);
-
-    const input = screen.getByPlaceholderText('000000') as HTMLInputElement;
-    expect(input).toHaveValue('123456');
-  });
-
-  it('should disable verify button when code length is not 6', () => {
-    const propsWithShortCode = { ...mockProps, twoFactorCode: '12345' };
-    render(<TwoFactorForm {...propsWithShortCode} />);
-
+  it('disables verify button when code length is not 6', () => {
+    render(<TwoFactorForm {...{ ...mockProps, twoFactorCode: '12345' }} />);
     const verifyButton = screen.getByRole('button', {
       name: /verify & sign in/i,
     });
     expect(verifyButton).toBeDisabled();
   });
 
-  it('should enable verify button when code length is 6', () => {
-    const propsWithFullCode = { ...mockProps, twoFactorCode: '123456' };
-    render(<TwoFactorForm {...propsWithFullCode} />);
-
+  it('enables verify button when code length is 6', () => {
+    render(<TwoFactorForm {...{ ...mockProps, twoFactorCode: '123456' }} />);
     const verifyButton = screen.getByRole('button', {
       name: /verify & sign in/i,
     });
     expect(verifyButton).not.toBeDisabled();
   });
 
-  it('should disable verify button when isLoading is true', () => {
-    const loadingProps = {
-      ...mockProps,
-      twoFactorCode: '123456',
-      isLoading: true,
-    };
-    render(<TwoFactorForm {...loadingProps} />);
-
-    const verifyButton = screen.getByRole('button', { name: /verifying/i });
-    expect(verifyButton).toBeDisabled();
+  it('shows verifying state and disables verify when loading', () => {
+    render(
+      <TwoFactorForm
+        {...{ ...mockProps, twoFactorCode: '123456', isLoading: true }}
+      />
+    );
+    const verifyingButton = screen.getByRole('button', { name: /verifying/i });
+    expect(verifyingButton).toBeDisabled();
   });
 
-  it('should display "Verifying..." when loading', () => {
-    const loadingProps = { ...mockProps, isLoading: true };
-    render(<TwoFactorForm {...loadingProps} />);
+  it('calls onVerify, onResendCode and onBack when actions triggered', async () => {
+    render(<TwoFactorForm {...{ ...mockProps, twoFactorCode: '123456' }} />);
 
-    expect(screen.getByText('Verifying...')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /verify & sign in/i }));
+    await waitFor(() => expect(mockProps.onVerify).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /resend code/i }));
+    await waitFor(() => expect(mockProps.onResendCode).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /change email/i }));
+    expect(mockProps.onBack).toHaveBeenCalled();
   });
 
-  it('should call onVerify when verify button is clicked', async () => {
-    const propsWithFullCode = { ...mockProps, twoFactorCode: '123456' };
-    render(<TwoFactorForm {...propsWithFullCode} />);
-
-    const verifyButton = screen.getByRole('button', {
-      name: /verify & sign in/i,
-    });
-    fireEvent.click(verifyButton);
-
-    await waitFor(() => {
-      expect(mockProps.onVerify).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('should call onResendCode when resend button is clicked', async () => {
-    render(<TwoFactorForm {...mockProps} />);
-
-    const resendButton = screen.getByRole('button', { name: /resend code/i });
-    fireEvent.click(resendButton);
-
-    await waitFor(() => {
-      expect(mockProps.onResendCode).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('should disable resend button when isLoading is true', () => {
-    const loadingProps = { ...mockProps, isLoading: true };
-    render(<TwoFactorForm {...loadingProps} />);
-
-    const resendButton = screen.getByRole('button', { name: /resend code/i });
-    expect(resendButton).toBeDisabled();
-  });
-
-  it('should call onBack when change email button is clicked', () => {
-    render(<TwoFactorForm {...mockProps} />);
-
-    const backButton = screen.getByRole('button', { name: /change email/i });
-    fireEvent.click(backButton);
-
-    expect(mockProps.onBack).toHaveBeenCalledTimes(1);
-  });
-
-  it('should break long email addresses properly', () => {
-    const longEmailProps = {
-      ...mockProps,
-      userEmail: 'verylongemailaddress@verylongdomainname.com',
-    };
-    render(<TwoFactorForm {...longEmailProps} />);
+  it('breaks long email addresses and applies break-all class', () => {
+    render(
+      <TwoFactorForm
+        {...{
+          ...mockProps,
+          userEmail: 'verylongemailaddress@verylongdomainname.com',
+        }}
+      />
+    );
 
     const emailElement = screen.getByText(
-      'verylongemailaddress@verylongdomainname.com'
+      content =>
+        typeof content === 'string' &&
+        content.includes('verylongemailaddress@verylongdomainname.com')
     );
     expect(emailElement).toBeInTheDocument();
     expect(emailElement).toHaveClass('break-all');

@@ -1,7 +1,18 @@
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+
+// Make the zod resolver a no-op for tests so form submission proceeds without
+// actual schema validation. This lets us exercise onSubmit branches reliably.
+jest.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => (values: unknown) => ({
+    values,
+    errors: {} as Record<string, unknown>,
+  }),
+}));
 import { ChangePasswordModal } from '../index';
 
-const sessionMock = { user: { id: 'test-user-id' } };
+const sessionMock: { user?: { id: string } | undefined } = {
+  user: { id: 'test-user-id' },
+};
 jest.mock('@/lib/auth-client', () => ({
   useSession: () => ({
     data: sessionMock,
@@ -106,6 +117,105 @@ describe('ChangePasswordModal', () => {
     );
     fireEvent.click(screen.getByText('Cancel'));
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('submits and triggers success flow (toast, onSuccess, onOpenChange after timeout)', async () => {
+    jest.useFakeTimers();
+
+    mockChangePassword.mockResolvedValueOnce({ success: true });
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+
+    // submit with default values
+    const formEl = screen
+      .getByPlaceholderText('Enter current password')
+      .closest('form') as HTMLFormElement;
+    fireEvent.submit(formEl);
+
+    // wait for the async changePassword and showToast to be called
+    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+
+    // advance timers to run the setTimeout callback
+    jest.runAllTimers();
+
+    expect(mockOnSuccess).toHaveBeenCalled();
+    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+
+    jest.useRealTimers();
+  });
+
+  it('shows error when changePassword returns success:false', async () => {
+    mockChangePassword.mockResolvedValueOnce({
+      success: false,
+      error: 'Bad request',
+    });
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+
+    const formEl = screen
+      .getByPlaceholderText('Enter current password')
+      .closest('form') as HTMLFormElement;
+    fireEvent.submit(formEl);
+
+    const err = await screen.findByTestId('error-message');
+    expect(err).toHaveTextContent('Bad request');
+  });
+
+  it('shows error when changePassword throws', async () => {
+    mockChangePassword.mockRejectedValueOnce(new Error('network fail'));
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+
+    const formEl = screen
+      .getByPlaceholderText('Enter current password')
+      .closest('form') as HTMLFormElement;
+    fireEvent.submit(formEl);
+
+    const err = await screen.findByTestId('error-message');
+    expect(err).toHaveTextContent('network fail');
+  });
+
+  it('sets error when user session is missing', async () => {
+    // Temporarily remove user id
+    const originalUser = sessionMock.user;
+    sessionMock.user = undefined;
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={mockOnOpenChange}
+        onSuccess={mockOnSuccess}
+      />
+    );
+
+    const formEl = screen
+      .getByPlaceholderText('Enter current password')
+      .closest('form') as HTMLFormElement;
+    fireEvent.submit(formEl);
+
+    const err = await screen.findByTestId('error-message');
+    expect(err).toHaveTextContent('User session not found');
+
+    // restore
+    sessionMock.user = originalUser;
   });
   it('renders correctly when open', () => {
     render(

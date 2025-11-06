@@ -20,7 +20,7 @@ const ContentRenderer = ({
             as={`h${block.content.level}`}
             size={block.content.level === 2 ? 'xl' : 'lg'}
             content={block.content.text}
-            className='text-gray-900 font-bold mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl'
+            className='text-gray-primary font-bold mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl'
           />
         );
 
@@ -29,7 +29,7 @@ const ContentRenderer = ({
           <Typography
             key={block.id}
             content={block.content.text}
-            className='text-gray-600 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-xs lg:text-lg'
+            className='text-gray-background mb-3 sm:mb-4 leading-relaxed text-sm sm:text-xs lg:text-lg'
           />
         );
 
@@ -41,7 +41,10 @@ const ContentRenderer = ({
             className='mb-3 sm:mb-4 pl-4 sm:pl-6 space-y-1 sm:space-y-2'
           >
             {block.content.items.map((item: string, index: number) => (
-              <li key={index} className='text-gray-600 text-sm sm:text-xs'>
+              <li
+                key={index}
+                className='text-gray-background text-sm sm:text-xs'
+              >
                 {item}
               </li>
             ))}
@@ -53,14 +56,14 @@ const ContentRenderer = ({
         return (
           <blockquote
             key={block.id}
-            className='border-l-4 border-primary pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 italic text-gray-700 bg-gray-50 rounded-r'
+            className='border-l-4 border-primary pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 italic text-gray-foreground bg-inactive-background rounded-r'
           >
             <Typography
               content={`"${block.content.text}"`}
               className='text-sm sm:text-xs'
             />
             {block.content.author && (
-              <cite className='text-xs sm:text-sm text-gray-500'>
+              <cite className='text-xs sm:text-sm text-gray-background'>
                 — {block.content.author}
               </cite>
             )}
@@ -80,7 +83,7 @@ const ContentRenderer = ({
             {block.content.caption && (
               <Typography
                 content={block.content.caption}
-                className='text-xs sm:text-sm text-gray-500 text-center mt-2 italic'
+                className='text-xs sm:text-sm text-gray-background text-center mt-2 italic'
               />
             )}
           </div>
@@ -90,7 +93,7 @@ const ContentRenderer = ({
         return (
           <pre
             key={block.id}
-            className='bg-gray-900 text-gray-100 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm'
+            className='bg-primary text-inactive-background p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm'
           >
             <code
               className={
@@ -105,8 +108,7 @@ const ContentRenderer = ({
         );
 
       default:
-        const _exhaustiveCheck: never = block;
-        return _exhaustiveCheck;
+        return null;
     }
   };
 

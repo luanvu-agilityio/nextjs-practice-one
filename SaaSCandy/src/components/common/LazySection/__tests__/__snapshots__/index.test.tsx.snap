@@ -14,13 +14,13 @@ exports[`LazySection should match snapshot with all props 1`] = `
       >
         <h2
           aria-level="2"
-          class="text-gray-900 font-bold mb-3 sm:mb-4 text-2xl sm:text-4xl lg:text-5xl"
+          class="text-primary font-bold mb-3 sm:mb-4 text-2xl sm:text-4xl lg:text-5xl"
           role="heading"
         >
           Full Props Test
         </h2>
         <p
-          class="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto sm:text-lg"
+          class="text-lg text-gray-background leading-relaxed max-w-3xl mx-auto sm:text-lg"
           role="paragraph"
         >
           This is a subtitle

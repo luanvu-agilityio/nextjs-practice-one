@@ -1,4 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+
+// mock next/navigation router to capture back() calls
+const mockRouterBack = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ back: mockRouterBack }),
+}));
+
 import BlogError from '@/app/(dashboard)/blog/error';
 
 describe('BlogError - Interactive Tests', () => {
@@ -27,6 +34,11 @@ describe('BlogError - Interactive Tests', () => {
     expect(screen.getByText('Back to Blog')).toBeInTheDocument();
   });
 
+  it('logs error to the console on mount', () => {
+    render(<BlogError error={mockError} reset={mockReset} />);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Blog page error:', mockError);
+  });
+
   it('should call reset when Try Again button is clicked', () => {
     render(<BlogError error={mockError} reset={mockReset} />);
 
@@ -43,7 +55,14 @@ describe('BlogError - Interactive Tests', () => {
 
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
-    expect(svg).toHaveClass('text-red-600');
+    expect(svg).toHaveClass('text-destructive-background');
+  });
+
+  it('calls router.back when Back to Blog is clicked', () => {
+    render(<BlogError error={mockError} reset={mockReset} />);
+    const backButton = screen.getByText('Back to Blog');
+    fireEvent.click(backButton);
+    expect(mockRouterBack).toHaveBeenCalledTimes(1);
   });
 
   it('should show error details in development mode', () => {

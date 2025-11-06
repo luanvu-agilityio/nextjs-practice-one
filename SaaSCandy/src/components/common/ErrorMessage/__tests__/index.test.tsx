@@ -2,9 +2,16 @@ const mockConstants = {
   GENERAL_MESSAGES: {
     SOMETHING_WRONG: 'Something went wrong. Please try again.',
   },
-  STRING_ERROR_KEYWORDS: { network: 'Network error occurred' },
-  ERROR_INSTANCE_KEYWORDS: { timeout: 'Request timed out' },
-  HTTP_STATUS_MESSAGES: { 404: 'Resource not found', 500: 'Server error' },
+  STRING_ERROR_KEYWORDS: {
+    network: 'Network error. Please check your connection.',
+  },
+  ERROR_INSTANCE_KEYWORDS: {
+    timeout: 'Something went wrong. Please try again.',
+  },
+  HTTP_STATUS_MESSAGES: {
+    404: 'Resource not found',
+    500: 'Server error. Please try again later.',
+  },
 };
 
 jest.mock('@/constants', () => mockConstants, { virtual: true });
@@ -67,5 +74,32 @@ describe('ErrorMessage Component', () => {
     expect(getFriendlyMessage(null)).toBe(
       mockConstants.GENERAL_MESSAGES.SOMETHING_WRONG
     );
+  });
+
+  it('getFriendlyMessage maps string keywords (case-insensitive)', () => {
+    const res = getFriendlyMessage('NETWORK FAILURE');
+    expect(res).not.toBe(mockConstants.GENERAL_MESSAGES.SOMETHING_WRONG);
+    expect(res.toLowerCase()).toContain('network');
+  });
+
+  it('getFriendlyMessage maps Error instances using ERROR_INSTANCE_KEYWORDS', () => {
+    // use an error message that contains the exact keyword from the mock
+    const err = new Error('timeout occurred');
+    const res = getFriendlyMessage(err);
+    expect(res).not.toBe(mockConstants.GENERAL_MESSAGES.SOMETHING_WRONG);
+    const keywords = ['request', 'time', 'timeout'];
+    const matched = keywords.some(k => res.toLowerCase().includes(k));
+    expect(matched).toBe(true);
+  });
+
+  it('getFriendlyMessage maps known HTTP status codes', () => {
+    const res = getFriendlyMessage({ status: 500 });
+    expect(res).not.toBe(mockConstants.GENERAL_MESSAGES.SOMETHING_WRONG);
+    expect(res.toLowerCase()).toContain('server');
+  });
+
+  it('ErrorMessage component renders mapped message for Error instance', () => {
+    render(<ErrorMessage error={new Error('timeout happened')} />);
+    expect(screen.getByText(/request|timeout|timed/i)).toBeInTheDocument();
   });
 });

@@ -1,11 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserMenu } from '@/components/UserMenu';
-import { useSession } from '@/lib/auth-client';
+import { useSession, signOut } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants';
 
-jest.mock('@/lib/auth-client');
+jest.mock('@/lib/auth-client', () => ({
+  __esModule: true,
+  useSession: jest.fn(),
+  signOut: jest.fn(),
+}));
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
@@ -397,6 +401,51 @@ describe('Dropdown Menu Interaction', () => {
         .closest('[role="menuitem"]');
       expect(settingsItem).toHaveAttribute('data-disabled');
     });
+  });
+
+  it('calls signOut and navigates home on Sign Out click', async () => {
+    const user = userEvent.setup();
+    // access the mocked signOut from the module
+    const signOutMock = signOut as unknown as jest.Mock;
+    signOutMock.mockResolvedValue(undefined);
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button', { name: /user menu/i });
+    await user.click(trigger);
+
+    await waitFor(async () => {
+      const signOutItem = screen.getByText('Sign Out');
+      await user.click(signOutItem);
+    });
+
+    expect(signOutMock).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith(ROUTES.HOME);
+    expect(mockRefresh).toHaveBeenCalled();
+    signOutMock.mockReset();
+  });
+
+  it('logs error when signOut throws', async () => {
+    const user = userEvent.setup();
+    const error = new Error('sign out failed');
+    const signOutMock = signOut as unknown as jest.Mock;
+    signOutMock.mockRejectedValue(error);
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    render(<UserMenu />);
+    const trigger = screen.getByRole('button', { name: /user menu/i });
+    await user.click(trigger);
+
+    await waitFor(async () => {
+      const signOutItem = screen.getByText('Sign Out');
+      await user.click(signOutItem);
+    });
+
+    expect(signOutMock).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith('Sign out error:', error);
+    consoleSpy.mockRestore();
+    signOutMock.mockReset();
   });
 });
 

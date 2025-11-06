@@ -43,7 +43,7 @@ const DocsContent = () => {
                               className={`text-left w-full p-2 rounded text-sm transition-colors ${
                                 activeSection === item.href.replace('#', '')
                                   ? 'bg-blue-50 text-blue-600 font-medium'
-                                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                  : 'text-gray-background hover:text-primary hover:bg-gray-50'
                               }`}
                             >
                               {item.title}

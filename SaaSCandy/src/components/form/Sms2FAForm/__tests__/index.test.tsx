@@ -136,6 +136,24 @@ describe('Sms2FAForm', () => {
         expect(mockSetCode).not.toHaveBeenCalled();
       });
     });
+
+    it('calls setCode and onVerify when rendered with an initial code and submitted', async () => {
+      mockOnVerify.mockResolvedValue(undefined);
+
+      render(<Sms2FAForm {...defaultProps} code={'654321'} />);
+
+      // Ensure the DOM input satisfies the required constraint so the form will submit
+      const codeInput = screen.getByTestId('code');
+      fireEvent.change(codeInput, { target: { value: '654321' } });
+
+      const verifyButton = screen.getByRole('button', { name: 'Verify Code' });
+      fireEvent.click(verifyButton);
+
+      await waitFor(() => {
+        expect(mockSetCode).toHaveBeenCalledWith('654321');
+        expect(mockOnVerify).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('Loading State', () => {
