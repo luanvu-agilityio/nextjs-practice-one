@@ -1,11 +1,5 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "storybook-static" }
-    }
-  ],
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build-storybook"
+  "buildCommand": "pnpm run build-storybook",
+  "outputDirectory": "storybook-static",
+  "installCommand": "pnpm install"
 }
