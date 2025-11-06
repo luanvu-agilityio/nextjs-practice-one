@@ -21,15 +21,25 @@ const PAGE_LAYOUT_ROUTES = [
   ROUTES.CONTACT,
 ];
 
+export const computeShouldShowHeader = (pathname?: string | null) => {
+  const isRoot = pathname === '/';
+
+  const isBlogSub = Boolean(
+    pathname?.startsWith('/blog/') && pathname !== '/blog'
+  );
+
+  const isPageLayout = PAGE_LAYOUT_ROUTES.some(route => {
+    if (pathname === route) return true;
+    if (route !== ROUTES.BLOG && pathname?.startsWith(route)) return true;
+    return false;
+  });
+
+  return !isRoot && (!isPageLayout || isBlogSub);
+};
+
 const RootLayoutClient = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  const shouldShowHeader =
-    pathname !== '/' &&
-    (!PAGE_LAYOUT_ROUTES.some(
-      route =>
-        pathname === route || (route !== '/blog' && pathname?.startsWith(route))
-    ) ||
-      (pathname?.startsWith('/blog/') && pathname !== '/blog'));
+  const shouldShowHeader = computeShouldShowHeader(pathname);
 
   return (
     <ReactQueryProvider>

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ForgotPasswordPageContent } from '../index';
+import * as ForgotModule from '../index';
 import React from 'react';
 
 // Mock dependencies used by the simplified component
@@ -18,7 +18,9 @@ jest.mock('@/components/form', () => ({
 
 describe('ForgotPasswordPageContent', () => {
   it('renders heading, description, and form', () => {
-    render(<ForgotPasswordPageContent />);
+    expect(ForgotModule.ForgotPasswordPageContent).toBeDefined();
+    expect(ForgotModule.default).toBeDefined();
+    render(<ForgotModule.ForgotPasswordPageContent />);
     expect(screen.getByTestId('heading')).toHaveTextContent(
       'Forgot your password?'
     );

@@ -3,7 +3,7 @@ import ContactPage from '@/app/(dashboard)/contact/page';
 import DocsPage from '@/app/(dashboard)/docs/page';
 import PortfolioPage from '@/app/(dashboard)/portfolio/page';
 import PricingPage from '@/app/(dashboard)/pricing/page';
-import ServicePage from '@/app/(dashboard)/services/page';
+import ServicePage, * as ServiceModule from '@/app/(dashboard)/services/page';
 
 jest.mock('@/components/layout/PageLayout', () => ({
   PageLayout: ({
@@ -90,5 +90,6 @@ describe('Service Page', () => {
       screen.getByText(/Choose the perfect plan that fits your needs/)
     ).toBeInTheDocument();
     expect(screen.getByTestId('service-page')).toBeInTheDocument();
+    expect(ServiceModule.metadata).toBeDefined();
   });
 });

@@ -129,22 +129,34 @@ describe('HttpClient', () => {
 
   describe('internal methods and edge cases', () => {
     it('should build full URL if path is already a full URL', () => {
-      const url = client.buildUrl('https://other.com/api');
+      const url = (
+        client as unknown as { buildUrl(path: string): string }
+      ).buildUrl('https://other.com/api');
       expect(url).toBe('https://other.com/api');
     });
 
     it('should build full URL from base and relative path', () => {
-      const url = client.buildUrl('/users/1');
+      const url = (
+        client as unknown as { buildUrl(path: string): string }
+      ).buildUrl('/users/1');
       expect(url).toBe('https://api.example.com/users/1');
     });
 
     it('should not include auth header on server-side', async () => {
-      const originalWindow = globalThis.window;
-
-      delete globalThis.window;
-      const headers = await client.getAuthHeader();
-      expect(headers).toEqual({});
-      globalThis.window = originalWindow;
+      const originalWindow = (globalThis as { window?: Window }).window;
+      try {
+        // simulate server-side by removing window
+        // some environments have a non-configurable window; set to undefined instead
+        (globalThis as { window?: Window }).window = undefined;
+        const headers = await (
+          client as unknown as {
+            getAuthHeader(): Promise<Record<string, string>>;
+          }
+        ).getAuthHeader();
+        expect(headers).toEqual({});
+      } finally {
+        (globalThis as { window?: Window }).window = originalWindow;
+      }
     });
 
     it('should set error status and data on failed request', async () => {
@@ -157,10 +169,21 @@ describe('HttpClient', () => {
       try {
         await client.get('fail');
       } catch (err: unknown) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.status).toBe(500);
-        expect(err.data).toEqual({ message: 'Server error', details: 'fail' });
+        const e = err as Error & { status?: number; data?: unknown };
+        expect(e).toBeInstanceOf(Error);
+        expect(e.status).toBe(500);
+        expect(e.data).toEqual({ message: 'Server error', details: 'fail' });
       }
+    });
+    it('uses statusText when response.json returns null', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Server Bad',
+        json: async () => null,
+      } as Response);
+
+      await expect(client.get('boom')).rejects.toThrow('Server Bad');
     });
     it('should export default http client', async () => {
       expect(http).toBeInstanceOf(HttpClient);
@@ -179,7 +202,6 @@ describe('HttpClient', () => {
     (
       globalThis.fetch as jest.MockedFunction<typeof fetch>
     ).mockImplementationOnce(() => {
-      // @ts-expect-error: should throw fail here
       throw 'fail';
     });
     try {

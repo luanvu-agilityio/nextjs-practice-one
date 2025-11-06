@@ -177,7 +177,6 @@ describe('API Services', () => {
         (
           global.fetch as jest.MockedFunction<typeof fetch>
         ).mockImplementationOnce(() => {
-          // @ts-expect-error : should throw fail here
           throw 'fail';
         });
         const result = await send2FACode('test@example.com', 'password123');

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import RootLayout from '../layout';
+import RootLayout, * as LayoutModule from '../layout';
 
 describe('RootLayout', () => {
   it('renders children inside RootLayoutClient', () => {
@@ -9,5 +9,13 @@ describe('RootLayout', () => {
       </RootLayout>
     );
     expect(getByText('Test Child')).toBeInTheDocument();
+  });
+
+  it('exports metadata', () => {
+    expect(LayoutModule.metadata).toBeDefined();
+  });
+
+  it('exports viewport', () => {
+    expect(LayoutModule.viewport).toBeDefined();
   });
 });

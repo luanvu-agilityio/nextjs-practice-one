@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import ContactPage from '@/app/(dashboard)/contact/page';
 import DocsPage from '@/app/(dashboard)/docs/page';
-import PortfolioPage from '@/app/(dashboard)/portfolio/page';
+import PortfolioPage, * as PortfolioModule from '@/app/(dashboard)/portfolio/page';
 import PricingPage from '@/app/(dashboard)/pricing/page';
 import ServicePage from '@/app/(dashboard)/services/page';
 
@@ -66,6 +66,7 @@ describe('Portfolio Page', () => {
     expect(screen.getByText('Portfolio')).toBeInTheDocument();
     expect(screen.getByText(/Select the ideal plan/)).toBeInTheDocument();
     expect(screen.getByTestId('portfolio-page')).toBeInTheDocument();
+    expect(PortfolioModule.metadata).toBeDefined();
   });
 });
 

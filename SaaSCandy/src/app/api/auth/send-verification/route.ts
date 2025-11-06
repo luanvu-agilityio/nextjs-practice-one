@@ -7,7 +7,7 @@
  *
  * Method: POST
  * Body: { email: string }
- * Response: { success: boolean, message: string, data?: any }
+ * Response: { success: boolean, message: string, data?: unknown }
  */
 import { NextRequest, NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';

@@ -38,6 +38,11 @@ jest.mock('@/constants', () => ({
       privacyLink: 'Privacy Policy',
     },
   },
+  // Values required by getFriendlyMessage / ErrorMessage
+  ERROR_INSTANCE_KEYWORDS: {},
+  GENERAL_MESSAGES: { SOMETHING_WRONG: 'Something went wrong' },
+  HTTP_STATUS_MESSAGES: {},
+  STRING_ERROR_KEYWORDS: {},
   ROUTES: {
     HOME: '/',
     SIGN_IN: '/signin',
@@ -216,5 +221,55 @@ describe('SignUpPageContent', () => {
     await user.click(signInEl);
 
     expect(mockPush).toHaveBeenCalledWith('/signin');
+  });
+
+  it('on signUp.email throwing shows error toast and does not show email-sent UI', async () => {
+    const { signUp } = jest.requireMock('@/lib/auth-client') as {
+      signUp: { email: jest.Mock };
+    };
+    // simulate a thrown error from the auth client
+    signUp.email.mockImplementationOnce(() => {
+      throw new Error('network');
+    });
+
+    render(<SignUpPageContent />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Submit/i }));
+
+    const { showToast } = jest.requireMock('@/components/common/Toast') as {
+      showToast: jest.Mock;
+    };
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Sign Up Failed' })
+      );
+    });
+
+    // Since an exception was thrown, the component should not show the email-sent UI
+    expect(
+      screen.queryByText('Verification Email Sent!')
+    ).not.toBeInTheDocument();
+  });
+
+  it('social sign up failure shows signup error toast', async () => {
+    const { handleSocialAuth } = jest.requireMock('@/utils/social-auth') as {
+      handleSocialAuth: jest.Mock;
+    };
+    handleSocialAuth.mockRejectedValueOnce(new Error('social fail'));
+
+    render(<SignUpPageContent />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Social SignUp/i }));
+
+    const { showToast } = jest.requireMock('@/components/common/Toast') as {
+      showToast: jest.Mock;
+    };
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Social Signup Failed' })
+      );
+    });
   });
 });

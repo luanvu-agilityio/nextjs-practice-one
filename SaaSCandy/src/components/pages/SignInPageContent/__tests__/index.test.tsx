@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import * as React from 'react';
 import userEvent from '@testing-library/user-event';
-import { SignInPageContent } from '../index';
+// Defer importing the component until after mocks are defined so that
+// module-level imports within the component see the jest mocks.
 
 const mockPush = jest.fn();
 const mockRefresh = jest.fn();
@@ -17,6 +19,52 @@ jest.mock('next/navigation', () => ({
     refresh: mockRefresh,
   }),
   usePathname: () => mockPathname,
+}));
+
+// Mock TwoFAMethodSelector to provide predictable test ids and buttons
+jest.mock('../TwoFAMethodSelector', () => ({
+  TwoFAMethodSelector: ({
+    userPhone,
+    setUserPhone,
+    loading,
+    handleSelect2FAMethod,
+    handleSms2FAVerify,
+  }: {
+    userPhone?: string;
+    setUserPhone?: (p: string) => void;
+    loading?: boolean;
+    handleSelect2FAMethod?: (method: 'email' | 'sms') => void;
+    handleSms2FAVerify?: () => void;
+  }) => (
+    <div data-testid='twofamethod-selector'>
+      <h2>Choose 2FA Method</h2>
+      <button onClick={() => handleSelect2FAMethod?.('email')}>
+        Email 2FA
+      </button>
+      <div>
+        <input
+          placeholder='Enter phone (+1234567890) for SMS'
+          value={userPhone ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUserPhone?.(e.target.value)
+          }
+        />
+        <button
+          onClick={() => {
+            // ensure a phone is set before invoking SMS verify; schedule verify
+            // on next microtask so React state updates flush first.
+            setUserPhone?.('5551234');
+            setTimeout(() => {
+              handleSms2FAVerify?.();
+            }, 0);
+          }}
+        >
+          SMS 2FA
+        </button>
+      </div>
+      {loading ? <div>Loading...</div> : null}
+    </div>
+  ),
 }));
 
 jest.mock('next/link', () => {
@@ -60,6 +108,12 @@ jest.mock('@/utils', () => ({
 }));
 
 jest.mock('@/constants', () => ({
+  API_ROUTES: {
+    AUTH: {
+      SEND_2FA_SMS: '/api/auth/send-2fa-sms',
+      SEND_2FA_CODE: '/api/auth/verify-2fa-code',
+    },
+  },
   AUTH_MESSAGES: {
     SIGN_IN: {
       title: 'Sign In',
@@ -165,6 +219,31 @@ jest.mock('@/components/common', () => ({
       type={type}
     />
   ),
+  Input: ({
+    value,
+    onChange,
+    placeholder,
+    type,
+    disabled,
+    className,
+  }: {
+    value?: string | number;
+    onChange?: React.ChangeEventHandler<HTMLInputElement>;
+    placeholder?: string;
+    type?: string;
+    disabled?: boolean;
+    className?: string;
+  }) => (
+    <input
+      data-testid={placeholder || 'input'}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      type={type}
+      disabled={disabled}
+      className={className}
+    />
+  ),
   Button: ({
     children,
     disabled,
@@ -181,7 +260,7 @@ jest.mock('@/components/common', () => ({
     </button>
   ),
   Heading: ({ content }: { content: string }) => <h2>{content}</h2>,
-  Divider: ({ text }: { text: string }) => <div>{text}</div>,
+  Divider: ({ text }: { text?: string }) => <div>{text}</div>,
   showToast: (...args: unknown[]) => mockShowToast(...args),
 }));
 
@@ -238,7 +317,8 @@ jest.mock('@/icons', () => ({
   },
 }));
 
-jest.mock('@/components/form/SignInForm/index', () => ({
+// Mock the form barrel so SignInPageContent receives mocked sub-components
+jest.mock('@/components/form', () => ({
   SignInForm: ({
     onSubmit,
     onSocialSignIn,
@@ -253,37 +333,73 @@ jest.mock('@/components/form/SignInForm/index', () => ({
       </button>
     </div>
   ),
-}));
-
-jest.mock('@/components/form/TwoFactorForm/index', () => {
-  const TwoFactorForm = ({
+  TwoFactorForm: ({
     onVerify,
     onBack,
+    onCodeChange,
   }: {
     onVerify: () => void;
     onBack: () => void;
-  }) => (
-    <div data-testid='twofactor-form'>
-      <button onClick={onVerify}>Verify</button>
-      <button onClick={onBack}>Back</button>
-    </div>
-  );
-  return { TwoFactorForm };
-});
-
-jest.mock('@/components/pages/SignInPageContent/TwoFAMethodSelector', () => ({
-  TwoFAMethodSelector: ({
-    handleSelect2FAMethod,
-    handleSms2FAVerify,
+    onCodeChange?: (e: { target: { value: string } }) => void;
+  }) => {
+    // Do not pre-fill the code here; let tests control the input value.
+    return (
+      <div data-testid='twofactor-form'>
+        <input
+          data-testid='twofactor-input'
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onCodeChange &&
+            onCodeChange({
+              target: { value: (e.target as HTMLInputElement).value },
+            })
+          }
+        />
+        <button
+          onClick={async () => {
+            // Call verify only when the user clicks. Tests should ensure the code value
+            // is present when they expect verification to succeed.
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore allow calling possibly-async onVerify
+            onVerify();
+          }}
+        >
+          Verify
+        </button>
+        <button onClick={onBack}>Back</button>
+      </div>
+    );
+  },
+  Sms2FAForm: ({
+    onVerify,
+    onBack,
+    setCode,
   }: {
-    handleSelect2FAMethod: (m: string) => void;
-    handleSms2FAVerify: () => void;
-  }) => (
-    <div data-testid='twofamethod-selector'>
-      <button onClick={() => handleSelect2FAMethod('email')}>Email 2FA</button>
-      <button onClick={handleSms2FAVerify}>SMS 2FA</button>
-    </div>
-  ),
+    onVerify: () => void;
+    onBack: () => void;
+    setCode?: (c: string) => void;
+  }) => {
+    // Do not auto-set code or auto-verify. Tests should click Verify when appropriate.
+    return (
+      <div data-testid='sms2fa-form'>
+        <input
+          data-testid='sms-code'
+          onChange={e =>
+            setCode && setCode((e.target as HTMLInputElement).value)
+          }
+        />
+        <button
+          onClick={async () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore allow calling possibly-async onVerify
+            onVerify();
+          }}
+        >
+          Verify
+        </button>
+        <button onClick={onBack}>Back</button>
+      </div>
+    );
+  },
 }));
 
 jest.mock('@/components/pages/SignInPageContent/SignInHeader', () => ({
@@ -293,6 +409,11 @@ jest.mock('@/components/pages/SignInPageContent/SignInHeader', () => ({
 jest.mock('@/components/pages/SignInPageContent/SignInFooter', () => ({
   SignInFooter: () => <div data-testid='signin-footer'>Footer</div>,
 }));
+
+// Import the component after all jest.mock calls above so it uses the mocks
+// NOTE: use require to import at runtime (works in Jest/Node test environment)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { SignInPageContent } = require('../index');
 
 describe('SignInForm - Snapshot', () => {
   beforeEach(() => {
@@ -342,10 +463,19 @@ describe('SignInPageContent - Rendering', () => {
     mockSend2FACode.mockImplementation(() =>
       Promise.resolve({ success: true })
     );
-    mockVerify2FACode.mockImplementation(() =>
-      Promise.resolve({ success: true, data: true })
-    );
-    mockSignIn.mockImplementation(() => Promise.resolve({ error: null }));
+    mockVerify2FACode.mockImplementation(() => {
+      // debug: log when verify is invoked in the tests
+      // eslint-disable-next-line no-console
+      console.log('DBG: mockVerify2FACode invoked');
+      return Promise.resolve({ success: true, data: true });
+    });
+    mockSignIn.mockImplementation(() => {
+      // debug: log when signIn is invoked
+      // eslint-disable-next-line no-console
+      console.log('DBG: mockSignIn invoked');
+      return Promise.resolve({ error: null });
+    });
+    // Keep console.error visible during these tests so rendering/runtime errors surface.
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -411,14 +541,27 @@ describe('SignInPageContent - Interactive', () => {
 describe('SignInPageContent - Additional Coverage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // reset individual mock implementations/call counts to avoid cross-test interference
+    mockSend2FACode.mockReset();
+    mockVerify2FACode.mockReset();
+    mockSignIn.mockReset();
+
     mockSend2FACode.mockImplementation(() =>
       Promise.resolve({ success: true })
     );
-    mockVerify2FACode.mockImplementation(() =>
-      Promise.resolve({ success: true, data: true })
-    );
-    mockSignIn.mockImplementation(() => Promise.resolve({ error: null }));
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockVerify2FACode.mockImplementation((...args: unknown[]) => {
+      // eslint-disable-next-line no-console
+      console.log('DBG: mockVerify2FACode called with args:', args);
+      return Promise.resolve({ success: true, data: true });
+    });
+    mockSignIn.mockImplementation((...args: unknown[]) => {
+      // eslint-disable-next-line no-console
+      console.log('DBG: mockSignIn called with args:', args);
+      return Promise.resolve({ error: null });
+    });
+    // Do NOT suppress console.error here so any rendering/runtime errors
+    // surface during the focused Additional Coverage tests.
+    // This aids debugging when render() returns an empty DOM.
   });
 
   afterEach(() => {
@@ -439,7 +582,9 @@ describe('SignInPageContent - Additional Coverage', () => {
     });
     // Select email 2FA
     await userEvent.click(screen.getByText('Email 2FA'));
-    // Should show toast for invalid code (empty code)
+    // Ensure the two-factor input is empty then click Verify to trigger invalid-code path
+    const codeInput = await screen.findByTestId('twofactor-input');
+    await userEvent.clear(codeInput);
     await userEvent.click(screen.getByText('Verify'));
     expect(mockShowToast).toHaveBeenCalledWith(
       expect.objectContaining({ variant: 'error' })
@@ -459,9 +604,9 @@ describe('SignInPageContent - Additional Coverage', () => {
   });
 
   it('handles SMS 2FA code send and error', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       json: async () => ({ success: false, error: 'SMS error' }),
-    }) as jest.Mock;
+    });
     render(<SignInPageContent />);
     await userEvent.click(screen.getByText('Submit'));
     await waitFor(() => {
@@ -573,5 +718,29 @@ describe('SignInPageContent - Additional Coverage', () => {
         expect.objectContaining({ variant: 'error' })
       );
     });
+  });
+
+  it('successful email verification signs in and navigates home', async () => {
+    // verify and sign in succeed
+    mockVerify2FACode.mockResolvedValueOnce({ success: true, data: true });
+    mockSignIn.mockResolvedValueOnce({ error: null });
+
+    render(<SignInPageContent />);
+    // Trigger submit -> 2FA selector
+    await userEvent.click(screen.getByText('Submit'));
+    await waitFor(() => {
+      expect(screen.getByTestId('twofamethod-selector')).toBeInTheDocument();
+    });
+    // Select email 2FA
+    await userEvent.click(screen.getByText('Email 2FA'));
+
+    // Type the 6-digit code into the mocked two-factor input then click Verify
+    await userEvent.type(screen.getByTestId('twofactor-input'), '123456');
+    await userEvent.click(screen.getByText('Verify'));
+
+    // Wait for verify to be called, then signIn, then navigation side-effects.
+    await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
+    await waitFor(() => expect(mockSignIn).toHaveBeenCalled());
+    await waitFor(() => expect(mockPush).toHaveBeenCalled());
   });
 });

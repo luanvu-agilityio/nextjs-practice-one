@@ -28,7 +28,7 @@ describe('better-auth initialization', () => {
 
     expect(betterAuth).toHaveBeenCalled();
     // sendgrid should be configured using env var
-    const mail = await import('@sendgrid/mail');
+    const mail = (await import('@sendgrid/mail')).default;
     expect(mail.setApiKey).toHaveBeenCalledWith('sg-key');
     expect(mod.auth).toBeDefined();
   });

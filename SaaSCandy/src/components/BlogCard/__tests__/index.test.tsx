@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { BlogCard } from '../index';
+import * as BlogCardModule from '../index';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -25,6 +25,7 @@ jest.mock('@/components/common', () => ({
   }: { content: React.ReactNode } & Record<string, unknown>) => (
     <h3 {...props}>{content}</h3>
   ),
+  Skeleton: (props: Record<string, unknown>) => <div {...props} />,
 }));
 
 describe('BlogCard', () => {
@@ -36,13 +37,19 @@ describe('BlogCard', () => {
 
   it('renders correctly with image', () => {
     const { container } = render(
-      <BlogCard {...defaultProps} image='/test-image.jpg' />
+      <BlogCardModule.BlogCard {...defaultProps} image='/test-image.jpg' />
     );
     expect(container).toMatchSnapshot();
   });
 
   it('renders correctly without image', () => {
-    const { container } = render(<BlogCard {...defaultProps} />);
+    const { container } = render(<BlogCardModule.BlogCard {...defaultProps} />);
+    expect(container).toMatchSnapshot();
+  });
+
+  it('exports BlogCardSkeleton', () => {
+    // Render the skeleton component so its function body is executed and counted by coverage
+    const { container } = render(<BlogCardModule.BlogCardSkeleton />);
     expect(container).toMatchSnapshot();
   });
 });

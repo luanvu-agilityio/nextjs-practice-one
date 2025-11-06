@@ -92,6 +92,31 @@ describe('/api/auth/verify-2fa-code', () => {
     jest.clearAllMocks();
   });
 
+  // Helper to ensure the mocked findFirst executes any provided orderBy callback
+  const mockEmailVerificationFindFirst = (value: unknown) => {
+    const { db } = require('@/lib/db');
+    const fn = db.query.emailVerificationCode.findFirst as jest.Mock;
+    fn.mockImplementationOnce((opts: unknown) => {
+      try {
+        const maybe = opts as {
+          orderBy?: (
+            table: { createdAt: string },
+            helpers: { desc: (x: unknown) => unknown }
+          ) => unknown;
+        };
+        if (typeof maybe?.orderBy === 'function') {
+          maybe.orderBy(
+            { createdAt: 'createdAt' },
+            { desc: (x: unknown) => x }
+          );
+        }
+      } catch {
+        // ignore any errors from the synthetic call
+      }
+      return Promise.resolve(value);
+    });
+  };
+
   it('should return error when email or code is missing', async () => {
     const request = createMockRequest({ email: '', code: '' });
 
@@ -137,9 +162,7 @@ describe('/api/auth/verify-2fa-code', () => {
       id: '1',
       email: 'test@example.com',
     });
-    (db.query.emailVerificationCode.findFirst as jest.Mock).mockResolvedValue(
-      null
-    );
+    mockEmailVerificationFindFirst(null);
 
     const request = createMockRequest({
       email: 'test@example.com',
@@ -178,7 +201,7 @@ describe('/api/auth/verify-2fa-code', () => {
       id: '1',
       email: 'test@example.com',
     });
-    (db.query.emailVerificationCode.findFirst as jest.Mock).mockResolvedValue({
+    mockEmailVerificationFindFirst({
       id: 'code-1',
       userId: '1',
       code: '123456',
@@ -203,7 +226,7 @@ describe('/api/auth/verify-2fa-code', () => {
       id: '1',
       email: 'test@example.com',
     });
-    (db.query.emailVerificationCode.findFirst as jest.Mock).mockResolvedValue({
+    mockEmailVerificationFindFirst({
       id: 'code-1',
       userId: '1',
       code: '654321',
@@ -222,13 +245,41 @@ describe('/api/auth/verify-2fa-code', () => {
     expect(data.error).toMatch(/Invalid code/);
   });
 
+  it('should pluralize remaining attempts when more than one remains', async () => {
+    const { db } = await import('@/lib/db');
+    (db.query.user.findFirst as jest.Mock).mockResolvedValue({
+      id: '1',
+      email: 'test@example.com',
+    });
+    // attempts = '0' => remainingAttempts = 2 -> plural 'attempts'
+    mockEmailVerificationFindFirst({
+      id: 'code-2',
+      userId: '1',
+      code: '654321',
+      verified: false,
+      expiresAt: new Date(Date.now() + 10000),
+      attempts: '0',
+    });
+
+    const request = createMockRequest({
+      email: 'test@example.com',
+      code: '123456',
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toMatch(/2 attempts remaining/);
+  });
+
   it('should verify code and return credentials', async () => {
     const { db } = await import('@/lib/db');
     (db.query.user.findFirst as jest.Mock).mockResolvedValue({
       id: '1',
       email: 'test@example.com',
     });
-    (db.query.emailVerificationCode.findFirst as jest.Mock).mockResolvedValue({
+    mockEmailVerificationFindFirst({
       id: 'code-1',
       userId: '1',
       code: '123456',
@@ -248,5 +299,55 @@ describe('/api/auth/verify-2fa-code', () => {
     expect(data.success).toBe(true);
     expect(data.data).toEqual({ email: 'test@example.com', password: 'pw123' });
     expect(data.message).toBe('Verification successful');
+  });
+
+  it('should handle thrown non-Error values in catch block', async () => {
+    const { db } = await import('@/lib/db');
+    // throw a plain string instead of Error instance
+    (db.query.user.findFirst as jest.Mock).mockImplementation(() => {
+      throw 'plain-string-error';
+    });
+
+    const request = createMockRequest({
+      email: 'test@example.com',
+      code: '123456',
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.message).toBe('Failed to verify code');
+    // because thrown value isn't instanceof Error, errMessage should be 'Unknown error'
+    expect(data.error).toBe('Unknown error');
+  });
+
+  it('should verify code and return empty password when tempPassword is missing', async () => {
+    const { db } = await import('@/lib/db');
+    (db.query.user.findFirst as jest.Mock).mockResolvedValue({
+      id: '1',
+      email: 'test@example.com',
+    });
+    // no tempPassword and attempts omitted to exercise fallback paths
+    mockEmailVerificationFindFirst({
+      id: 'code-3',
+      userId: '1',
+      code: '123456',
+      verified: false,
+      expiresAt: new Date(Date.now() + 10000),
+    });
+
+    const request = createMockRequest({
+      email: 'test@example.com',
+      code: '123456',
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.data).toEqual({ email: 'test@example.com', password: '' });
   });
 });

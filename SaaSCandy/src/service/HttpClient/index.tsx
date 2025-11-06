@@ -19,6 +19,21 @@ interface HttpError extends Error {
  *   const http = new HttpClient(API_BASE);
  *   const data = await http.get('/resource');
  */
+/**
+ * Returns true when running in a browser-like environment with a global window.
+ * Exported for testing so tests can exercise the browser detection branches.
+ */
+export function isBrowser() {
+  // Allow tests to override browser detection by setting globalThis.__TEST_IS_BROWSER__.
+  // This keeps production behavior unchanged while making the environment deterministic in tests.
+  const testOverride = (
+    globalThis as unknown as { __TEST_IS_BROWSER__?: unknown }
+  ).__TEST_IS_BROWSER__;
+  if (testOverride !== undefined) return !!testOverride;
+
+  return (globalThis as unknown as { window?: unknown }).window !== undefined;
+}
+
 export class HttpClient {
   baseUrl: string;
   defaultHeaders: Record<string, string>;
@@ -40,7 +55,10 @@ export class HttpClient {
    */
   private async getAuthHeader(): Promise<Record<string, string>> {
     try {
-      if (typeof window === 'undefined') return {};
+      // if there's no window (server-side) or it's falsy, skip auth
+      if (!isBrowser()) {
+        return {};
+      }
 
       const session = await getSession();
       const accessToken = session?.data?.session?.token;

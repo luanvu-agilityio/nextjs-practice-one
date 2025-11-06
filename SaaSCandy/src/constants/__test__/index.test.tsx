@@ -1,10 +1,6 @@
 import * as authRoutes from '../auth-routes';
 import * as docs from '../docs';
-import {
-  TwoFactorEmail,
-  VerificationEmail,
-  ResetPasswordEmail,
-} from '../email-template';
+import * as emailTemplate from '../email-template';
 import * as portfolio from '../portfolio';
 import * as appCategories from '../app-categories';
 import * as authProvider from '../auth-provider';
@@ -106,7 +102,11 @@ describe('docs.ts', () => {
 
 describe('email-template.ts', () => {
   test('TwoFactorEmail returns correct HTML with code and userName', () => {
-    const html = TwoFactorEmail({ code: '123456', userName: 'TestUser' });
+    expect(emailTemplate.TwoFactorEmail).toBeDefined();
+    const html = emailTemplate.TwoFactorEmail({
+      code: '123456',
+      userName: 'TestUser',
+    });
     expect(html).toContain('123456');
     expect(html).toContain('Hello TestUser!');
     expect(html).toContain('Your Login Code');
@@ -115,14 +115,14 @@ describe('email-template.ts', () => {
   });
 
   test('TwoFactorEmail returns correct HTML without userName', () => {
-    const html = TwoFactorEmail({ code: '654321' });
+    const html = emailTemplate.TwoFactorEmail({ code: '654321' });
     expect(html).toContain('654321');
     expect(html).toContain('Hello!');
   });
 
   test('VerificationEmail returns correct HTML with verificationUrl', () => {
     const url = 'https://test.com/verify';
-    const html = VerificationEmail({ verificationUrl: url });
+    const html = emailTemplate.VerificationEmail({ verificationUrl: url });
     expect(html).toContain(url);
     expect(html).toContain('Verify Your Email Address');
     expect(html).toContain('Welcome to SaaSCandy');
@@ -131,11 +131,18 @@ describe('email-template.ts', () => {
 
   test('ResetPasswordEmail returns correct HTML with resetUrl', () => {
     const url = 'https://test.com/reset';
-    const html = ResetPasswordEmail({ resetUrl: url });
+    const html = emailTemplate.ResetPasswordEmail({ resetUrl: url });
     expect(html).toContain(url);
     expect(html).toContain('Reset Your Password');
     expect(html).toContain('Password Reset Request');
     expect(html).toContain(new Date().getFullYear().toString());
+  });
+
+  test('PasswordChangedAlertEmail returns notification HTML', () => {
+    expect(emailTemplate.PasswordChangedAlertEmail).toBeDefined();
+    const html = emailTemplate.PasswordChangedAlertEmail();
+    expect(html).toContain('Password Changed Successfully');
+    expect(html).toContain('SaaSCandy');
   });
 });
 describe('constants', () => {

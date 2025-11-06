@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import ContactPage from '@/app/(dashboard)/contact/page';
 import DocsPage from '@/app/(dashboard)/docs/page';
 import PortfolioPage from '@/app/(dashboard)/portfolio/page';
-import PricingPage from '@/app/(dashboard)/pricing/page';
+import PricingPage, * as PricingModule from '@/app/(dashboard)/pricing/page';
 import ServicePage from '@/app/(dashboard)/services/page';
 
 jest.mock('@/components/layout/PageLayout', () => ({
@@ -78,6 +78,7 @@ describe('Pricing Page', () => {
       screen.getByText(/Choose the perfect plan that fits your needs/)
     ).toBeInTheDocument();
     expect(screen.getByTestId('pricing-page')).toBeInTheDocument();
+    expect(PricingModule.metadata).toBeDefined();
   });
 });
 

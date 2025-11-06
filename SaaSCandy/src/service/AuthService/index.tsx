@@ -56,6 +56,9 @@ async function apiRequest<T = unknown>(
   }
 }
 
+// expose apiRequest for targeted unit tests (keeps public API unchanged)
+export { apiRequest };
+
 // =============================================================================
 // AUTH SERVICES
 // =============================================================================

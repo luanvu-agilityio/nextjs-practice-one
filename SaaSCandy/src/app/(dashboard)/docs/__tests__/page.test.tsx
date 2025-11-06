@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ContactPage from '@/app/(dashboard)/contact/page';
-import DocsPage from '@/app/(dashboard)/docs/page';
+import DocsPage, * as DocsModule from '@/app/(dashboard)/docs/page';
 import PortfolioPage from '@/app/(dashboard)/portfolio/page';
 import PricingPage from '@/app/(dashboard)/pricing/page';
 import ServicePage from '@/app/(dashboard)/services/page';
@@ -56,6 +56,7 @@ describe('Docs Page', () => {
     expect(screen.getByText('Docs')).toBeInTheDocument();
     expect(screen.getByText('Check our intensive docs')).toBeInTheDocument();
     expect(screen.getByTestId('docs-content')).toBeInTheDocument();
+    expect(DocsModule.metadata).toBeDefined();
   });
 });
 

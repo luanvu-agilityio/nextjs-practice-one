@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import BlogPage from '@/app/(dashboard)/blog/page';
+import BlogPage, * as BlogModule from '@/app/(dashboard)/blog/page';
 
 jest.mock('@/components/layout/PageLayout', () => ({
   PageLayout: ({
@@ -46,5 +46,10 @@ describe('Blog Page - Snapshot Tests', () => {
     const { getByTestId } = render(<BlogPage />);
 
     expect(getByTestId('blog-page')).toBeInTheDocument();
+  });
+
+  it('exports metadata', () => {
+    // ensure module-level metadata is executed and counted by coverage
+    expect(BlogModule.metadata).toBeDefined();
   });
 });

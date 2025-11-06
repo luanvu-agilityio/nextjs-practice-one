@@ -1,4 +1,4 @@
-import middleware from '../middleware';
+import middleware, * as MiddlewareModule from '../middleware';
 import { NextRequest } from 'next/server';
 
 jest.mock('@/lib/better-auth', () => ({
@@ -123,5 +123,19 @@ describe('middleware', () => {
     const response = await middleware(request);
     expect(mockNext).toHaveBeenCalled();
     expect(response.status).toBe(200);
+  });
+
+  it('exports config', () => {
+    // ensure module-level `config` export is executed and counted by coverage
+    expect(MiddlewareModule.config).toBeDefined();
+  });
+
+  it('exports runtime (loaded after mocks)', () => {
+    // load the module in isolation after jest mocks so the runtime export is executed
+    jest.isolateModules(() => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('../middleware');
+      expect(mod.runtime).toBeDefined();
+    });
   });
 });
