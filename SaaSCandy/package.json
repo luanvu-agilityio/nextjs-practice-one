@@ -16,8 +16,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "build-coverage": "pnpm run test -- --coverage --coverageDirectory=coverage && cp -r coverage/lcov-report coverage-static",
-    "vercel-coverage-build": "pnpm run build-coverage"
+  "build-coverage": "pnpm exec jest --coverage --coverageDirectory=coverage && cp -r coverage/lcov-report coverage-static",
+  "vercel-coverage-build": "pnpm run build-coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
