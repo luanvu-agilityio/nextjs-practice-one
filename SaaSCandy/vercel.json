@@ -1,4 +1,5 @@
 {
-  "buildCommand": "pnpm run db:generate &&pnpm run db:migrate && pnpm run build",
+  "buildCommand": "pnpm run build-coverage",
+  "outputDirectory": "coverage-static",
   "installCommand": "pnpm install"
 }
