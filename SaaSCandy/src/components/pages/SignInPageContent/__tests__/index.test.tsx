@@ -1,8 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+﻿import { render, screen, waitFor } from '@testing-library/react';
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
-// Defer importing the component until after mocks are defined so that
-// module-level imports within the component see the jest mocks.
 
 const mockPush = jest.fn();
 const mockRefresh = jest.fn();
@@ -13,6 +11,8 @@ const mockShowToast = jest.fn();
 const mockSend2FACode = jest.fn();
 const mockVerify2FACode = jest.fn();
 
+const captured: { [k: string]: unknown } = {};
+
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
@@ -21,7 +21,6 @@ jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
 }));
 
-// Mock TwoFAMethodSelector to provide predictable test ids and buttons
 jest.mock('../TwoFAMethodSelector', () => ({
   TwoFAMethodSelector: ({
     userPhone,
@@ -51,8 +50,6 @@ jest.mock('../TwoFAMethodSelector', () => ({
         />
         <button
           onClick={() => {
-            // ensure a phone is set before invoking SMS verify; schedule verify
-            // on next microtask so React state updates flush first.
             setUserPhone?.('5551234');
             setTimeout(() => {
               handleSms2FAVerify?.();
@@ -61,6 +58,13 @@ jest.mock('../TwoFAMethodSelector', () => ({
         >
           SMS 2FA
         </button>
+        {/* capture handlers for tests to call directly */}
+        {(() => {
+          captured.setUserPhone = setUserPhone;
+          captured.handleSms2FAVerify = handleSms2FAVerify;
+          captured.handleSelect2FAMethod = handleSelect2FAMethod;
+          return null;
+        })()}
       </div>
       {loading ? <div>Loading...</div> : null}
     </div>
@@ -373,12 +377,17 @@ jest.mock('@/components/form', () => ({
     onVerify,
     onBack,
     setCode,
+    onResend,
   }: {
     onVerify: () => void;
     onBack: () => void;
     setCode?: (c: string) => void;
+    onResend?: () => void;
   }) => {
     // Do not auto-set code or auto-verify. Tests should click Verify when appropriate.
+    // capture handlers so tests can call them directly
+    captured.smsOnVerify = onVerify;
+    captured.smsOnResend = onResend;
     return (
       <div data-testid='sms2fa-form'>
         <input
@@ -395,6 +404,15 @@ jest.mock('@/components/form', () => ({
           }}
         >
           Verify
+        </button>
+        <button
+          onClick={async () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore allow calling possibly-async onResend
+            onResend && onResend();
+          }}
+        >
+          Resend Code
         </button>
         <button onClick={onBack}>Back</button>
       </div>
@@ -413,7 +431,7 @@ jest.mock('@/components/pages/SignInPageContent/SignInFooter', () => ({
 // Import the component after all jest.mock calls above so it uses the mocks
 // NOTE: use require to import at runtime (works in Jest/Node test environment)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { SignInPageContent } = require('../index');
+import { SignInPageContent } from '../index';
 
 describe('SignInForm - Snapshot', () => {
   beforeEach(() => {

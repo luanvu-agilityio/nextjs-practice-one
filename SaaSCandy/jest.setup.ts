@@ -55,19 +55,20 @@ jest.mock('better-auth/client/plugins', () => ({
   twoFactorClient: jest.fn(() => ({})),
 }));
 
-// Mock your auth client specifically
-jest.mock('@/lib/auth-client', () => ({
-  authClient: {
-    useSession: jest.fn(() => ({
-      data: null,
-      isPending: false,
-      error: null,
-    })),
-  },
-  useSession: jest.fn(() => ({
-    data: null,
-    isPending: false,
-    error: null,
+// Mock better-auth/react so importing the real auth client module is safe
+jest.mock('better-auth/react', () => ({
+  createAuthClient: jest.fn(() => ({
+    useSession: jest.fn(() => ({ data: null, isPending: false, error: null })),
+    signIn: { email: jest.fn() },
+    signUp: { email: jest.fn() },
+    signOut: jest.fn(),
+    getSession: jest.fn(),
+    updateUser: jest.fn(),
+    twoFactor: {
+      enable: jest.fn(),
+      disable: jest.fn(),
+      verifyOtp: jest.fn(),
+    },
   })),
 }));
 jest.mock('next/navigation', () => ({

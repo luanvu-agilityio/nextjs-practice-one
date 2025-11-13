@@ -68,4 +68,12 @@ describe('Share', () => {
       expect.stringContaining(encodeURIComponent(window.location.href))
     );
   });
+
+  it('uses empty title when no title prop provided (covers default title = "")', () => {
+    render(<Share />);
+
+    const twitterLink = screen.getByText('Twitter').closest('a');
+    // When title is the default empty string, the twitter share URL will include an empty text param: &text=
+    expect(twitterLink).toHaveAttribute('href', expect.stringContaining('&text='));
+  });
 });
