@@ -53,6 +53,29 @@ describe('POST /api/auth/send-verification-email', () => {
     expect(sgMailVerify.send).toHaveBeenCalled();
   });
 
+  it('should use default FROM fallback when env var is falsy', async () => {
+    // ensure the env var is undefined so the fallback is used
+    delete process.env.SENDGRID_FROM_EMAIL;
+
+    (sgMailVerify.send as jest.Mock).mockResolvedValue([
+      { statusCode: 202, body: 'sent' },
+    ]);
+
+    const request = createMockRequest({
+      email: 'test@example.com',
+    });
+
+    const response = await SendVerificationEmail(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    // ensure the mocked send was called and the 'from' argument used the fallback
+    expect(sgMailVerify.send).toHaveBeenCalled();
+    const sentArg = (sgMailVerify.send as jest.Mock).mock.calls[0][0];
+    expect(sentArg.from).toBe('onboarding@sendgrid.dev');
+  });
+
   it('should handle Error instance', async () => {
     (sgMailVerify.send as jest.Mock).mockRejectedValue(
       new Error('SendGrid API error')

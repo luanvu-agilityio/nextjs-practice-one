@@ -80,4 +80,57 @@ describe('ContentRenderer - Snapshot Tests', () => {
     // the unknown block should not produce an additional child element
     expect(wrapper.children.length).toBe(mockBlocks.length);
   });
+
+  it('covers remaining branches: heading level !=2, ordered list, quote without author, image without caption, code without language', () => {
+    const extraBlocks: ContentBlock[] = [
+      { id: '7', type: 'heading', content: { level: 3, text: 'H3' } },
+      { id: '8', type: 'list', content: { ordered: true, items: ['A', 'B'] } },
+      { id: '9', type: 'quote', content: { text: 'No author' } },
+      {
+        id: '10',
+        type: 'image',
+        // omit width/height to exercise the fallback expressions (width || 800, height || 400)
+        content: { src: '/no-caption.jpg', alt: 'No caption image' },
+      },
+      { id: '11', type: 'code', content: { code: 'console.log(1);' } },
+    ];
+
+    const { container } = render(
+      <ContentRenderer blocks={[...mockBlocks, ...extraBlocks]} />
+    );
+
+    // heading level 3 should render as h3
+    expect(container.querySelector('h3')).toBeInTheDocument();
+    // ordered list should render an <ol>
+    expect(container.querySelector('ol')).toBeInTheDocument();
+    // quote without author: find the blockquote containing our 'No author' text and ensure it has no <cite>
+    const blockquotes = Array.from(container.querySelectorAll('blockquote'));
+    const noAuthorBlock = blockquotes.find(b =>
+      b.textContent?.includes('No author')
+    );
+    expect(noAuthorBlock).toBeDefined();
+    if (noAuthorBlock) {
+      expect(noAuthorBlock.querySelector('cite')).toBeNull();
+    }
+    // image without caption should not render the caption text for that image
+    const imgs = Array.from(container.querySelectorAll('img'));
+    const noCaptionImg = imgs.find(i =>
+      i.getAttribute('src')?.includes('no-caption')
+    );
+    expect(noCaptionImg).toBeDefined();
+    if (noCaptionImg) {
+      const parent = noCaptionImg.parentElement;
+      expect(parent?.textContent).not.toContain('Test caption');
+    }
+
+    // code without language: find the code node that contains our extra snippet and assert it has no language- class
+    const codeNodes = Array.from(container.querySelectorAll('pre code'));
+    const extraCode = codeNodes.find(c =>
+      c.textContent?.includes('console.log(1)')
+    );
+    expect(extraCode).toBeDefined();
+    if (extraCode) {
+      expect(extraCode.className).toBe('');
+    }
+  });
 });

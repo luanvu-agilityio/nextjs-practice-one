@@ -25,8 +25,11 @@ export async function POST(request: NextRequest) {
     const token = crypto.randomUUID();
     const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
 
+    const fromAddress =
+      process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev';
+
     const result = await sgMail.send({
-      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+      from: fromAddress,
       to: email,
       subject: 'Verify your email - SaaSCandy',
       html: VerificationEmail({ verificationUrl }),

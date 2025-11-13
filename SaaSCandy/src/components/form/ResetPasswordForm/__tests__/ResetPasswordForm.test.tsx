@@ -144,6 +144,52 @@ describe('ResetPasswordForm', () => {
     expect(onError).toHaveBeenCalledWith('boom');
   });
 
+  it('handles API failure with no message (uses default message)', async () => {
+    (resetPassword as jest.Mock).mockResolvedValue({ success: false });
+    const onError = jest.fn();
+
+    render(<ResetPasswordForm token='t' onError={onError} />);
+
+    const newPass = screen.getByTestId('newPassword') as HTMLInputElement;
+    const confirm = screen.getByTestId('confirmPassword') as HTMLInputElement;
+    const button = screen.getByRole('button', { name: /Change Password/i });
+
+    fireEvent.change(newPass, { target: { value: 'Abcd1234' } });
+    fireEvent.change(confirm, { target: { value: 'Abcd1234' } });
+
+    fireEvent.click(button);
+
+    await waitFor(() => expect(resetPassword).toHaveBeenCalled());
+
+    // default message fallback should be used
+    expect(mockGetFriendlyMessage).toHaveBeenCalledWith(
+      'Failed to reset password'
+    );
+    expect(onError).toHaveBeenCalledWith('Failed to reset password');
+  });
+
+  it('handles thrown non-Error from service (uses Unknown error)', async () => {
+    (resetPassword as jest.Mock).mockRejectedValue('bad');
+    const onError = jest.fn();
+
+    render(<ResetPasswordForm token='t2' onError={onError} />);
+
+    const newPass = screen.getByTestId('newPassword') as HTMLInputElement;
+    const confirm = screen.getByTestId('confirmPassword') as HTMLInputElement;
+    const button = screen.getByRole('button', { name: /Change Password/i });
+
+    fireEvent.change(newPass, { target: { value: 'Abcd1234' } });
+    fireEvent.change(confirm, { target: { value: 'Abcd1234' } });
+
+    fireEvent.click(button);
+
+    await waitFor(() => expect(resetPassword).toHaveBeenCalled());
+
+    // non-Error thrown should result in 'Unknown error' message
+    expect(mockGetFriendlyMessage).toHaveBeenCalledWith('Unknown error');
+    expect(onError).toHaveBeenCalledWith('Unknown error');
+  });
+
   it('shows validation error when passwords do not match', async () => {
     render(<ResetPasswordForm token='t3' />);
 

@@ -26,6 +26,20 @@ function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+export function formatSmsError(smsError: unknown) {
+  if (smsError instanceof Error) return smsError.message;
+  if (typeof smsError === 'string') return smsError;
+  if (typeof smsError === 'object' && smsError !== null) {
+    const message = (smsError as { message?: unknown }).message;
+    if (typeof message === 'string') return message;
+  }
+  return String(smsError);
+}
+
+export function formatUnknownError(error: unknown) {
+  return error instanceof Error ? error.message : 'Unknown error';
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
@@ -104,15 +118,7 @@ export async function POST(request: NextRequest) {
       // Log Twilio error for debugging
       console.error('[send-2fa-sms] Twilio send failed:', smsError);
       // If Twilio provides a message, surface it in the response to help debugging (dev only)
-      const smsErrorMessage = (() => {
-        if (smsError instanceof Error) return smsError.message;
-        if (typeof smsError === 'string') return smsError;
-        if (typeof smsError === 'object' && smsError !== null) {
-          const message = (smsError as { message?: unknown }).message;
-          if (typeof message === 'string') return message;
-        }
-        return String(smsError);
-      })();
+      const smsErrorMessage = formatSmsError(smsError);
       return NextResponse.json(
         {
           success: false,
@@ -127,7 +133,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: formatUnknownError(error),
       },
       { status: 500 }
     );
@@ -176,7 +182,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: formatUnknownError(error),
       },
       { status: 500 }
     );

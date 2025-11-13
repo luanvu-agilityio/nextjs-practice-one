@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
@@ -43,7 +44,7 @@ describe('DropdownMenu - extra branches', () => {
   });
 
   it('renders sub trigger with chevron icon', () => {
-    const {} = render(
+    render(
       <DropdownMenu defaultOpen>
         <DropdownMenuTrigger>open</DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -59,5 +60,38 @@ describe('DropdownMenu - extra branches', () => {
 
     // ChevronRight icon should render (Radix portals content to document.body; assert there)
     expect(document.body.querySelector('svg')).toBeTruthy();
+  });
+
+  it('applies inset class to SubTrigger when inset prop is true', () => {
+    const { getByText } = render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger>open</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger inset>MoreInset</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem>Inner</DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+
+    const el = getByText('MoreInset');
+    expect(el.className).toEqual(expect.stringContaining('pl-8'));
+  });
+
+  it('applies inset class to Label when inset prop is true', () => {
+    const { getByText } = render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger>open</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel inset>LabelInset</DropdownMenuLabel>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+
+    const label = getByText('LabelInset');
+    expect(label.className).toEqual(expect.stringContaining('pl-8'));
   });
 });

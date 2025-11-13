@@ -205,6 +205,64 @@ describe('ChangePasswordModal', () => {
     expect(screen.getByTestId('error')).toHaveTextContent('bad');
   });
 
+  it('shows fallback message when API returns success:false without error', async () => {
+    (mockUseSession as jest.Mock).mockReturnValue({
+      data: { user: { id: 'u1' } },
+    });
+    (changePassword as jest.Mock).mockResolvedValue({ success: false });
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={jest.fn()}
+        onSuccess={jest.fn()}
+      />
+    );
+
+    const current = screen.getByTestId('currentPassword');
+    const np = screen.getByTestId('newPassword');
+    const cp = screen.getByTestId('confirmPassword');
+
+    fireEvent.change(current, { target: { value: 'OldPass1' } });
+    fireEvent.change(np, { target: { value: 'NewPass1' } });
+    fireEvent.change(cp, { target: { value: 'NewPass1' } });
+
+    const changeBtn = screen.getByRole('button', { name: /Change Password/i });
+    fireEvent.click(changeBtn);
+
+    const err = await screen.findByTestId('error');
+    expect(err).toHaveTextContent('Failed to update password');
+  });
+
+  it('handles thrown non-Error from service (uses generic fallback)', async () => {
+    (mockUseSession as jest.Mock).mockReturnValue({
+      data: { user: { id: 'u1' } },
+    });
+    (changePassword as jest.Mock).mockRejectedValue('bad');
+
+    render(
+      <ChangePasswordModal
+        open={true}
+        onOpenChange={jest.fn()}
+        onSuccess={jest.fn()}
+      />
+    );
+
+    const current = screen.getByTestId('currentPassword');
+    const np = screen.getByTestId('newPassword');
+    const cp = screen.getByTestId('confirmPassword');
+
+    fireEvent.change(current, { target: { value: 'OldPass1' } });
+    fireEvent.change(np, { target: { value: 'NewPass1' } });
+    fireEvent.change(cp, { target: { value: 'NewPass1' } });
+
+    const changeBtn = screen.getByRole('button', { name: /Change Password/i });
+    fireEvent.click(changeBtn);
+
+    const err = await screen.findByTestId('error');
+    expect(err).toHaveTextContent('Failed to change password');
+  });
+
   it('handles thrown exception', async () => {
     (mockUseSession as jest.Mock).mockReturnValue({
       data: { user: { id: 'u1' } },

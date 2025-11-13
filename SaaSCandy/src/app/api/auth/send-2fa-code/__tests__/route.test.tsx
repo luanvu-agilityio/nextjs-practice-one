@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import sgMail from '@sendgrid/mail';
 import { db } from '@/lib/db';
 import { auth } from '@/lib/better-auth';
+import { TwoFactorEmail } from '@/constants/email-template';
 
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
@@ -178,6 +179,78 @@ describe('POST /api/auth/send-2fa-code', () => {
 
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
+  });
+
+  it('should use fallback SENDGRID_FROM_EMAIL when env var missing', async () => {
+    // ensure env var is falsy for this test
+    process.env.SENDGRID_FROM_EMAIL = '';
+
+    (auth.api.signInEmail as unknown as jest.Mock).mockResolvedValue({
+      user: {
+        id: 'user-123',
+        email: 'test@example.com',
+        name: 'Test User',
+      },
+    });
+
+    const mockWhere = jest.fn().mockResolvedValue({});
+    (db.delete as jest.Mock).mockReturnValue({ where: mockWhere });
+
+    const mockValues = jest.fn().mockResolvedValue({});
+    (db.insert as jest.Mock).mockReturnValue({ values: mockValues });
+
+    (sgMail.send as jest.Mock).mockResolvedValue([{ statusCode: 202 }]);
+
+    const request = createMockRequest({
+      email: 'test@example.com',
+      password: 'password123',
+    });
+
+    const response = await Send2FACode(request);
+
+    expect(response.status).toBe(200);
+    expect(sgMail.send).toHaveBeenCalled();
+    // fallback should be used when env var is missing
+    const sent = (sgMail.send as jest.Mock).mock.calls[0][0];
+    expect(sent.from).toBe('onboarding@sendgrid.dev');
+  });
+
+  it('should use fallback userName when name is missing', async () => {
+    (auth.api.signInEmail as unknown as jest.Mock).mockResolvedValue({
+      user: {
+        id: 'user-456',
+        email: 'no-name@example.com',
+        // name omitted to trigger fallback
+      },
+    });
+
+    const mockWhere = jest.fn().mockResolvedValue({});
+    (db.delete as jest.Mock).mockReturnValue({ where: mockWhere });
+
+    const mockValues = jest.fn().mockResolvedValue({});
+    (db.insert as jest.Mock).mockReturnValue({ values: mockValues });
+
+    (sgMail.send as jest.Mock).mockResolvedValue([
+      { statusCode: 202 },
+    ] as unknown);
+
+    const request = createMockRequest({
+      email: 'no-name@example.com',
+      password: 'password123',
+    });
+
+    const response = await Send2FACode(request);
+
+    expect(response.status).toBe(200);
+    // TwoFactorEmail is mocked; assert it's called with fallback userName
+    expect(
+      (TwoFactorEmail as unknown as jest.Mock).mock.calls.length
+    ).toBeGreaterThan(0);
+    expect(
+      (TwoFactorEmail as unknown as jest.Mock).mock.calls[0][0]
+    ).toMatchObject({
+      userName: 'User',
+    });
   });
 
   it('should handle errors with Error instance', async () => {

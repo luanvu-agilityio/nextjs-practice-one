@@ -623,6 +623,84 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     expect(data.details).toBeDefined();
   });
 
+  it('should handle Twilio error when thrown value is null', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    // throw null to exercise the fallback String(smsError) branch
+    mockCreate.mockImplementationOnce(() => {
+      throw null as unknown as Error;
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    // String(null) === 'null'
+    expect(data.details).toBe('null');
+  });
+
+  it('should handle Twilio error when thrown value is undefined', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    // throw undefined to exercise the fallback String(smsError) branch
+    mockCreate.mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw undefined as unknown as Error;
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    // String(undefined) === 'undefined'
+    expect(data.details).toBe('undefined');
+  });
+
+  it('should handle Twilio error with non-string message property', async () => {
+    const mockUser = {
+      id: 'user-123',
+      email: 'test@example.com',
+      phone: '+1234567890',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    // message property exists but is not a string -> should fall back to String(smsError)
+    mockCreate.mockImplementationOnce(() => {
+      throw { message: 123 };
+    });
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.details).toBeDefined();
+  });
+
   it('should handle POST with missing body', async () => {
     const request = {
       json: jest.fn().mockRejectedValue(new Error('Bad JSON')),
@@ -670,5 +748,116 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     expect(response.status).toBe(401);
     expect(data.success).toBe(false);
     expect(data.error).toBe('Invalid code');
+  });
+
+  it('should return Unknown error when POST throws a non-Error (string)', async () => {
+    // Cause database call to throw a non-Error value to hit the outer catch's else branch
+    mockWhere.mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw 'non-error-post';
+    });
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    // When thrown value is not an Error, the route returns the fallback 'Unknown error'
+    expect(data.error).toBe('Unknown error');
+  });
+
+  it('should return Unknown error when PUT throws a non-Error (string)', async () => {
+    mockWhere.mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw 'non-error-put';
+    });
+    const request = createMockRequest({ phone: '+1234567890', code: '123456' });
+    const response = await callPUT(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Unknown error');
+  });
+
+  it('should handle Twilio throwing a primitive (number) and stringify it', async () => {
+    const mockUser = {
+      id: 'user-999',
+      email: 'num@example.com',
+      phone: '+19990000000',
+      twoFactorEnabled: true,
+    };
+    const mockUsers = [mockUser];
+    const mockWhere = jest.fn().mockResolvedValue(mockUsers);
+    const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = jest.fn().mockReturnValue({ from: mockFrom });
+    (db.select as jest.Mock) = mockSelect;
+    // Twilio client throws a primitive number
+    mockCreate.mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw 123;
+    });
+
+    const request = createMockRequest({ phone: '+19990000000' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    // details should be the stringified number
+    expect(data.details).toBe('123');
+  });
+
+  // Direct unit tests for the small helpers exported from the route file to
+  // ensure branch coverage for the error-formatting logic.
+  it('formatSmsError handles various shapes', async () => {
+    const { formatSmsError } = await import('../route');
+    expect(formatSmsError(new Error('e'))).toBe('e');
+    expect(formatSmsError('s')).toBe('s');
+    expect(formatSmsError({ message: 'msg' })).toBe('msg');
+    // message is non-string, so the helper falls back to String(smsError)
+    expect(formatSmsError({ message: 123 })).toBe(String({ message: 123 }));
+    expect(formatSmsError(null)).toBe('null');
+    expect(formatSmsError(undefined)).toBe('undefined');
+    expect(formatSmsError(456)).toBe('456');
+  });
+
+  it('formatUnknownError returns Unknown for non-Error', async () => {
+    const { formatUnknownError } = await import('../route');
+    expect(formatUnknownError(new Error('boom'))).toBe('boom');
+    // Non-Error should map to 'Unknown error'
+    expect(formatUnknownError('str')).toBe('Unknown error');
+  });
+
+  // Extra targeted cases using explicit rejected promises (primitive) to ensure
+  // the outer catch branches that check `instanceof Error` hit the non-Error side.
+  it('POST outer catch should return Unknown error for rejected primitive', async () => {
+    // Make db.select().from().where() return a rejected promise with a primitive
+    const mockWhereRejected = jest.fn().mockRejectedValue('primitive-post');
+    const mockFromRejected = jest
+      .fn()
+      .mockReturnValue({ where: mockWhereRejected });
+    const mockSelectRejected = jest
+      .fn()
+      .mockReturnValue({ from: mockFromRejected });
+    (db.select as jest.Mock) = mockSelectRejected;
+
+    const request = createMockRequest({ phone: '+1234567890' });
+    const response = await callPOST(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Unknown error');
+  });
+
+  it('PUT outer catch should return Unknown error for rejected primitive', async () => {
+    const mockWhereRejected = jest.fn().mockRejectedValue('primitive-put');
+    const mockFromRejected = jest
+      .fn()
+      .mockReturnValue({ where: mockWhereRejected });
+    const mockSelectRejected = jest
+      .fn()
+      .mockReturnValue({ from: mockFromRejected });
+    (db.select as jest.Mock) = mockSelectRejected;
+
+    const request = createMockRequest({ phone: '+1234567890', code: '123456' });
+    const response = await callPUT(request as unknown as NextRequest);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Unknown error');
   });
 });

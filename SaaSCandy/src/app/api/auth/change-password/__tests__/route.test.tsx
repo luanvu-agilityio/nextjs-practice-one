@@ -141,6 +141,21 @@ describe('/api/auth/change-password', () => {
         'Current password and new password are required'
       );
     });
+
+    it('should return 400 when request.json() resolves to null (body ?? {} branch)', async () => {
+      const request = {
+        json: jest.fn().mockResolvedValue(null),
+        headers: new Headers(),
+      } as unknown as NextRequest;
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toBe(
+        'Current password and new password are required'
+      );
+    });
   });
 
   describe('Error Handling', () => {
@@ -263,6 +278,68 @@ describe('/api/auth/change-password', () => {
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
       expect(data.message).toBe('Unexpected error');
+    });
+
+    it('should return 500 with generic message when changePassword throws non-Error', async () => {
+      (auth.api.changePassword as unknown as jest.Mock).mockImplementation(
+        () => {
+          // reject with a non-Error value to cover the non-Error catch branch
+          return Promise.reject('non-error');
+        }
+      );
+      const request = createMockRequest({
+        currentPassword: 'oldPassword123',
+        newPassword: 'newPassword456',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(500);
+      expect(data.success).toBe(false);
+      // non-Error should fall back to default message
+      expect(data.message).toBe('Failed to change password');
+    });
+
+    it('should return 200 with default success message when user present but no message', async () => {
+      (auth.api.changePassword as unknown as jest.Mock).mockResolvedValue({
+        user: { id: 'user-123' },
+      });
+      const request = createMockRequest({
+        currentPassword: 'oldPassword123',
+        newPassword: 'newPassword456',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.message).toBe('Password changed successfully');
+    });
+
+    it('should return 400 with generic failure when changePassword returns empty object', async () => {
+      (auth.api.changePassword as unknown as jest.Mock).mockResolvedValue({});
+      const request = createMockRequest({
+        currentPassword: 'oldPassword123',
+        newPassword: 'newPassword456',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.message).toBe('Failed to change password');
+    });
+
+    it('should return 400 when message is not a string (non-string message falls back)', async () => {
+      (auth.api.changePassword as unknown as jest.Mock).mockResolvedValue({
+        message: { text: 'not-a-string' },
+      });
+      const request = createMockRequest({
+        currentPassword: 'oldPassword123',
+        newPassword: 'newPassword456',
+      });
+      const response = await POST(request);
+      const data = await response.json();
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.message).toBe('Failed to change password');
     });
   });
 });

@@ -140,4 +140,41 @@ describe('POST /api/auth/forgot-password', () => {
     expect(data.success).toBe(false);
     expect(data.message).toBe('Failed to send reset email');
   });
+
+  it('should handle string result from requestPasswordReset', async () => {
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockResolvedValue(
+      'Reset via string'
+    );
+    const request = createMockRequest({ email: 'test@example.com' });
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(false);
+    expect(data.message).toBe('Reset via string');
+  });
+
+  it('should return 500 when requestPasswordReset rejects with non-Error', async () => {
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockRejectedValue(
+      'primitive error'
+    );
+    const request = createMockRequest({ email: 'test@example.com' });
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    // details should be String(error)
+    expect(data.details).toBe('primitive error');
+  });
+
+  it('should return default success message when result has no message', async () => {
+    (auth.api.requestPasswordReset as unknown as jest.Mock).mockResolvedValue({
+      ok: true,
+    });
+    const request = createMockRequest({ email: 'test@example.com' });
+    const response = await ForgotPassword(request);
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('Reset email sent');
+  });
 });

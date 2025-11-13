@@ -54,6 +54,14 @@ describe('authApi', () => {
         authApi.login({ email: 'test@example.com', password: 'password123' })
       ).rejects.toThrow('Login failed');
     });
+
+    it('treats non-array response as invalid credentials', async () => {
+      // If http.get returns a non-array (object), login should fail
+      mockHttp.get.mockResolvedValue({} as unknown as User[]);
+      await expect(
+        authApi.login({ email: 'test@example.com', password: 'password123' })
+      ).rejects.toThrow('Login failed');
+    });
   });
 
   describe('register', () => {
@@ -83,6 +91,19 @@ describe('authApi', () => {
           password: 'password123',
         })
       ).rejects.toThrow('Registration failed');
+    });
+
+    it('falls back to email as name when first/last missing', async () => {
+      const created = { ...mockUser, name: mockUser.email };
+      mockHttp.post.mockResolvedValue(created);
+
+      const result = await authApi.register({
+        email: mockUser.email,
+        password: 'password123',
+      });
+
+      expect(result.user.name).toBe(mockUser.email);
+      expect(result.token).toContain('mock-token-');
     });
   });
 
