@@ -22,6 +22,13 @@ jest.mock('@/components/common', () => ({
   getFriendlyMessage: (e: unknown) => mockGetFriendlyMessage(e),
 }));
 
+// Helper to check whether a toast with a specific variant was emitted
+const hasToastVariant = (variant: string) =>
+  mockShowToast.mock.calls.some(call => {
+    const arg = call[0] as unknown as { variant?: string } | undefined;
+    return !!arg && arg.variant === variant;
+  });
+
 // Mock form components to drive flows and capture handlers
 jest.mock('@/components/form', () => ({
   SignInForm: ({
@@ -277,9 +284,7 @@ describe('SignInPageContent', () => {
 
     await waitFor(() => {
       expect(mockSend2FACode).toHaveBeenCalled();
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ variant: 'success' })
-      );
+      expect(hasToastVariant('success')).toBeTruthy();
     });
   });
 
@@ -330,12 +335,8 @@ describe('SignInPageContent', () => {
       (capturedOnVerify as () => unknown)();
     }
 
-    // wait for the success toast
-    await waitFor(() =>
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({ variant: 'success' })
-      )
-    );
+    // wait for a success toast to have been emitted
+    await waitFor(() => expect(hasToastVariant('success')).toBeTruthy());
 
     useStateSpy.mockRestore();
   });

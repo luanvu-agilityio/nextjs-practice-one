@@ -8,6 +8,20 @@ import { ContentRenderer, Tags, NewsletterSignup, Share } from '@/components';
 // Types
 import { BlogPost } from '@/types/blog-post';
 
+export const buildShareUrls = (post: Readonly<BlogPost>, baseHref?: string) => {
+  const href =
+    baseHref ?? (typeof window !== 'undefined' ? window.location.href : '');
+
+  const encodedHref = encodeURIComponent(href);
+  const encodedTitle = encodeURIComponent(post.title ?? '');
+
+  return {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedHref}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodedHref}&text=${encodedTitle}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedHref}`,
+  };
+};
+
 const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
   return (
     <Section className='bg-white'>
@@ -96,7 +110,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
             <ul className='space-y-2'>
               <li>
                 <Link
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  href={buildShareUrls(post).facebook}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'
@@ -106,7 +120,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
               </li>
               <li>
                 <Link
-                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
+                  href={buildShareUrls(post).twitter}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'
@@ -116,7 +130,7 @@ const BlogPostDetailPageContent = ({ post }: { post: Readonly<BlogPost> }) => {
               </li>
               <li>
                 <Link
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                  href={buildShareUrls(post).linkedin}
                   target='_blank'
                   rel='noopener noreferrer'
                   className='text-sm sm:text-xs text-gray-background hover:text-primary transition-colors'

@@ -100,6 +100,23 @@ describe('VerifyEmailContent Component', () => {
     await screen.findByText('Verification Failed');
   });
 
+  it("throws when verifyEmail returns success:false without an error message", async () => {
+    // Arrange: verifyEmail resolves to { success: false } (no error field)
+    mockVerifyEmail.mockResolvedValueOnce({ success: false });
+
+    // Act
+    render(<VerifyEmailContent />);
+
+    // Assert: component shows failure UI (caught error path)
+    await screen.findByText('Verification Failed');
+
+    expect(mockVerifyEmail).toHaveBeenCalled();
+    // confirm the catch logged the error
+    expect((console.error as jest.Mock).mock.calls.length).toBeGreaterThan(0);
+    const firstCall = (console.error as jest.Mock).mock.calls[0];
+    expect(firstCall[0]).toContain('Email verification error:');
+  });
+
   it('error state buttons navigate to signup and signin', async () => {
     // Arrange: make verifyEmail fail so error UI (with action buttons) renders
     mockVerifyEmail.mockResolvedValueOnce({ success: false, error: 'err' });

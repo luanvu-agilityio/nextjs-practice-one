@@ -7,15 +7,19 @@ import {
   act,
 } from '@testing-library/react';
 
-import type { Control } from 'react-hook-form';
+import type {
+  Control,
+  FieldPath,
+  ControllerRenderProps,
+} from 'react-hook-form';
 import type { EditProfileFormData } from '@/utils';
+import { Controller } from 'react-hook-form';
+import { computeFullName } from '@/components/form/EditProfileModal';
 
 jest.mock('@/lib/auth-client');
 jest.mock('@/service');
-
 jest.mock('@/components/common', () => {
   // Provide a simple mock that connects inputs to react-hook-form via Controller.
-  const { Controller } = require('react-hook-form');
 
   return {
     Button: ({
@@ -37,23 +41,23 @@ jest.mock('@/components/common', () => {
       control: Control<EditProfileFormData>;
       type?: string;
     }) => {
+      // Use strong react-hook-form types for the Controller so we avoid `any` casts
       return (
         <Controller
-          name={name as any}
-          control={control as any}
+          name={name as unknown as FieldPath<EditProfileFormData>}
+          control={control}
           render={({
             field,
           }: {
-            field: {
-              name: string;
-              onChange: (e: { target: { value: string } }) => void;
-              value: unknown;
-            };
+            field: ControllerRenderProps<
+              EditProfileFormData,
+              FieldPath<EditProfileFormData>
+            >;
           }) => (
             <input
               data-testid={String(name)}
               placeholder={placeholder}
-              {...(field as any)}
+              {...field}
               type={type}
             />
           )}
@@ -116,23 +120,11 @@ describe('EditProfileModal', () => {
   } as const;
 
   beforeAll(() => {
-    // Mock window.location.reload for all tests in a safe way. Some jsdom versions make
-    // `location.reload` non-writable, so try multiple strategies and swallow failures.
+    // Try to stub location.reload in a safe way for tests; ignore if envirait readonly.
     try {
-      // try direct assignment (works in many environments)
-      // @ts-ignore
-      window.location.reload = jest.fn();
-    } catch (err) {
-      try {
-        // fallback: define on the Location prototype
-        const locProto: any = Object.getPrototypeOf(window.location);
-        Object.defineProperty(locProto, 'reload', {
-          configurable: true,
-          value: jest.fn(),
-        });
-      } catch (err2) {
-        // last-resort: no-op, tests will still run but may log jsdom navigation messages
-      }
+      globalThis.location.reload = jest.fn();
+    } catch {
+      // ignore when we can't overwrite
     }
   });
 
@@ -152,7 +144,6 @@ describe('EditProfileModal', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
     jest.clearAllMocks();
   });
@@ -205,7 +196,6 @@ describe('EditProfileModal', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(
@@ -366,7 +356,6 @@ describe('EditProfileModal', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(
@@ -399,7 +388,6 @@ describe('EditProfileModal', () => {
       isPending: false,
       error: null,
       refetch: jest.fn(),
-      isRefetching: false,
     });
 
     render(
@@ -459,7 +447,7 @@ describe('EditProfileModal', () => {
         },
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -492,7 +480,7 @@ describe('EditProfileModal', () => {
         },
       },
       isPending: false,
-      isRefetching: false,
+
       error: null,
       refetch: jest.fn(),
     });
@@ -562,5 +550,58 @@ describe('EditProfileModal', () => {
         'Failed to update profile'
       );
     });
+  });
+
+  it('submits with first and last name and calls updateProfile with combined name', async () => {
+    mockUpdateProfile.mockResolvedValue({ success: true });
+
+    render(
+      <EditProfileModal
+        open={true}
+        onOpenChange={() => {}}
+        onSuccess={() => {}}
+      />
+    );
+
+    // Provide valid first and last names so validation passes and onSubmit runs
+    fireEvent.change(screen.getByTestId('firstName'), {
+      target: { value: 'Alice' },
+    });
+    fireEvent.change(screen.getByTestId('lastName'), {
+      target: { value: 'Wonder' },
+    });
+    fireEvent.change(screen.getByTestId('email'), {
+      target: { value: 'alice@wonder.test' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+
+    await waitFor(() => {
+      expect(mockUpdateProfile).toHaveBeenCalledWith({
+        name: 'Alice Wonder',
+        email: 'alice@wonder.test',
+      });
+    });
+  });
+});
+
+describe('computeFullName', () => {
+  it('joins first and last when both present', () => {
+    expect(computeFullName({ firstName: 'Alice', lastName: 'Wonder' })).toBe(
+      'Alice Wonder'
+    );
+  });
+
+  it('returns only first name when lastName is undefined', () => {
+    expect(computeFullName({ firstName: 'OnlyFirst' })).toBe('OnlyFirst');
+  });
+
+  it('returns only last name when firstName is undefined', () => {
+    expect(computeFullName({ lastName: 'OnlyLast' })).toBe('OnlyLast');
+  });
+
+  it('returns empty string when both are empty or undefined', () => {
+    expect(computeFullName({ firstName: '', lastName: '' })).toBe('');
+    expect(computeFullName({})).toBe('');
   });
 });

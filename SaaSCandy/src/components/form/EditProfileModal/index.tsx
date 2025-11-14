@@ -28,6 +28,16 @@ interface EditProfileModalProps {
   onSuccess: () => void;
 }
 
+// Exported helper to compute the full name — extracted so unit tests can
+// exercise the branching logic (firstName/lastName optional) without relying
+// on form validation to reach the onSubmit path.
+export const computeFullName = (data: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  return `${data.firstName || ''} ${data.lastName || ''}`.trim();
+};
+
 const EditProfileModal = ({
   open,
   onOpenChange,
@@ -59,7 +69,7 @@ const EditProfileModal = ({
     setError(null);
 
     try {
-      const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      const fullName = computeFullName(data);
 
       const result = await updateProfile({
         name: fullName,
@@ -71,7 +81,7 @@ const EditProfileModal = ({
       }
 
       // Reload to refresh session
-      window.location.reload();
+      globalThis.location.reload();
 
       setTimeout(() => {
         onSuccess();

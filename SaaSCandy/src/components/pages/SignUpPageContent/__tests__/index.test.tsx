@@ -1,10 +1,14 @@
 import React from 'react';
 import { z } from 'zod';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { ReactNode } from 'react';
-import { SignUpPageContent } from '../index';
+// Import mocked members directly (jest.mock will replace these during tests)
+import { extractBreadcrumbs } from '@/utils';
+import { signUp } from '@/lib/auth-client';
+import { showToast } from '@/components/common/Toast';
+import { handleSocialAuth } from '@/utils/social-auth';
 
 // Router mock
 const mockPush = jest.fn();
@@ -12,6 +16,9 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/signup',
   useRouter: () => ({ push: mockPush }),
 }));
+
+// Import component after mocks so mocked modules are used during module initialization
+import { SignUpPageContent } from '../index';
 
 // Simple next/link mock
 jest.mock('next/link', () => {
@@ -68,12 +75,13 @@ jest.mock('@/constants', () => ({
 // Mock social auth util
 jest.mock('@/utils/social-auth', () => ({ handleSocialAuth: jest.fn() }));
 
-// Mock extractBreadcrumbs
+// Mock extractBreadcrumbs inside the factory (avoids hoisting issues).
+// We'll retrieve the mock with jest.requireMock in tests when we need to change its return value.
 jest.mock('@/utils', () => ({
-  extractBreadcrumbs: () => [
+  extractBreadcrumbs: jest.fn(() => [
     { label: 'Home', href: '/', isActive: false },
     { label: 'Sign Up', href: '/signup', isActive: true },
-  ],
+  ]),
   // provide a minimal zod schema so zodResolver can validate in tests
   // permissive schema so handleSubmit will call onSubmit in tests
   signUpSchema: z.object({
@@ -133,9 +141,6 @@ describe('SignUpPageContent', () => {
 
   it('on successful signUp.email shows email sent UI and stores email', async () => {
     // signUp.email resolves without error
-    const { signUp } = jest.requireMock('@/lib/auth-client') as {
-      signUp: { email: jest.Mock };
-    };
     signUp.email.mockResolvedValue({ error: null });
 
     render(<SignUpPageContent />);
@@ -154,19 +159,12 @@ describe('SignUpPageContent', () => {
   });
 
   it('on signUp.email error shows toast and still shows email-sent UI', async () => {
-    const { signUp } = jest.requireMock('@/lib/auth-client') as {
-      signUp: { email: jest.Mock };
-    };
     signUp.email.mockResolvedValue({ error: { message: 'Bad' } });
 
     render(<SignUpPageContent />);
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Submit/i }));
-
-    const { showToast } = jest.requireMock('@/components/common/Toast') as {
-      showToast: jest.Mock;
-    };
 
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith(
@@ -181,19 +179,12 @@ describe('SignUpPageContent', () => {
   });
 
   it('handles social sign up and shows redirect toast', async () => {
-    const { handleSocialAuth } = jest.requireMock('@/utils/social-auth') as {
-      handleSocialAuth: jest.Mock;
-    };
-    handleSocialAuth.mockResolvedValue(undefined);
+    (handleSocialAuth as jest.Mock).mockResolvedValue(undefined);
 
     render(<SignUpPageContent />);
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Social SignUp/i }));
-
-    const { showToast } = jest.requireMock('@/components/common/Toast') as {
-      showToast: jest.Mock;
-    };
 
     await waitFor(() => {
       expect(handleSocialAuth).toHaveBeenCalledWith('Google', 'signup');
@@ -207,10 +198,7 @@ describe('SignUpPageContent', () => {
   });
 
   it("'Already verified? Sign In' navigates to sign in", async () => {
-    const { signUp } = jest.requireMock('@/lib/auth-client') as {
-      signUp: { email: jest.Mock };
-    };
-    signUp.email.mockResolvedValue({ error: null });
+    (signUp.email as jest.Mock).mockResolvedValue({ error: null });
 
     render(<SignUpPageContent />);
 
@@ -224,21 +212,14 @@ describe('SignUpPageContent', () => {
   });
 
   it('on signUp.email throwing shows error toast and does not show email-sent UI', async () => {
-    const { signUp } = jest.requireMock('@/lib/auth-client') as {
-      signUp: { email: jest.Mock };
-    };
     // simulate a thrown error from the auth client
-    signUp.email.mockImplementationOnce(() => {
+    (signUp.email as jest.Mock).mockImplementationOnce(() => {
       throw new Error('network');
     });
 
     render(<SignUpPageContent />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Submit/i }));
-
-    const { showToast } = jest.requireMock('@/components/common/Toast') as {
-      showToast: jest.Mock;
-    };
 
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith(
@@ -253,23 +234,47 @@ describe('SignUpPageContent', () => {
   });
 
   it('social sign up failure shows signup error toast', async () => {
-    const { handleSocialAuth } = jest.requireMock('@/utils/social-auth') as {
-      handleSocialAuth: jest.Mock;
-    };
-    handleSocialAuth.mockRejectedValueOnce(new Error('social fail'));
+    (handleSocialAuth as jest.Mock).mockRejectedValueOnce(
+      new Error('social fail')
+    );
 
     render(<SignUpPageContent />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Social SignUp/i }));
-
-    const { showToast } = jest.requireMock('@/components/common/Toast') as {
-      showToast: jest.Mock;
-    };
 
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Social Signup Failed' })
       );
     });
+  });
+
+  it('breadcrumb: single item has no separators', () => {
+    // set breadcrumbs to a single active item
+    // Use mockImplementation to be robust against prior calls in other tests
+    (extractBreadcrumbs as jest.Mock).mockImplementation(() => [
+      { label: 'Only', href: '/only', isActive: true },
+    ]);
+
+    render(<SignUpPageContent />);
+    const nav = screen.getByLabelText('breadcrumb');
+    const separators = nav.querySelectorAll('li[role="presentation"]');
+    expect(separators.length).toBe(0);
+  });
+
+  it('breadcrumb: multiple items render separators and links for non-active items', () => {
+    (extractBreadcrumbs as jest.Mock).mockImplementation(() => [
+      { label: 'Home', href: '/', isActive: false },
+      { label: 'Section', href: '/section', isActive: false },
+      { label: 'Sign Up', href: '/signup', isActive: true },
+    ]);
+
+    render(<SignUpPageContent />);
+    const nav = screen.getByLabelText('breadcrumb');
+    const separators = nav.querySelectorAll('li[role="presentation"]');
+    expect(separators.length).toBe(2);
+
+    const first = within(nav).getByText('Home');
+    expect(first.closest('a')).not.toBeNull();
   });
 });

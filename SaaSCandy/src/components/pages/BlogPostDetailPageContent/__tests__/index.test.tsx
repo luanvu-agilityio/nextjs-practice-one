@@ -84,6 +84,16 @@ describe('BlogPostDetailPage Component', () => {
     // href may be absolute in the test environment; check it contains the encoded url
     // (this covers the interpolation branch that uses window.location.href)
     expect(fbAnchor?.getAttribute('href') ?? '').toContain(encoded);
+    const twitterAnchor = screen.getByText('Twitter').closest('a');
+    expect(twitterAnchor).toBeTruthy();
+    // twitter link also encodes the post.title
+    expect(twitterAnchor?.getAttribute('href') ?? '').toContain(
+      encodeURIComponent(post.title)
+    );
+
+    const liAnchor = screen.getByText('LinkedIn').closest('a');
+    expect(liAnchor).toBeTruthy();
+    expect(liAnchor?.getAttribute('href') ?? '').toContain('linkedin.com');
   });
 
   it('renders structured content via ContentRenderer and hides featured image when absent', () => {
@@ -152,8 +162,37 @@ describe('BlogPostDetailPage Component', () => {
     // There are two newsletter mocks (mobile and sidebar) — pick the sidebar one that has the className prop
     const newsletters = screen.getAllByTestId('newsletter');
     const sidebarNewsletter = newsletters.find(
-      n => n.getAttribute('data-classname') === 'w-full'
+      n => n.dataset.classname === 'w-full'
     );
     expect(sidebarNewsletter).toBeTruthy();
+  });
+
+  it('handles missing window (server-side) when building share links and still renders author label', () => {
+    // Temporarily remove window to exercise the typeof window !== 'undefined' branches
+    const g = globalThis as unknown as Record<string, unknown>;
+    const origWindow = g['window'];
+    delete g['window'];
+
+    try {
+      const postNoWindow: BlogPost = { ...basePost };
+      render(<BlogPostDetailPageContent post={postNoWindow} />);
+
+      // Author label text should still display
+      expect(screen.getByText('Author')).toBeInTheDocument();
+
+      // When window is undefined the share URLs will include an href but without a real url value
+      const fbAnchor = screen.getByText('Facebook').closest('a');
+      expect(fbAnchor).toBeTruthy();
+      expect(fbAnchor?.getAttribute('href') ?? '').toContain('sharer.php');
+      expect(typeof fbAnchor?.getAttribute('href')).toBe('string');
+    } finally {
+      // restore window
+      if (origWindow === undefined) {
+        // ensure property exists again as undefined
+        g['window'] = undefined;
+      } else {
+        g['window'] = origWindow;
+      }
+    }
   });
 });

@@ -1,4 +1,5 @@
-﻿import { render, screen, waitFor } from '@testing-library/react';
+﻿import { render, screen, waitFor, within } from '@testing-library/react';
+import { act } from 'react';
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 
@@ -267,6 +268,16 @@ jest.mock('@/components/common', () => ({
   Divider: ({ text }: { text?: string }) => <div>{text}</div>,
   showToast: (...args: unknown[]) => mockShowToast(...args),
 }));
+
+// Helper removed: prefer capturing call count locally in tests to assert
+// that a specific variant was emitted after an action.
+
+const hasToastVariant = (variant: string) => {
+  return mockShowToast.mock.calls.some(call => {
+    const arg = call[0] as unknown as { variant?: string } | undefined;
+    return !!arg && arg.variant === variant;
+  });
+};
 
 jest.mock('@/components/common/Breadcrumb', () => ({
   Breadcrumb: ({ children }: { children: React.ReactNode }) => (
@@ -760,5 +771,117 @@ describe('SignInPageContent - Additional Coverage', () => {
     await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
     await waitFor(() => expect(mockSignIn).toHaveBeenCalled());
     await waitFor(() => expect(mockPush).toHaveBeenCalled());
+  });
+
+  it('sms 2FA full flow verifies and signs in', async () => {
+    // First fetch (POST) for sending SMS code, second fetch (PUT) for verification
+    globalThis.fetch = jest
+      .fn()
+      .mockImplementation((_url, opts?: RequestInit) => {
+        if (opts && opts.method === 'POST') {
+          return Promise.resolve({ json: async () => ({ success: true }) });
+        }
+        // verification PUT
+        return Promise.resolve({
+          json: async () => ({ success: true, data: true }),
+        });
+      });
+
+    mockSignIn.mockResolvedValueOnce({ error: null });
+
+    render(<SignInPageContent />);
+    // Trigger submit -> 2FA selector
+    await userEvent.click(screen.getByText('Submit'));
+    await waitFor(() => {
+      expect(screen.getByTestId('twofamethod-selector')).toBeInTheDocument();
+    });
+
+    // Trigger the selector's SMS flow directly (avoid setTimeout timing)
+    // set the phone then call the handler captured by the mocked selector
+    // Call the captured setters/handlers inside act to avoid warnings and
+    // ensure state updates are flushed before assertions.
+    // Mimic the real selector's behavior: set phone, wait for state to update,
+    // then call the verify handler (the real selector uses setTimeout for this).
+    act(() => {
+      if (typeof captured.setUserPhone === 'function') {
+        (captured.setUserPhone as (p: string) => void)('5551234');
+      }
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByPlaceholderText('Enter phone (+1234567890) for SMS')
+      ).toHaveValue('5551234')
+    );
+    act(() => {
+      if (typeof captured.handleSms2FAVerify === 'function') {
+        (captured.handleSms2FAVerify as () => void)();
+      }
+    });
+
+    // Wait for the SMS send handler to complete and show a success toast
+    const before = mockShowToast.mock.calls.length;
+    await waitFor(() =>
+      expect(mockShowToast.mock.calls.length).toBeGreaterThan(before)
+    );
+    const newCalls = mockShowToast.mock.calls.slice(before);
+    const lastArg = (newCalls.at(-1) || [])[0] as
+      | { variant?: string }
+      | undefined;
+    expect(lastArg).toEqual(expect.objectContaining({ variant: 'success' }));
+  });
+
+  it('sms resend code shows success toast', async () => {
+    // fetch POST for resend should return success
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue({ json: async () => ({ success: true }) });
+
+    render(<SignInPageContent />);
+    await userEvent.click(screen.getByText('Submit'));
+    await waitFor(() => {
+      expect(screen.getByTestId('twofamethod-selector')).toBeInTheDocument();
+    });
+    // Trigger the selector's SMS flow directly (avoid setTimeout timing)
+    act(() => {
+      if (typeof captured.setUserPhone === 'function') {
+        (captured.setUserPhone as (p: string) => void)('5551234');
+      }
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByPlaceholderText('Enter phone (+1234567890) for SMS')
+      ).toHaveValue('5551234')
+    );
+    act(() => {
+      if (typeof captured.handleSms2FAVerify === 'function') {
+        (captured.handleSms2FAVerify as () => void)();
+      }
+    });
+    const before2 = mockShowToast.mock.calls.length;
+    await waitFor(() =>
+      expect(mockShowToast.mock.calls.length).toBeGreaterThan(before2)
+    );
+    const newCalls2 = mockShowToast.mock.calls.slice(before2);
+    const lastArg2 = (newCalls2.at(-1) || [])[0] as
+      | { variant?: string }
+      | undefined;
+    expect(lastArg2).toEqual(expect.objectContaining({ variant: 'success' }));
+  });
+
+  it('shows error toast when send2FACode fails on email selection', async () => {
+    mockSend2FACode.mockResolvedValueOnce({ success: false, error: 'Bad' });
+    render(<SignInPageContent />);
+    await userEvent.click(screen.getByText('Submit'));
+    await waitFor(() => {
+      expect(screen.getByTestId('twofamethod-selector')).toBeInTheDocument();
+    });
+    // Choose email 2FA
+    await userEvent.click(screen.getByText('Email 2FA'));
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ variant: 'error' })
+      );
+    });
   });
 });

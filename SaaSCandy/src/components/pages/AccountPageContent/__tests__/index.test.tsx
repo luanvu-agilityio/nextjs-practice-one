@@ -269,4 +269,46 @@ describe('AccountPageContent Component', () => {
       })
     );
   });
+
+  it('falls back to email initial when name is missing', () => {
+    // name missing but email present -> initial should come from email
+    mockedUseSession.mockReturnValue({
+      data: {
+        user: { name: undefined, email: 'bob@example.com', image: null },
+      },
+      isPending: false,
+    } as unknown as ReturnType<typeof useSession>);
+
+    render(<AccountPageContent />);
+
+    // initial letter should come from email
+    expect(screen.getByText('b')).toBeInTheDocument();
+
+    // heading falls back to 'User' when name is missing
+    const nameHeading = screen.getByRole('heading', { name: 'User', level: 2 });
+    expect(nameHeading).toBeInTheDocument();
+
+    // Personal Information Name should show 'Not provided'
+    expect(screen.getByText('Not provided')).toBeInTheDocument();
+  });
+
+  it('falls back to defaults when both name and email are missing', () => {
+    mockedUseSession.mockReturnValue({
+      data: { user: { name: undefined, email: undefined, image: null } },
+      isPending: false,
+    } as unknown as ReturnType<typeof useSession>);
+
+    render(<AccountPageContent />);
+
+    // initial should be the literal 'U'
+    expect(screen.getByText('U')).toBeInTheDocument();
+
+    // heading falls back to 'User'
+    expect(
+      screen.getByRole('heading', { name: 'User', level: 2 })
+    ).toBeInTheDocument();
+
+    // Name in Personal Information should be 'Not provided'
+    expect(screen.getByText('Not provided')).toBeInTheDocument();
+  });
 });
