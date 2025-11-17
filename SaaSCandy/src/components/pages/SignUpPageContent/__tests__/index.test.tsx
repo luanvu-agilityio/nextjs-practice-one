@@ -18,7 +18,6 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Import component after mocks so mocked modules are used during module initialization
-import { SignUpPageContent } from '../index';
 
 // Simple next/link mock
 jest.mock('next/link', () => {
@@ -91,6 +90,20 @@ jest.mock('@/utils', () => ({
   }),
 }));
 
+// Mock ErrorMessage so we can spy/mock getFriendlyMessage safely
+jest.mock('@/components/common/ErrorMessage', () => {
+  const actual = jest.requireActual('@/components/common/ErrorMessage');
+  return {
+    ...actual,
+    getFriendlyMessage: jest.fn((err: unknown) =>
+      actual.getFriendlyMessage(err)
+    ),
+  };
+});
+import * as common from '@/components/common';
+import * as ErrorMessageModule from '@/components/common/ErrorMessage';
+import { SignUpPageContent } from '../index';
+
 // Mock SignUpForm to control submit and social flows.
 jest.mock('@/components/form', () => ({
   SignUpForm: (props: {
@@ -141,7 +154,7 @@ describe('SignUpPageContent', () => {
 
   it('on successful signUp.email shows email sent UI and stores email', async () => {
     // signUp.email resolves without error
-    signUp.email.mockResolvedValue({ error: null });
+    (signUp.email as jest.Mock).mockResolvedValue({ error: null });
 
     render(<SignUpPageContent />);
 
@@ -159,7 +172,9 @@ describe('SignUpPageContent', () => {
   });
 
   it('on signUp.email error shows toast and still shows email-sent UI', async () => {
-    signUp.email.mockResolvedValue({ error: { message: 'Bad' } });
+    (signUp.email as jest.Mock).mockResolvedValue({
+      error: { message: 'Bad' },
+    });
 
     render(<SignUpPageContent />);
 
@@ -245,6 +260,86 @@ describe('SignUpPageContent', () => {
     await waitFor(() => {
       expect(showToast).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Social Signup Failed' })
+      );
+    });
+  });
+
+  it('social sign up failure calls getFriendlyMessage when available', async () => {
+    // make getFriendlyMessage provide a human-friendly message
+    const spy = jest
+      .spyOn(common, 'getFriendlyMessage')
+      .mockReturnValue('Friendly error');
+    (handleSocialAuth as jest.Mock).mockRejectedValueOnce(
+      new Error('social fail')
+    );
+
+    render(<SignUpPageContent />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Social SignUp/i }));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalled();
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({ description: 'Friendly error' })
+      );
+    });
+    spy.mockRestore();
+  });
+
+  it('social sign up failure falls back to default description when getFriendlyMessage is empty', async () => {
+    // Make getFriendlyMessage return undefined so fallback description is used
+    jest
+      .spyOn(ErrorMessageModule, 'getFriendlyMessage')
+      .mockReturnValueOnce(undefined as unknown as string);
+    (handleSocialAuth as jest.Mock).mockRejectedValueOnce(
+      new Error('social fail')
+    );
+
+    render(<SignUpPageContent />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Social SignUp/i }));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: 'Failed to sign up with Google',
+        })
+      );
+    });
+  });
+
+  it('on successful signUp.email shows success toast', async () => {
+    // signUp.email resolves without error
+    (signUp.email as jest.Mock).mockResolvedValue({ error: null });
+
+    render(<SignUpPageContent />);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Submit/i }));
+
+    await waitFor(() => {
+      expect(signUp.email).toHaveBeenCalled();
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Account Created!' })
+      );
+    });
+  });
+
+  it('on signUp.email error with no message uses default description', async () => {
+    // error object with no message should use TOAST_MESSAGES fallback description
+    (signUp.email as jest.Mock).mockResolvedValue({ error: {} });
+
+    render(<SignUpPageContent />);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Submit/i }));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Sign Up Failed',
+          description: 'Please try again.',
+        })
       );
     });
   });
