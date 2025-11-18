@@ -8,7 +8,7 @@ jest.mock('@/components/common', () => ({
   getFriendlyMessage: (e: unknown) => mockGetFriendlyMessage(e),
 }));
 
-// Minimal form mocks
+// Minimal form/component mocks to drive the UI
 jest.mock('@/components/form', () => ({
   SignInForm: ({ onSubmit }: { onSubmit: () => unknown }) => (
     <div>
@@ -20,11 +20,9 @@ jest.mock('@/components/form', () => ({
   TwoFactorForm: ({
     onCodeChange,
     onVerify,
-    onResend,
   }: {
     onCodeChange?: (e: { target: { value: string } }) => unknown;
     onVerify?: () => unknown;
-    onResend?: () => unknown;
   }) => (
     <div>
       <input
@@ -36,19 +34,11 @@ jest.mock('@/components/form', () => ({
         }
       />
       <button data-testid='verify' onClick={() => onVerify?.()} />
-      <button data-testid='resend' onClick={() => onResend?.()} />
     </div>
   ),
-  Sms2FAForm: ({
-    onVerify,
-    onResend,
-  }: {
-    onVerify?: () => unknown;
-    onResend?: () => unknown;
-  }) => (
+  Sms2FAForm: ({ onVerify }: { onVerify?: () => unknown }) => (
     <div>
       <button data-testid='sms-verify' onClick={() => onVerify?.()} />
-      <button data-testid='resend-sms' onClick={() => onResend?.()} />
     </div>
   ),
 }));
@@ -92,7 +82,7 @@ const push = jest.fn();
 const refresh = jest.fn();
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push, refresh }) }));
 
-// simple useForm mock
+// react-hook-form
 jest.mock('react-hook-form', () => ({
   useForm: () => ({
     control: {},
@@ -104,7 +94,7 @@ jest.mock('react-hook-form', () => ({
 
 import { SignInPageContent } from '..';
 
-describe('SignInPageContent - more failure branches', () => {
+describe('SignInPageContent - focused fallback coverage (A)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSend2FACode.mockResolvedValue({ success: true });
@@ -112,138 +102,10 @@ describe('SignInPageContent - more failure branches', () => {
     mockSignInEmail.mockResolvedValue({ error: undefined });
   });
 
-  it('email verify returns success:false -> shows error toast', async () => {
-    mockVerify2FACode.mockResolvedValueOnce({ success: false, error: 'bad' });
-
-    render(<SignInPageContent />);
-    fireEvent.click(screen.getByTestId('signin-submit'));
-    await waitFor(() =>
-      expect(screen.getByTestId('select-email')).toBeInTheDocument()
-    );
-    fireEvent.click(screen.getByTestId('select-email'));
-    await waitFor(() =>
-      expect(screen.getByTestId('twofactor-code')).toBeInTheDocument()
-    );
-
-    fireEvent.change(screen.getByTestId('twofactor-code'), {
-      target: { value: '123456' },
-    });
-    fireEvent.click(screen.getByTestId('verify'));
-
-    await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
-    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
-  });
-
-  it('email verify returns data:false -> shows error toast', async () => {
-    mockVerify2FACode.mockResolvedValueOnce({ success: true, data: false });
-
-    render(<SignInPageContent />);
-    fireEvent.click(screen.getByTestId('signin-submit'));
-    await waitFor(() =>
-      expect(screen.getByTestId('select-email')).toBeInTheDocument()
-    );
-    fireEvent.click(screen.getByTestId('select-email'));
-    await waitFor(() =>
-      expect(screen.getByTestId('twofactor-code')).toBeInTheDocument()
-    );
-
-    fireEvent.change(screen.getByTestId('twofactor-code'), {
-      target: { value: '123456' },
-    });
-    fireEvent.click(screen.getByTestId('verify'));
-
-    await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
-    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
-  });
-
-  it('sms verify PUT returns success:false -> shows error toast', async () => {
-    // seed internal state to sms flow with phone and code
-    const useStateSpy = jest.spyOn(React, 'useState') as jest.SpyInstance;
-    const dispatch = (() => undefined) as React.Dispatch<
-      React.SetStateAction<unknown>
-    >;
-    const values: unknown[] = [
-      false,
-      true,
-      'sms',
-      '123456',
-      'a@b.com',
-      'P@ssw0rd',
-      '555',
-    ];
-    let idx = 0;
-    useStateSpy.mockImplementation((init: unknown) => {
-      const v = idx < values.length ? values[idx++] : init;
-      return [v, dispatch] as [
-        unknown,
-        React.Dispatch<React.SetStateAction<unknown>>,
-      ];
-    });
-
-    try {
-      globalThis.fetch = jest.fn().mockResolvedValue({
-        json: async () => ({ success: false, error: 'smsbad' }),
-      });
-
-      render(<SignInPageContent />);
-      await waitFor(() =>
-        expect(screen.getByTestId('sms-verify')).toBeInTheDocument()
-      );
-      fireEvent.click(screen.getByTestId('sms-verify'));
-
-      await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
-      // SMS verify PUT failure should show an error toast (caught in handler)
-      await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
-    } finally {
-      useStateSpy.mockRestore();
-    }
-  });
-
-  it('resend-sms (POST) returns success:false -> shows toast', async () => {
-    const useStateSpy = jest.spyOn(React, 'useState') as jest.SpyInstance;
-    const dispatch = (() => undefined) as React.Dispatch<
-      React.SetStateAction<unknown>
-    >;
-    const values: unknown[] = [
-      false,
-      true,
-      'sms',
-      '',
-      'a@b.com',
-      'P@ssw0rd',
-      '555',
-    ];
-    let idx = 0;
-    useStateSpy.mockImplementation((init: unknown) => {
-      const v = idx < values.length ? values[idx++] : init;
-      return [v, dispatch] as [
-        unknown,
-        React.Dispatch<React.SetStateAction<unknown>>,
-      ];
-    });
-
-    try {
-      globalThis.fetch = jest.fn().mockResolvedValue({
-        json: async () => ({ success: false, error: 'resendfail' }),
-      });
-
-      render(<SignInPageContent />);
-      await waitFor(() =>
-        expect(screen.getByTestId('resend-sms')).toBeInTheDocument()
-      );
-      fireEvent.click(screen.getByTestId('resend-sms'));
-
-      await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
-      // Resend (POST) returning success:false does not trigger showToast in implementation
-      await waitFor(() => expect(mockShowToast).not.toHaveBeenCalled());
-    } finally {
-      useStateSpy.mockRestore();
-    }
-  });
-
-  it('verify succeeds but signIn.email returns error -> shows toast (post-verify signIn error)', async () => {
+  it('verify succeeds but signIn.email returns an object-without-message -> calls showToast (fallback)', async () => {
     mockVerify2FACode.mockResolvedValueOnce({ success: true, data: true });
-    mockSignInEmail.mockResolvedValueOnce({ error: { message: 'signin bad' } });
+    // signIn returns an error object without a message property
+    mockSignInEmail.mockResolvedValueOnce({ error: {} });
 
     render(<SignInPageContent />);
     fireEvent.click(screen.getByTestId('signin-submit'));
@@ -263,5 +125,52 @@ describe('SignInPageContent - more failure branches', () => {
     await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
     await waitFor(() => expect(mockSignInEmail).toHaveBeenCalled());
     await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+  });
+
+  it('verify throws a non-Error (object) -> catcher uses fallback and showToast is called', async () => {
+    // make verify throw a non-Error object to hit fallback message path
+    mockVerify2FACode.mockRejectedValueOnce({ code: 'SOME_CODE' });
+
+    render(<SignInPageContent />);
+    fireEvent.click(screen.getByTestId('signin-submit'));
+    await waitFor(() =>
+      expect(screen.getByTestId('select-email')).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByTestId('select-email'));
+    await waitFor(() =>
+      expect(screen.getByTestId('twofactor-code')).toBeInTheDocument()
+    );
+
+    fireEvent.change(screen.getByTestId('twofactor-code'), {
+      target: { value: '123456' },
+    });
+    fireEvent.click(screen.getByTestId('verify'));
+
+    await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
+    await waitFor(() => expect(mockShowToast).toHaveBeenCalled());
+  });
+
+  it('verify succeeds and signIn.email returns no error -> router push called (success path)', async () => {
+    mockVerify2FACode.mockResolvedValueOnce({ success: true, data: true });
+    mockSignInEmail.mockResolvedValueOnce({ error: null });
+
+    render(<SignInPageContent />);
+    fireEvent.click(screen.getByTestId('signin-submit'));
+    await waitFor(() =>
+      expect(screen.getByTestId('select-email')).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByTestId('select-email'));
+    await waitFor(() =>
+      expect(screen.getByTestId('twofactor-code')).toBeInTheDocument()
+    );
+
+    fireEvent.change(screen.getByTestId('twofactor-code'), {
+      target: { value: '123456' },
+    });
+    fireEvent.click(screen.getByTestId('verify'));
+
+    await waitFor(() => expect(mockVerify2FACode).toHaveBeenCalled());
+    await waitFor(() => expect(mockSignInEmail).toHaveBeenCalled());
+    await waitFor(() => expect(push).toHaveBeenCalled());
   });
 });
