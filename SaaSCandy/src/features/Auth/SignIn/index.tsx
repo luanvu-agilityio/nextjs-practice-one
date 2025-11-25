@@ -4,7 +4,7 @@ import { ChangeEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { Effect, Option, pipe } from 'effect';
+import { Effect, pipe } from 'effect';
 
 // Components
 import { Button, getFriendlyMessage, showToast } from '@/components/ui';
@@ -95,19 +95,10 @@ const SignInPageContent = () => {
       if (twoFactorMethod === 'email') {
         verificationResult = yield* verify2FACode(userEmail, twoFactorCode);
       } else {
-        const smsResult = yield* pipe(
-          apiEffects.verify2FASMS({ phone: userPhone, code: twoFactorCode }),
-          Effect.retry({ times: 1 }),
-          Effect.timeout('5 seconds'),
-          Effect.flatMap(option => {
-            const opt = option as Option.Option<unknown>;
-            if (Option.isNone(opt)) {
-              return Effect.fail(new Error('Verification timeout'));
-            }
-            return Effect.succeed(opt.value);
-          })
-        );
-        verificationResult = smsResult;
+        verificationResult = yield* apiEffects.verify2FASMS({
+          phone: userPhone,
+          code: twoFactorCode,
+        });
       }
 
       const res = verificationResult as {
@@ -351,7 +342,6 @@ const SignInPageContent = () => {
         email: userEmail,
         password: userPassword,
       }),
-      Effect.timeout('5 seconds'),
       Effect.tap(result =>
         Effect.sync(() => {
           const res = result as { success?: boolean; error?: string };
