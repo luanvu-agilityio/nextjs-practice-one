@@ -23,7 +23,8 @@ import { sendSms, isTwilioConfigured } from '@/lib/twilio';
 
 interface SmsResult {
   success: boolean;
-  message: string;
+  message?: string;
+  data?: boolean;
   error?: string;
   details?: string;
   status?: number;
@@ -214,7 +215,7 @@ export async function PUT(request: NextRequest) {
         .where(eq(schema.smsVerificationCode.id, entry.id))
     );
 
-    return { success: true, status: 200 } as SmsResult;
+    return { success: true, data: true, status: 200 } as SmsResult;
   });
 
   try {
@@ -226,6 +227,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(
       {
         success: result.success,
+        ...(result.data !== undefined && { data: result.data }),
         ...(result.message && { message: result.message }),
         ...(result.error && { error: result.error }),
       },
