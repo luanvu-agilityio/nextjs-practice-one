@@ -18,10 +18,19 @@ import { UserMenu } from '@/features/Auth';
 import { ROUTES } from '@/constants';
 
 const Header = memo((): JSX.Element => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [showMobileAuth, setShowMobileAuth] = useState(false);
 
   const renderAuthSection = () => {
+    if (isPending) {
+      return (
+        <div className='flex items-center gap-2 sm:gap-4'>
+          <div className='w-20 h-10 bg-gray-200 rounded-lg animate-pulse' />
+          <div className='w-20 h-10 bg-gray-200 rounded-lg animate-pulse' />
+        </div>
+      );
+    }
+
     if (session?.user) {
       return <UserMenu />;
     }

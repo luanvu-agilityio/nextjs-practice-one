@@ -124,60 +124,14 @@ exports[`HeroSection Snapshot Tests should match snapshot when session is pendin
             />
           </svg>
           <div
-            class="hidden sm:flex items-center gap-2 sm:gap-4"
+            class="flex items-center gap-2 sm:gap-4"
           >
-            <a
-              class="no-underline"
-              href="/signin"
-            >
-              <button
-                variant="secondary"
-              >
-                Sign In
-              </button>
-            </a>
-            <a
-              class="no-underline"
-              href="/signup"
-            >
-              <button
-                variant="primary"
-              >
-                Sign Up
-              </button>
-            </a>
-          </div>
-          <div
-            class="mobile-auth-toggle relative"
-          >
-            <button
-              aria-label="Toggle auth menu"
-              class="text-primary p-0 "
-              variant="ghost"
-            >
-              <svg
-                aria-hidden="true"
-                class="lucide lucide-user w-6 h-6"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
-                />
-                <circle
-                  cx="12"
-                  cy="7"
-                  r="4"
-                />
-              </svg>
-            </button>
+            <div
+              class="w-20 h-10 bg-gray-200 rounded-lg animate-pulse"
+            />
+            <div
+              class="w-20 h-10 bg-gray-200 rounded-lg animate-pulse"
+            />
           </div>
         </div>
       </div>
