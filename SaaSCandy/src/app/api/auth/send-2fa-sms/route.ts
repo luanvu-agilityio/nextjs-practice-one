@@ -6,128 +6,152 @@
  * - Supports POST (send code) and PUT (verify code).
  */
 import { NextRequest, NextResponse } from 'next/server';
-import twilio from 'twilio';
-import { db } from '@/lib/db';
+import { Effect } from 'effect';
 import { eq } from 'drizzle-orm';
+
+// DB
+import { db } from '@/lib/db';
+
+// Schema
 import * as schema from '@/lib/db/schema';
+
+// Auth
 import { auth } from '@/lib/better-auth';
 
-function getFromPhone() {
-  return process.env.TWILIO_PHONE_NUMBER;
-}
+// Helpers
+import { sendSms, isTwilioConfigured } from '@/lib/twilio';
 
-function getTwilioClient() {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  return twilio(accountSid, authToken);
-}
-
-function generateCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+interface SmsResult {
+  success: boolean;
+  message: string;
+  error?: string;
+  details?: string;
+  status?: number;
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json().catch(() => null);
+  // Effect returns plain data
+  const program = Effect.gen(function* () {
+    const body = yield* Effect.promise(() => request.json().catch(() => null));
     console.log('[send-2fa-sms] POST body:', body);
     const { phone, email, password } = body || {};
+
     if (!phone) {
-      return NextResponse.json({ error: 'Phone required' }, { status: 400 });
+      return {
+        success: false,
+        message: 'Phone required',
+        error: 'Phone required',
+        status: 400,
+      } as SmsResult;
     }
+
     // Optionally validate user credentials
-    let user = null;
+    type UserLike = {
+      id: string;
+      phone?: string;
+      [key: string]: unknown;
+    } | null;
+    let user: UserLike = null;
+
     if (email && password) {
-      const signInResult = await auth.api.signInEmail({
-        body: { email, password },
-      });
+      const signInResult = yield* Effect.promise(() =>
+        auth.api.signInEmail({ body: { email, password } })
+      );
       if (!signInResult?.user) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid credentials' },
-          { status: 401 }
-        );
+        return {
+          success: false,
+          message: 'Invalid credentials',
+          error: 'Invalid credentials',
+          status: 401,
+        } as SmsResult;
       }
       user = signInResult.user;
     } else {
       // Find user by phone
-      const users = await db
-        .select()
-        .from(schema.user)
-        .where(eq(schema.user.twoFactorEnabled, true));
-      user = users.find(u => u.phone === phone);
-      if (!user) {
-        return NextResponse.json(
-          { success: false, error: 'User not found' },
-          { status: 404 }
-        );
-      }
-    }
-    // Generate code
-    const code = generateCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    await db
-      .delete(schema.smsVerificationCode)
-      .where(eq(schema.smsVerificationCode.userId, user.id));
-    // Store code
-    await db.insert(schema.smsVerificationCode).values({
-      id: crypto.randomUUID(),
-      userId: user.id,
-      phone,
-      code,
-      expiresAt,
-      verified: false,
-      attempts: '0',
-    });
-    // Send SMS
-    try {
-      const accountSid = process.env.TWILIO_ACCOUNT_SID;
-      const authToken = process.env.TWILIO_AUTH_TOKEN;
-      const fromPhone = getFromPhone();
-      if (!accountSid || !authToken || !fromPhone) {
-        console.error('[send-2fa-sms] Missing Twilio env vars', {
-          accountSid: !!accountSid,
-          authToken: !!authToken,
-          fromPhone: !!fromPhone,
-        });
-        return NextResponse.json(
-          { success: false, error: 'Twilio configuration missing' },
-          { status: 500 }
-        );
-      }
-
-      await getTwilioClient().messages.create({
-        body: `Your SaaSCandy verification code is: ${code}`,
-        from: fromPhone,
-        to: phone,
-      });
-    } catch (smsError) {
-      // Log Twilio error for debugging
-      console.error('[send-2fa-sms] Twilio send failed:', smsError);
-      // If Twilio provides a message, surface it in the response to help debugging (dev only)
-      const smsErrorMessage = (() => {
-        if (smsError instanceof Error) return smsError.message;
-        if (typeof smsError === 'string') return smsError;
-        if (typeof smsError === 'object' && smsError !== null) {
-          const message = (smsError as { message?: unknown }).message;
-          if (typeof message === 'string') return message;
-        }
-        return String(smsError);
-      })();
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to send SMS',
-          details: smsErrorMessage,
-        },
-        { status: 500 }
+      const users = yield* Effect.promise(() =>
+        db
+          .select()
+          .from(schema.user)
+          .where(eq(schema.user.twoFactorEnabled, true))
       );
+      const found = users.find(u => {
+        const p = (u as Record<string, unknown>).phone;
+        return typeof p === 'string' && p === phone;
+      });
+      user = (found as UserLike) ?? null;
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found',
+          error: 'User not found',
+          status: 404,
+        } as SmsResult;
+      }
     }
-    return NextResponse.json({ success: true, message: 'SMS code sent' });
-  } catch (error) {
+
+    // Generate and store code
+    const { createSmsOtp } = yield* Effect.promise(() => import('@/lib/otp'));
+    const { code } = yield* Effect.promise(() => createSmsOtp(user!.id, phone));
+
+    // Send SMS via centralized helper
+    if (!isTwilioConfigured()) {
+      console.error('[send-2fa-sms] Twilio not configured');
+      return {
+        success: false,
+        message: 'Twilio configuration missing',
+        error: 'Twilio configuration missing',
+        status: 500,
+      } as SmsResult;
+    }
+
+    yield* Effect.promise(() =>
+      sendSms(phone, `Your SaaSCandy verification code is: ${code}`)
+    );
+
+    return {
+      success: true,
+      message: 'SMS code sent',
+      status: 200,
+    } as SmsResult;
+  });
+
+  try {
+    // Run Effect and get plain result
+    const result = (await Effect.runPromise(program)) as SmsResult;
+
+    // Map to NextResponse at boundary
+    const status = result.status || (result.success ? 200 : 400);
+    return NextResponse.json(
+      {
+        success: result.success,
+        message: result.message,
+        ...(result.error && { error: result.error }),
+        ...(result.details && { details: result.details }),
+      },
+      { status }
+    );
+  } catch (error: unknown) {
+    let details: string;
+    if (typeof error === 'string') {
+      details = error;
+    } else if (error instanceof Error) {
+      details = error.message;
+    } else if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error
+    ) {
+      details = String((error as { message: unknown }).message);
+    } else {
+      details = error ? JSON.stringify(error) : 'Unknown error';
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Failed to send SMS',
+        error: 'Failed to send SMS',
+        details,
       },
       { status: 500 }
     );
@@ -135,48 +159,93 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { phone, code } = body;
+  // Effect returns plain data
+  const program = Effect.gen(function* () {
+    const body = yield* Effect.promise(() => request.json());
+    const { phone, code } = body || {};
+
     if (!phone || !code) {
-      return NextResponse.json(
-        { error: 'Phone and code required' },
-        { status: 400 }
-      );
+      return {
+        success: false,
+        message: 'Phone and code required',
+        error: 'Phone and code required',
+        status: 400,
+      } as SmsResult;
     }
+
     // Find code entry
-    const entries = await db
-      .select()
-      .from(schema.smsVerificationCode)
-      .where(eq(schema.smsVerificationCode.phone, phone));
+    const entries = yield* Effect.promise(() =>
+      db
+        .select()
+        .from(schema.smsVerificationCode)
+        .where(eq(schema.smsVerificationCode.phone, phone))
+    );
     const entry = entries[0];
+
     if (!entry || entry.expiresAt < new Date()) {
-      return NextResponse.json(
-        { success: false, error: 'Code expired' },
-        { status: 400 }
-      );
+      return {
+        success: false,
+        message: 'Code expired',
+        error: 'Code expired',
+        status: 400,
+      } as SmsResult;
     }
+
     if (entry.code !== code) {
       // Optionally increment attempts
-      await db
-        .update(schema.smsVerificationCode)
-        .set({ attempts: String(Number(entry.attempts || '0') + 1) })
-        .where(eq(schema.smsVerificationCode.id, entry.id));
-      return NextResponse.json(
-        { success: false, error: 'Invalid code' },
-        { status: 401 }
+      yield* Effect.promise(() =>
+        db
+          .update(schema.smsVerificationCode)
+          .set({ attempts: String(Number(entry.attempts || '0') + 1) })
+          .where(eq(schema.smsVerificationCode.id, entry.id))
       );
+      return {
+        success: false,
+        message: 'Invalid code',
+        error: 'Invalid code',
+        status: 401,
+      } as SmsResult;
     }
+
     // Mark as verified and delete code
-    await db
-      .delete(schema.smsVerificationCode)
-      .where(eq(schema.smsVerificationCode.id, entry.id));
-    return NextResponse.json({ success: true });
-  } catch (error) {
+    yield* Effect.promise(() =>
+      db
+        .delete(schema.smsVerificationCode)
+        .where(eq(schema.smsVerificationCode.id, entry.id))
+    );
+
+    return { success: true, status: 200 } as SmsResult;
+  });
+
+  try {
+    // Run Effect and get plain result
+    const result = (await Effect.runPromise(program)) as SmsResult;
+
+    // Map to NextResponse at boundary
+    const status = result.status || (result.success ? 200 : 400);
+    return NextResponse.json(
+      {
+        success: result.success,
+        ...(result.message && { message: result.message }),
+        ...(result.error && { error: result.error }),
+      },
+      { status }
+    );
+  } catch (error: unknown) {
+    let details: string;
+    if (typeof error === 'string') {
+      details = error;
+    } else if (error instanceof Error) {
+      details = error.message;
+    } else {
+      details = 'Unknown error';
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: details,
+        error: details === 'Unexpected error' ? 'Unexpected' : details,
       },
       { status: 500 }
     );

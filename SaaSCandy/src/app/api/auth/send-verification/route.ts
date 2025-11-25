@@ -14,30 +14,51 @@ import sgMail from '@sendgrid/mail';
 
 // Constants
 import { VerificationEmail } from '@/constants/email-template';
+import { getConfig } from '@/lib/config';
+import { Effect } from 'effect';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+type Config = {
+  SENDGRID_API_KEY?: string;
+  SENDGRID_FROM_EMAIL?: string;
+  BETTER_AUTH_URL?: string;
+};
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { email } = body;
+export async function handleSendVerification(
+  request: NextRequest,
+  config: Config
+) {
+  const program = Effect.gen(function* () {
+    const cfg = config;
+    if (cfg.SENDGRID_API_KEY) {
+      sgMail.setApiKey(cfg.SENDGRID_API_KEY);
+    }
+    const body = yield* Effect.promise(() => request.json());
+    const { email } = body as { email?: string };
 
     const token = crypto.randomUUID();
-    const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
+    const verificationUrl = `${cfg.BETTER_AUTH_URL}/email-verification?token=${token}`;
 
-    const result = await sgMail.send({
-      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-      to: email,
-      subject: 'Verify your email - SaaSCandy',
-      html: VerificationEmail({ verificationUrl }),
-    });
+    const result = yield* Effect.promise(() =>
+      sgMail.send({
+        from: cfg.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+        to: email,
+        subject: 'Verify your email - SaaSCandy',
+        html: VerificationEmail({ verificationUrl }),
+      })
+    );
 
     return NextResponse.json({
       success: true,
       message: 'Verification email sent',
       data: result,
     });
+  });
+
+  try {
+    return await Effect.runPromise(program);
   } catch (error: unknown) {
+    // For send-verification we intentionally return success-shaped object even on errors
+    // so tests expect 200 status
     let message = 'Failed to send email';
     if (error instanceof Error) {
       message = error.message;
@@ -47,16 +68,14 @@ export async function POST(request: NextRequest) {
       try {
         message = JSON.stringify(error);
       } catch {
-        // keep default message
+        // keep default
       }
     }
-
-    return NextResponse.json(
-      {
-        success: false,
-        message,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: false, message });
   }
+}
+
+export async function POST(request: NextRequest) {
+  const cfg = await getConfig();
+  return handleSendVerification(request, cfg);
 }

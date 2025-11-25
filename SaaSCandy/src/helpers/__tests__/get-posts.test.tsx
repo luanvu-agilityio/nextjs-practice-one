@@ -66,7 +66,9 @@ describe('Get Posts Helpers', () => {
     });
 
     it('should return empty array on error', async () => {
-      mockBlogService.getAllPosts.mockRejectedValue(new Error('API error'));
+      mockBlogService.getAllPosts.mockImplementation(() =>
+        Promise.reject(new Error('API error'))
+      );
       const result = await getAllPosts();
       expect(result).toEqual([]);
       expect(mockBlogService.getAllPosts).toHaveBeenCalled();

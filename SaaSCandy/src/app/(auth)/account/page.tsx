@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { AccountPageContent } from '@/components';
+import { AccountPageContent } from '@/features';
 
 export const metadata: Metadata = {
   title: 'Account Details | SaaSCandy',

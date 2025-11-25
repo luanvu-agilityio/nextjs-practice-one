@@ -1,5 +1,5 @@
 import { PageLayout } from '@/components/layout';
-import { BlogPageContent } from '@/components';
+import { BlogPageContent } from '@/features';
 
 export const metadata = {
   title: 'Blog | SaaSCandy',

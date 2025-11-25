@@ -1,4 +1,5 @@
-// For SMS 2FA codes
+import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
+
 export const smsVerificationCode = pgTable('smsVerificationCode', {
   id: text('id').primaryKey(),
   userId: text('userId')
@@ -11,22 +12,16 @@ export const smsVerificationCode = pgTable('smsVerificationCode', {
   attempts: text('attempts').default('0'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 });
-import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  // Password is stored on the `account` table for credential providers.
-  // Keep this nullable to avoid insert failures when the auth adapter
-  // creates a user record without a password field.
   password: text('password'),
-  phone: text('phone'), // Optional phone for SMS 2FA
+  phone: text('phone'),
   emailVerified: boolean('emailVerified').notNull(),
   image: text('image'),
   twoFactorEnabled: boolean('twoFactorEnabled').default(false),
-  // Note: resetToken and resetTokenExpires removed - Better Auth uses verification table
-  // TODO: Run migration to drop these columns: drizzle-kit generate && drizzle-kit push
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
@@ -72,8 +67,6 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
-// For DEMO/LEARNING purposes only - stores verification codes
-// In production, use proper token-based verification
 export const emailVerificationCode = pgTable('emailVerificationCode', {
   id: text('id').primaryKey(),
   userId: text('userId')

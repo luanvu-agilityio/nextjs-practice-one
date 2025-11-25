@@ -9,10 +9,10 @@ import { User } from 'lucide-react';
 import { LogoIcon, ThemeSwitcherIcon } from '@/icons';
 
 // Components
-import Navbar from '@/components/NavBar';
-import { Button, Heading } from '@/components/common';
-import { IconButton } from '@/components/common/IconButton';
-import { UserMenu } from '@/components/UserMenu';
+
+import { Button, Heading, Navbar } from '@/components/ui';
+import { IconButton } from '@/components/ui/IconButton';
+import { UserMenu } from '@/features/Auth';
 
 // Constants
 import { ROUTES } from '@/constants';

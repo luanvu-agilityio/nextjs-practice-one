@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BlogCard renders correctly with image 1`] = `
+<div>
+  <article
+    class="group"
+  >
+    <a
+      class="block rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white"
+      href="/blog/test-blog"
+    >
+      <div
+        class="w-full overflow-hidden"
+      >
+        <img
+          alt="Next Image"
+          class="object-cover w-full h-48 sm:h-60 lg:h-71 group-hover:scale-105 transition-transform duration-300"
+          height="284"
+          loading="lazy"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 416px"
+          src="/test-image.jpg"
+          width="416"
+        />
+      </div>
+      <div
+        class="flex flex-col gap-3 sm:gap-4 py-6 sm:py-8 lg:py-10 px-4 sm:px-0"
+      >
+        <h3
+          as="h3"
+          class="text-primary font-medium text-lg sm:text-xl line-clamp-2"
+        >
+          Test Blog Title
+        </h3>
+        <div
+          class="text-xs sm:text-sm text-gray-background"
+        >
+          2024-01-01
+        </div>
+      </div>
+    </a>
+  </article>
+</div>
+`;
+
+exports[`BlogCard renders correctly without image 1`] = `
+<div>
+  <article
+    class="group"
+  >
+    <a
+      class="block rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white"
+      href="/blog/test-blog"
+    >
+      <div
+        class="w-full overflow-hidden"
+      >
+        <div
+          class="w-full h-48 sm:h-60 lg:h-71 flex items-center justify-center text-gray-background bg-gray-100"
+        >
+          No image
+        </div>
+      </div>
+      <div
+        class="flex flex-col gap-3 sm:gap-4 py-6 sm:py-8 lg:py-10 px-4 sm:px-0"
+      >
+        <h3
+          as="h3"
+          class="text-primary font-medium text-lg sm:text-xl line-clamp-2"
+        >
+          Test Blog Title
+        </h3>
+        <div
+          class="text-xs sm:text-sm text-gray-background"
+        >
+          2024-01-01
+        </div>
+      </div>
+    </a>
+  </article>
+</div>
+`;

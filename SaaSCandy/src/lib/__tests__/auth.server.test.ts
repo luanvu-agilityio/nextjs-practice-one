@@ -74,6 +74,18 @@ describe('auth server actions', () => {
       expect(result.user).toBeUndefined();
       expect(result.error).toContain('network');
     });
+
+    it('returns generic message when login rejects with non-Error', async () => {
+      // simulate a rejection with a non-Error value (e.g. string)
+      (authApi.login as jest.Mock).mockRejectedValue('bad');
+
+      const fd = makeFormData({ email: 'x@x.com', password: 'pw' });
+      const result = await signInAction(fd);
+
+      expect(result.success).toBeUndefined();
+      expect(result.user).toBeUndefined();
+      expect(result.error).toBe('Sign in failed');
+    });
   });
 
   describe('signUpAction', () => {
@@ -124,6 +136,63 @@ describe('auth server actions', () => {
       expect(result.success).toBeUndefined();
       expect(result.user).toBeUndefined();
       expect(result.error).toContain('boom');
+    });
+
+    it('returns generic message when register rejects with non-Error', async () => {
+      (authApi.register as jest.Mock).mockRejectedValue('oops');
+
+      const fd = makeFormData({ name: 'X', email: 'x@x.com', password: 'pw' });
+      const result = await signUpAction(fd);
+
+      expect(result.success).toBeUndefined();
+      expect(result.user).toBeUndefined();
+      expect(result.error).toBe('Sign up failed');
+    });
+
+    it('uses fallback firstName/lastName when name has no space', async () => {
+      (authApi.register as jest.Mock).mockResolvedValue({
+        user: { id: '3', email: 'single@name.com' },
+      });
+
+      const fd = makeFormData({
+        name: 'Single',
+        email: 'single@name.com',
+        password: 'pw',
+      });
+      const result = await signUpAction(fd);
+
+      expect(result.success).toBe(true);
+      expect(result.user).toEqual({ id: '3', email: 'single@name.com' });
+      // ensure register was called with firstName equal to the whole name and lastName empty
+      expect((authApi.register as jest.Mock).mock.calls.length).toBeGreaterThan(
+        0
+      );
+      const callArgs = (authApi.register as jest.Mock).mock.calls[0][0];
+      expect(callArgs.firstName).toBe('Single');
+      expect(callArgs.lastName).toBe('');
+    });
+
+    it('falls back to full name when firstName is falsy', async () => {
+      (authApi.register as jest.Mock).mockResolvedValue({
+        user: { id: '4', email: 'leading@space.com' },
+      });
+
+      // leading space produces an empty firstName from split(' ')
+      const nameWithLeadingSpace = ' Leading';
+      const fd = makeFormData({
+        name: nameWithLeadingSpace,
+        email: 'leading@space.com',
+        password: 'pw',
+      });
+      const result = await signUpAction(fd);
+
+      expect(result.success).toBe(true);
+      expect(result.user).toEqual({ id: '4', email: 'leading@space.com' });
+      const callArgs = (authApi.register as jest.Mock).mock.calls[
+        (authApi.register as jest.Mock).mock.calls.length - 1
+      ][0];
+      // when firstName is falsy, firstName || name should evaluate to the full name
+      expect(callArgs.firstName).toBe(nameWithLeadingSpace);
     });
   });
 

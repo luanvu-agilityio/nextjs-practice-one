@@ -1,14 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Footer } from '@/components/layout';
 
-// jsdom (used by Jest) doesn't implement HTMLFormElement.requestSubmit in some versions.
-// Polyfill a basic implementation so tests that click a form button don't throw.
 if (
   typeof HTMLFormElement !== 'undefined' &&
   !HTMLFormElement.prototype.requestSubmit
 ) {
-  // eslint-disable-next-line func-names
-  HTMLFormElement.prototype.requestSubmit = function () {
+  HTMLFormElement.prototype.requestSubmit = function (this: HTMLFormElement) {
     const event = new Event('submit', { bubbles: true, cancelable: true });
     return this.dispatchEvent(event);
   } as unknown as (this: HTMLFormElement) => boolean;
@@ -82,7 +79,7 @@ describe('Footer', () => {
   describe('Desktop Layout', () => {
     beforeEach(() => {
       // Mock desktop viewport
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 1200,
@@ -160,14 +157,14 @@ describe('Footer', () => {
       );
 
       expect(iconButtons.length).toBeGreaterThan(0);
-      iconButtons.forEach(btn => {
+      for (const btn of iconButtons) {
         // Each icon button should have an aria-label (the accessible name)
         expect(btn).toHaveAttribute('aria-label');
         // And wrap an anchor element linking to the social site
         const anchor = btn.querySelector('a');
         expect(anchor).toBeTruthy();
         expect(anchor).toHaveAttribute('href');
-      });
+      }
     });
 
     it('social links have aria labels', () => {
@@ -238,13 +235,14 @@ describe('Footer', () => {
 
     it('accordion toggles open and close for mobile sections', () => {
       // Ensure mobile viewport
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 375,
       });
 
-      const { container } = render(<Footer />);
+      // Render footer for mobile interactions
+      render(<Footer />);
 
       // Find the Services button and toggle
       const servicesButton = screen.getByRole('button', { name: /Services/i });
@@ -321,11 +319,11 @@ describe('Footer', () => {
       const { container } = render(<Footer />);
       const links = container.querySelectorAll('a');
 
-      links.forEach(link => {
+      for (const link of links) {
         const hasText = link.textContent && link.textContent.trim().length > 0;
         const hasAriaLabel = link.hasAttribute('aria-label');
         expect(hasText || hasAriaLabel).toBe(true);
-      });
+      }
     });
 
     it('email input has aria-label', () => {
@@ -368,7 +366,7 @@ describe('Footer', () => {
 
   describe('Responsive Behavior', () => {
     it('hides desktop layout on mobile', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 375,
@@ -380,7 +378,7 @@ describe('Footer', () => {
     });
 
     it('shows desktop layout on large screens', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 1200,

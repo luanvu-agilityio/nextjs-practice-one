@@ -1,5 +1,5 @@
 import { PageLayout } from '@/components/layout';
-import { ServicePageContent } from '@/components/pages';
+import { ServicePageContent } from '@/features';
 
 export const metadata = {
   title: 'Services | SaaSCandy',

@@ -1,21 +1,14 @@
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/components', () => ({
-  FAQSection: () => <div data-testid='faq-section'>FAQ Section</div>,
-  JoinUsSection: () => <div data-testid='join-us-section'>Join Us Section</div>,
-}));
-
-jest.mock('@/components/HeroSection', () => ({
-  __esModule: true,
-  default: () => <div data-testid='hero-section'>Hero Section</div>,
-}));
-
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   ServicePageContent: () => <div data-testid='service-page'>Service Page</div>,
   PortfolioPageContent: () => (
     <div data-testid='portfolio-page'>Portfolio Page</div>
   ),
   PricingPageContent: () => <div data-testid='pricing-page'>Pricing Page</div>,
+  FAQSection: () => <div data-testid='faq-section'>FAQ Section</div>,
+  JoinUsSection: () => <div data-testid='join-us-section'>Join Us Section</div>,
+  HeroSection: () => <div data-testid='hero-section'>Hero Section</div>,
 }));
 
 import HomePage from '@/app/page';

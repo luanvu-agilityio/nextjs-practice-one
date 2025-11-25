@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Minimal mocks for common components used by Footer
-jest.mock('@/components/common', () => ({
+jest.mock('@/components/ui', () => ({
   Button: ({ children }: { children?: React.ReactNode }) => (
     <button>{children}</button>
   ),

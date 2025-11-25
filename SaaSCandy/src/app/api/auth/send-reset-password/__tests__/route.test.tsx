@@ -136,7 +136,7 @@ describe('POST /api/auth/forgot-password', () => {
     const request = createMockRequest({ email: 'test@example.com' });
     const response = await ForgotPassword(request);
     const data = await response.json();
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(400);
     expect(data.success).toBe(false);
     expect(data.message).toBe('Failed to send reset email');
   });

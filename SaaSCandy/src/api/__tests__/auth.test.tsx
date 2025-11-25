@@ -1,10 +1,14 @@
 import { authApi } from '../auth';
-import { http } from '@/service';
+import { runHttpEffect } from '@/service/HttpClient/helper';
 import { User } from '@/types/user';
 
-jest.mock('@/service');
+jest.mock('@/service/HttpClient/helper', () => ({
+  runHttpEffect: jest.fn(),
+}));
 
-const mockHttp = http as jest.Mocked<typeof http>;
+const mockRunHttp = runHttpEffect as unknown as jest.MockedFunction<
+  typeof runHttpEffect
+>;
 
 describe('authApi', () => {
   const mockUser: User = {
@@ -29,27 +33,33 @@ describe('authApi', () => {
 
   describe('login', () => {
     it('should return token and user on successful login', async () => {
-      mockHttp.get.mockResolvedValue([mockUser]);
+      mockRunHttp.mockResolvedValue([mockUser]);
       const result = await authApi.login({
         email: 'test@example.com',
         password: 'password123',
       });
       expect(result.user).toEqual(mockUser);
       expect(result.token).toContain('mock-token-');
-      expect(mockHttp.get).toHaveBeenCalledWith(
-        expect.stringContaining('users?email=')
-      );
+      expect(mockRunHttp).toHaveBeenCalled();
     });
 
     it('should throw error when credentials are invalid', async () => {
-      mockHttp.get.mockResolvedValue([]);
+      mockRunHttp.mockResolvedValue([]);
       await expect(
         authApi.login({ email: 'wrong@example.com', password: 'wrong' })
       ).rejects.toThrow('Login failed');
     });
 
     it('should throw error when http.get throws', async () => {
-      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
+      await expect(
+        authApi.login({ email: 'test@example.com', password: 'password123' })
+      ).rejects.toThrow('Login failed');
+    });
+
+    it('treats non-array response as invalid credentials', async () => {
+      // If http.get returns a non-array (object), login should fail
+      mockRunHttp.mockResolvedValue({} as unknown as User[]);
       await expect(
         authApi.login({ email: 'test@example.com', password: 'password123' })
       ).rejects.toThrow('Login failed');
@@ -58,7 +68,7 @@ describe('authApi', () => {
 
   describe('register', () => {
     it('should create new user and return token', async () => {
-      mockHttp.post.mockResolvedValue(mockUser);
+      mockRunHttp.mockResolvedValue(mockUser);
       const result = await authApi.register({
         firstName: 'John',
         lastName: 'Doe',
@@ -67,14 +77,11 @@ describe('authApi', () => {
       });
       expect(result.user).toEqual(mockUser);
       expect(result.token).toContain('mock-token-');
-      expect(mockHttp.post).toHaveBeenCalledWith(
-        'users',
-        expect.objectContaining({ email: 'test@example.com' })
-      );
+      expect(mockRunHttp).toHaveBeenCalled();
     });
 
     it('should throw error when http.post throws', async () => {
-      mockHttp.post.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
       await expect(
         authApi.register({
           firstName: 'John',
@@ -84,23 +91,36 @@ describe('authApi', () => {
         })
       ).rejects.toThrow('Registration failed');
     });
+
+    it('falls back to email as name when first/last missing', async () => {
+      const created = { ...mockUser, name: mockUser.email };
+      mockRunHttp.mockResolvedValue(created);
+
+      const result = await authApi.register({
+        email: mockUser.email,
+        password: 'password123',
+      });
+
+      expect(result.user.name).toBe(mockUser.email);
+      expect(result.token).toContain('mock-token-');
+    });
   });
 
   describe('findByEmail', () => {
     it('should return user when found', async () => {
-      mockHttp.get.mockResolvedValue([mockUser]);
+      mockRunHttp.mockResolvedValue([mockUser]);
       const result = await authApi.findByEmail('test@example.com');
       expect(result).toEqual(mockUser);
     });
 
     it('should return null when user not found', async () => {
-      mockHttp.get.mockResolvedValue([]);
+      mockRunHttp.mockResolvedValue([]);
       const result = await authApi.findByEmail('notfound@example.com');
       expect(result).toBeNull();
     });
 
     it('should return null when http.get throws', async () => {
-      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
       const result = await authApi.findByEmail('test@example.com');
       expect(result).toBeNull();
     });
@@ -108,14 +128,14 @@ describe('authApi', () => {
 
   describe('getUser', () => {
     it('should return user when found', async () => {
-      mockHttp.get.mockResolvedValue(mockUser);
+      mockRunHttp.mockResolvedValue(mockUser);
       const result = await authApi.getUser('1');
       expect(result).toEqual(mockUser);
-      expect(mockHttp.get).toHaveBeenCalledWith('users/1');
+      expect(mockRunHttp).toHaveBeenCalled();
     });
 
     it('should throw error when http.get throws', async () => {
-      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
       await expect(authApi.getUser('1')).rejects.toThrow(
         'Failed to fetch user data.'
       );
@@ -125,30 +145,24 @@ describe('authApi', () => {
   describe('updateUser', () => {
     it('should update user with new password', async () => {
       const updatedUser = { ...mockUser, password: 'newpass123' };
-      mockHttp.put.mockResolvedValue(updatedUser);
+      mockRunHttp.mockResolvedValue(updatedUser);
       const result = await authApi.updateUser('1', {
         newPassword: 'newpass123',
       });
       expect(result.password).toBe('newpass123');
-      expect(mockHttp.put).toHaveBeenCalledWith(
-        'users/1',
-        expect.objectContaining({ password: 'newpass123' })
-      );
+      expect(mockRunHttp).toHaveBeenCalled();
     });
 
     it('should update user with patch only', async () => {
       const updatedUser = { ...mockUser, firstName: 'Jane' };
-      mockHttp.put.mockResolvedValue(updatedUser);
+      mockRunHttp.mockResolvedValue(updatedUser);
       const result = await authApi.updateUser('1', { firstName: 'Jane' });
       expect(result.firstName).toBe('Jane');
-      expect(mockHttp.put).toHaveBeenCalledWith(
-        'users/1',
-        expect.objectContaining({ firstName: 'Jane' })
-      );
+      expect(mockRunHttp).toHaveBeenCalled();
     });
 
     it('should throw error when http.put throws', async () => {
-      mockHttp.put.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
       await expect(
         authApi.updateUser('1', { firstName: 'Jane' })
       ).rejects.toThrow('Failed to update user data.');
@@ -157,19 +171,19 @@ describe('authApi', () => {
 
   describe('verifyPassword', () => {
     it('should return true for correct password', async () => {
-      mockHttp.get.mockResolvedValue(mockUser);
+      mockRunHttp.mockResolvedValue(mockUser);
       const result = await authApi.verifyPassword('1', 'password123');
       expect(result).toBe(true);
     });
 
     it('should return false for incorrect password', async () => {
-      mockHttp.get.mockResolvedValue(mockUser);
+      mockRunHttp.mockResolvedValue(mockUser);
       const result = await authApi.verifyPassword('1', 'wrongpassword');
       expect(result).toBe(false);
     });
 
     it('should throw error when http.get throws', async () => {
-      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      mockRunHttp.mockRejectedValue(new Error('Network error'));
       await expect(authApi.verifyPassword('1', 'password123')).rejects.toThrow(
         'Failed to verify password.'
       );

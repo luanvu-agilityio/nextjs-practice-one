@@ -12,7 +12,7 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   BlogPostDetailPageContent: () => <div>BlogPostDetailPage</div>,
 }));
 

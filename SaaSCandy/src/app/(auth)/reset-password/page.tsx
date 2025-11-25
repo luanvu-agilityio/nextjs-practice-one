@@ -1,5 +1,6 @@
 'use client';
-import ResetPasswordPageContent from '@/components/pages/ResetPasswordPageContent';
+
+import ResetPasswordPageContent from '@/features/Auth/ResetPasswordPageContent';
 import { Suspense } from 'react';
 
 const ResetPasswordPage = () => {

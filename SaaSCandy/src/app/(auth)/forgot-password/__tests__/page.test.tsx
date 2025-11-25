@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import ForgotPasswordPage from '../page';
-import { ForgotPasswordPageContent } from '@/components';
+import { ForgotPasswordPageContent } from '@/features';
 
-
-jest.mock('@/components', () => ({
+jest.mock('@/features', () => ({
   ForgotPasswordPageContent: jest.fn(() => (
     <div data-testid='forgot-password-content'>Forgot Password Content</div>
   )),

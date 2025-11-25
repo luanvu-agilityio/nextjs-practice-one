@@ -1,6 +1,6 @@
 'use client';
 
-import { VerifyEmailContent } from '@/components';
+import { VerifyEmailContent } from '@/features';
 import { Suspense } from 'react';
 
 const VerifyEmailPage = () => {

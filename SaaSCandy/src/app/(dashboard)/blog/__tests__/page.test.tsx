@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
-import BlogPage from '@/app/(dashboard)/blog/page';
+import BlogPage, * as BlogModule from '@/app/(dashboard)/blog/page';
 
-jest.mock('@/components/layout/PageLayout', () => ({
+jest.mock('@/components/layout', () => ({
   PageLayout: ({
     title,
     subtitle,
@@ -21,7 +21,7 @@ jest.mock('@/components/layout/PageLayout', () => ({
   },
 }));
 
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   BlogPageContent: () => {
     return <div data-testid='blog-page'>Blog Page Content</div>;
   },
@@ -46,5 +46,10 @@ describe('Blog Page - Snapshot Tests', () => {
     const { getByTestId } = render(<BlogPage />);
 
     expect(getByTestId('blog-page')).toBeInTheDocument();
+  });
+
+  it('exports metadata', () => {
+    // ensure module-level metadata is executed and counted by coverage
+    expect(BlogModule.metadata).toBeDefined();
   });
 });

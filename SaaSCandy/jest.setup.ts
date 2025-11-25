@@ -6,6 +6,18 @@ global.Response = jest.fn();
 global.Headers = jest.fn();
 global.fetch = jest.fn();
 
+// Polyfill TextEncoder/TextDecoder for packages that expect browser globals
+// (the `effect` package uses TextEncoder internally). Node provides these
+// under the `util` module; expose them on the global object for Jest.
+import { TextEncoder, TextDecoder } from 'util';
+
+if (typeof global.TextEncoder === 'undefined')
+  // @ts-ignore: Node's TextEncoder type is compatible enough for tests
+  global.TextEncoder = TextEncoder;
+if (typeof global.TextDecoder === 'undefined')
+  // @ts-ignore: Node's TextDecoder type may differ from lib.dom, ignore for tests
+  global.TextDecoder = TextDecoder;
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -24,52 +36,16 @@ jest.mock('nanostores', () => ({
   computed: jest.fn(),
   onMount: jest.fn(),
 }));
-jest.mock('better-auth/client', () => ({
-  createAuthClient: jest.fn(() => ({
-    useSession: jest.fn(),
-    signIn: { email: jest.fn() },
-    signUp: { email: jest.fn() },
-    signOut: jest.fn(),
-  })),
-}));
+// Manual mocks for Better Auth are provided under `__mocks__/better-auth/*`.
+// This allows Jest to load the package mocks automatically.
 
 // Mock @neondatabase/serverless
 jest.mock('@neondatabase/serverless', () => ({
   neon: jest.fn(),
 }));
-// Mock Better Auth completely
-jest.mock('better-auth/client', () => ({
-  createAuthClient: jest.fn(() => ({
-    useSession: jest.fn(() => ({
-      data: null,
-      isPending: false,
-      error: null,
-    })),
-    signIn: { email: jest.fn() },
-    signUp: { email: jest.fn() },
-    signOut: jest.fn(),
-  })),
-}));
-
-jest.mock('better-auth/client/plugins', () => ({
-  twoFactorClient: jest.fn(() => ({})),
-}));
 
 // Mock your auth client specifically
-jest.mock('@/lib/auth-client', () => ({
-  authClient: {
-    useSession: jest.fn(() => ({
-      data: null,
-      isPending: false,
-      error: null,
-    })),
-  },
-  useSession: jest.fn(() => ({
-    data: null,
-    isPending: false,
-    error: null,
-  })),
-}));
+// Note: do NOT mock `@/lib/auth-client` here so tests can exercise it directly.
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),

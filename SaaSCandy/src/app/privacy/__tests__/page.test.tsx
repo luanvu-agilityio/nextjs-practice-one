@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock the PrivacyPageContent used by the page so test stays focused
-jest.mock('@/components', () => ({
+jest.mock('@/features', () => ({
   PrivacyPageContent: () => <div>PRIVACY-MOCK</div>,
 }));
 

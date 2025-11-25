@@ -2,7 +2,6 @@ import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { auth } from '@/lib/better-auth';
 import twilio from 'twilio';
-import { POST, PUT } from '../route';
 
 jest.mock('next/server', () => ({
   NextResponse: {
@@ -53,6 +52,23 @@ const mockTwilioClient = {
   mockTwilioClient as unknown as ReturnType<typeof twilio>
 );
 
+// Mock our twilio helper so tests don't call into Effect/getConfig
+jest.mock('@/lib/twilio', () => ({
+  sendSms: jest.fn(async (to: string, body: string) => {
+    return mockCreate({
+      to,
+      from: process.env.TWILIO_PHONE_NUMBER || '',
+      body,
+    });
+  }),
+  isTwilioConfigured: jest.fn(
+    () =>
+      !!process.env.TWILIO_ACCOUNT_SID &&
+      !!process.env.TWILIO_AUTH_TOKEN &&
+      !!process.env.TWILIO_PHONE_NUMBER
+  ),
+}));
+
 // Mock database operations
 const mockSelect = jest.fn();
 const mockFrom = jest.fn();
@@ -73,10 +89,12 @@ const mockSet = jest.fn();
 // process.env before invoking handlers and also mutate the imported `db`
 // mock at runtime.
 const callPOST = async (request: NextRequest) => {
+  const { POST } = await import('../route');
   return POST(request as unknown as NextRequest);
 };
 
 const callPUT = async (request: NextRequest) => {
+  const { PUT } = await import('../route');
   return PUT(request as unknown as NextRequest);
 };
 
@@ -186,7 +204,7 @@ describe('SMS 2FA API Routes', () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe('Database error');
+      expect(data.error).toBe('Failed to send SMS');
     });
   });
 
@@ -356,7 +374,7 @@ describe('SMS 2FA API Routes', () => {
       const data = await response.json();
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe('Unexpected');
+      expect(data.error).toBe('Failed to send SMS');
     });
   });
 
@@ -415,6 +433,16 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     process.env.TWILIO_ACCOUNT_SID = 'sid';
     process.env.TWILIO_AUTH_TOKEN = 'token';
     process.env.TWILIO_PHONE_NUMBER = '+10000000000';
+    // Re-establish DB and Twilio mock behaviors since mocks were cleared
+    mockSelect.mockReturnValue({ from: mockFrom });
+    mockFrom.mockReturnValue({ where: mockWhere });
+    mockWhere.mockResolvedValue([]);
+    mockInsert.mockReturnValue({ values: mockValues });
+    mockValues.mockResolvedValue(undefined);
+    mockDelete.mockReturnValue({ where: mockWhere });
+    mockUpdate.mockReturnValue({ set: mockSet });
+    mockSet.mockReturnValue({ where: mockWhere });
+    mockCreate.mockResolvedValue({ sid: 'test-sid' });
   });
 
   it('should handle POST with valid email/password and send SMS', async () => {
@@ -432,11 +460,14 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
       email: 'test@example.com',
       password: 'pw',
     });
+    // ensure Twilio mock resolves for this test (avoid flakiness)
+    mockCreate.mockReset();
+    mockCreate.mockResolvedValue({ sid: 'test-sid' });
     const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
-    expect(response.status).toBe(500);
-    expect(data.success).toBe(false);
-    expect(data.message).toBe(undefined);
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.message).toBeDefined();
   });
 
   it('should handle POST with valid phone and send SMS', async () => {
@@ -594,7 +625,7 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     expect(response.status).toBe(500);
     expect(data.success).toBe(false);
     expect(data.error).toBe('Failed to send SMS');
-    expect(data.details).toBe('Twilio object message');
+    expect(data.details).toBe('{"message":"Twilio object message"}');
   });
 
   it('should handle Twilio error with object without message property', async () => {
@@ -630,7 +661,7 @@ describe('SMS 2FA API Routes - Extra Coverage', () => {
     const response = await callPOST(request as unknown as NextRequest);
     const data = await response.json();
     expect(response.status).toBe(400);
-    expect(data.success).toBe(undefined);
+    expect(data.success).toBe(false);
     expect(data.error).toBe('Phone required');
   });
 
