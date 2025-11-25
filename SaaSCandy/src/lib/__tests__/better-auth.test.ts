@@ -50,7 +50,7 @@ describe('better-auth bootstrap', () => {
           user,
           token,
         }: SendVerificationArgs) => {
-          const verificationUrl = `${process.env.BETTER_AUTH_URL}/email-verification?token=${token}`;
+          const verificationUrl = `${process.env.BETTER_AUTH_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.BETTER_AUTH_URL}/signin`;
           await sg.default.send({
             from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
             to: user.email,

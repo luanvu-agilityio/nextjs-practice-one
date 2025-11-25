@@ -332,6 +332,7 @@ export const updateProfile = (data: { name?: string; email?: string }) => {
  * Verify email with token
  *
  * Validates token format and adds timeout to prevent hanging requests.
+ * Calls Better Auth's verify-email endpoint through the catch-all route.
  *
  * @example
  * ```typescript
@@ -348,9 +349,7 @@ export const verifyEmail = (token: string) =>
   pipe(
     validateToken(token),
     Effect.flatMap(validToken =>
-      http.get<ApiResponse>(
-        `${API_ROUTES.AUTH.VERIFY_EMAIL}?token=${validToken}`
-      )
+      http.get<ApiResponse>(`/api/auth/verify-email?token=${validToken}`)
     ),
     // Add timeout to prevent hanging on slow connections (throws TimeoutException)
     Effect.timeout('10 seconds'),
