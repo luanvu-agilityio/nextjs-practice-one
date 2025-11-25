@@ -21,7 +21,6 @@ export const getAllPosts = async (): Promise<BlogPost[]> => {
   } catch (error) {
     // Log and return empty array on error to keep callers resilient
     // This matches the original helper contract in the tests.
-    // eslint-disable-next-line no-console
     console.error('Error fetching posts:', error);
     return [];
   }

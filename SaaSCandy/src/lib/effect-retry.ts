@@ -8,11 +8,7 @@ export interface RetryOptions {
   readonly timeoutMs?: number;
 }
 
-const exponentialJitterSchedule = (
-  maxRetries: number,
-  baseMs: number,
-  _jitter: number
-) => {
+const exponentialJitterSchedule = (maxRetries: number, baseMs: number) => {
   // Build a schedule: exponential(base) -> jitter -> recurs(n)
   const exp = Schedule.exponential(`${baseMs} millis`);
   const rec = Schedule.recurs(maxRetries);
@@ -31,14 +27,9 @@ export function runWithRetryAndTimeout<Out, Err = never, Env = never>(
   effect: Effect.Effect<Out, Err, Env>,
   opts?: RetryOptions
 ): Effect.Effect<Out, Err | Error, Env> {
-  const {
-    maxRetries = 4,
-    baseDelayMs = 200,
-    jitter = 0.2,
-    timeoutMs = 5000,
-  } = opts ?? {};
+  const { maxRetries = 4, baseDelayMs = 200, timeoutMs = 5000 } = opts ?? {};
 
-  const schedule = exponentialJitterSchedule(maxRetries, baseDelayMs, jitter);
+  const schedule = exponentialJitterSchedule(maxRetries, baseDelayMs);
 
   // Apply timeout (library operator accepts Duration input like "5000 millis")
   const timed = pipe(effect, Effect.timeout(`${timeoutMs} millis`));

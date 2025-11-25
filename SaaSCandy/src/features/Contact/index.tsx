@@ -41,7 +41,7 @@ const ContactPageContent = () => {
     },
   });
 
-  const onSubmit = async (_data: ContactFormData) => {
+  const onSubmit = async () => {
     setIsSubmitting(true);
 
     try {

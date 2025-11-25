@@ -217,9 +217,8 @@ jest.mock('@/utils/social-auth', () => ({
 // Mock apiEffects used for SMS 2FA (normalize to return Effects)
 jest.mock('@/service/HttpClient/helper', () => ({
   apiEffects: {
-    send2FASMS: (..._args: unknown[]) => Effect.succeed({ success: true }),
-    verify2FASMS: (..._args: unknown[]) =>
-      Effect.succeed({ success: true, data: true }),
+    send2FASMS: () => Effect.succeed({ success: true }),
+    verify2FASMS: () => Effect.succeed({ success: true, data: true }),
   },
 }));
 

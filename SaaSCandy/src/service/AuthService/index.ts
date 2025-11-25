@@ -1,5 +1,5 @@
 // Effect
-import { Effect, pipe, Schedule, Option } from 'effect';
+import { Effect, pipe, Schedule } from 'effect';
 
 // Client HTTP
 import { http } from '@/service/HttpClient';

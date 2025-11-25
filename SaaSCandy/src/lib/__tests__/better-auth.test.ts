@@ -5,7 +5,7 @@ jest.mock('@sendgrid/mail', () => ({
 }));
 
 jest.mock('better-auth', () => ({
-  betterAuth: jest.fn((_opts: unknown) => ({
+  betterAuth: jest.fn(() => ({
     $Infer: { Session: { user: { id: 'x' } } },
   })),
 }));

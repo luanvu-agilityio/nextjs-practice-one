@@ -1,5 +1,3 @@
-import type { Twilio } from 'twilio';
-
 // Mock the external twilio package (default export) with an attached create mock
 jest.mock('twilio', () => {
   const createMock = jest.fn();
@@ -40,7 +38,7 @@ describe('twilio helpers', () => {
 
   it('getClientFromEnv returns a client when credentials provided', () => {
     const client = getClientFromEnv('SID', 'TOKEN') as unknown as {
-      messages: { create: Function };
+      messages: { create: (...args: unknown[]) => unknown };
     };
     expect(client).not.toBeNull();
     expect(typeof client.messages.create).toBe('function');

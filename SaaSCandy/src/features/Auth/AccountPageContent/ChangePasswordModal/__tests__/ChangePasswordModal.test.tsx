@@ -21,7 +21,7 @@ jest.mock('@/components/ui', () => {
       }) => { field: Record<string, unknown> }
     )({ name, control });
     // strip non-DOM props to avoid React warnings
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { showPasswordToggle, ...restProps } = rest as Record<
       string,
       unknown

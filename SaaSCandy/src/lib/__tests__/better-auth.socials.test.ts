@@ -10,8 +10,9 @@ describe('better-auth social providers branch', () => {
     process.env.GITHUB_ID = 'github-id';
 
     const sgMock = { setApiKey: jest.fn(), send: jest.fn() };
-    const betterAuthMock = jest.fn((_opts: unknown) => ({
+    const betterAuthMock = jest.fn((opts: unknown) => ({
       $Infer: { Session: {} },
+      ...(opts || {}),
     }));
 
     jest.doMock('@sendgrid/mail', () => sgMock);

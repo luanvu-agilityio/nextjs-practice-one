@@ -12,11 +12,9 @@ global.fetch = jest.fn();
 import { TextEncoder, TextDecoder } from 'util';
 
 if (typeof global.TextEncoder === 'undefined')
-  // @ts-ignore: Node's TextEncoder type is compatible enough for tests
-  global.TextEncoder = TextEncoder;
+  global.TextEncoder = TextEncoder as typeof global.TextEncoder;
 if (typeof global.TextDecoder === 'undefined')
-  // @ts-ignore: Node's TextDecoder type may differ from lib.dom, ignore for tests
-  global.TextDecoder = TextDecoder;
+  global.TextDecoder = TextDecoder as typeof global.TextDecoder;
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({

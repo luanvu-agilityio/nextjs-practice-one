@@ -8,7 +8,7 @@ describe('auth-client coverage smoke', () => {
     // without pulling in the full better-auth runtime.
     jest.doMock('better-auth/react', () => {
       return {
-        createAuthClient: (_opts: unknown) => ({
+        createAuthClient: () => ({
           signIn: jest.fn(),
           signUp: jest.fn(),
           signOut: jest.fn(),
