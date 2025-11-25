@@ -130,11 +130,10 @@ describe('middleware', () => {
     expect(MiddlewareModule.config).toBeDefined();
   });
 
-  it('exports runtime (loaded after mocks)', () => {
+  it('exports runtime (loaded after mocks)', async () => {
     // load the module in isolation after jest mocks so the runtime export is executed
-    jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const mod = require('../middleware');
+    await jest.isolateModules(async () => {
+      const mod = await import('../middleware');
       expect(mod.runtime).toBeDefined();
     });
   });

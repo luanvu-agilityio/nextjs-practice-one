@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/common';
+import { Skeleton } from '@/components/ui';
 
 const AccountLoading = () => {
   return (

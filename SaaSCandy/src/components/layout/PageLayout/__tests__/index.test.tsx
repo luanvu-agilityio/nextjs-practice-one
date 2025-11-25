@@ -43,6 +43,7 @@ describe('PageLayout - Snapshot Tests', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');
@@ -87,6 +88,7 @@ describe('PageLayout - Interactive Tests', () => {
     mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');
@@ -265,6 +267,7 @@ describe('PageLayout - Interactive Tests', () => {
         },
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');

@@ -1,13 +1,13 @@
 'use client';
 
 import {
+  FAQSection,
+  HeroSection,
+  JoinUsSection,
   PortfolioPageContent,
   PricingPageContent,
   ServicePageContent,
-} from '@/components/pages';
-
-import HeroSection from '@/components/HeroSection';
-import { FAQSection, JoinUsSection } from '@/components';
+} from '@/features';
 
 const HomePage = () => {
   return (

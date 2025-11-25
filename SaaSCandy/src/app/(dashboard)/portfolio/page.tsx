@@ -1,5 +1,5 @@
 import { PageLayout } from '@/components/layout';
-import { PortfolioPageContent } from '@/components/pages';
+import { PortfolioPageContent } from '@/features';
 
 export const metadata = {
   title: 'Pricing Plans | SaaSCandy',

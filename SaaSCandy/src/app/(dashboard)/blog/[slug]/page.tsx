@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 // Components
-import { BlogPostDetailPageContent } from '@/components/pages';
+import { BlogPostDetailPageContent } from '@/features';
 
 // Helpers
 import { getPostBySlug } from '@/helpers';

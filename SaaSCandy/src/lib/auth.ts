@@ -13,9 +13,15 @@
  *   await signOutAction();
  */
 import { redirect } from 'next/navigation';
-import { authApi } from '@/api';
+
+// Constants
 import { ROUTES } from '@/constants';
+
+// Types
 import type { AuthState } from '@/types';
+
+// API
+import { authApi } from '@/api';
 
 export async function signInAction(formData: FormData): Promise<AuthState> {
   const email = formData.get('email') as string;

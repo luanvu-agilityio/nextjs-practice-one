@@ -10,10 +10,9 @@ import { User } from 'lucide-react';
 import { LogoIcon, ThemeSwitcherIcon } from '@/icons';
 
 // Components
-import { Heading, Typography, Button } from '@/components/common';
-import { IconButton } from '@/components/common/IconButton';
-import Navbar from '@/components/NavBar';
-import { UserMenu } from '@/components/UserMenu';
+import { Heading, Typography, Button, Navbar } from '@/components/ui';
+import { IconButton } from '@/components/ui/IconButton';
+import { UserMenu } from '@/features/Auth';
 
 import {
   Breadcrumb,
@@ -22,7 +21,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
-} from '@/components/common/Breadcrumb';
+} from '@/components/ui/Breadcrumb';
 
 // Utils
 import { extractBreadcrumbs } from '@/utils';

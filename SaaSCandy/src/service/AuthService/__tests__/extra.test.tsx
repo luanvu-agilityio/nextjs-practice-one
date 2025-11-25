@@ -1,4 +1,14 @@
 import { send2FACode, resetPassword, verifyEmail } from '../index';
+import { Effect } from 'effect';
+import type { ApiResponse } from '../index';
+import { AppError } from '@/lib/errors';
+import { runAuthEffect } from '../helpers';
+
+function run<T>(effect: Effect.Effect<T, unknown, unknown>): Promise<T> {
+  return runAuthEffect(
+    effect as unknown as Effect.Effect<unknown, AppError, unknown>
+  ) as Promise<T>;
+}
 
 describe('AuthService - extra branches', () => {
   const origFetch = global.fetch;
@@ -9,35 +19,36 @@ describe('AuthService - extra branches', () => {
   });
 
   it('send2FACode returns error when server responds not ok with message', async () => {
-    global.fetch = jest.fn().mockResolvedValueOnce({
+    // Mock for retries (initial + 2 retries = 3 responses)
+    global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 400,
       json: async () => ({ message: 'invalid' }),
       statusText: 'Bad',
     } as unknown as Response);
 
-    const res = await send2FACode('a@a.com', 'p');
-    expect(res.success).toBe(false);
-    expect(res.error).toBe('invalid');
+    // Use valid password (6+ chars) to pass validation and reach API level
+    const res = (await run(send2FACode('a@a.com', 'password123'))) as
+      | ApiResponse
+      | undefined;
+    expect(res && res.success).toBe(false);
+    expect(res && res.error).toEqual(expect.stringContaining('invalid'));
   });
 
-  it('resetPassword sends empty token when token is nullish', async () => {
-    let calledBody: string | undefined;
+  it('resetPassword validates token and password', async () => {
+    // Test that validation catches empty token
+    const emptyTokenRes = (await run(
+      resetPassword('', 'password123')
+    )) as ApiResponse;
+    expect(emptyTokenRes.success).toBe(false);
+    expect(emptyTokenRes.error).toContain('Token is required');
 
-    global.fetch = jest.fn().mockImplementation(async (_url, options) => {
-      calledBody = (options as RequestInit).body as string;
-      return {
-        ok: true,
-        json: async () => ({ data: {} }),
-      } as unknown as Response;
-    });
-
-    await resetPassword(null as unknown as string, 'newpass');
-
-    expect(calledBody).toBeDefined();
-    const parsed = JSON.parse(calledBody as string);
-    expect(parsed.token).toBe('');
-    expect(parsed.newPassword).toBe('newpass');
+    // Test that validation catches short password
+    const shortPassRes = (await run(
+      resetPassword('valid-token', 'short')
+    )) as ApiResponse;
+    expect(shortPassRes.success).toBe(false);
+    expect(shortPassRes.error).toContain('at least 6 characters');
   });
 
   it('verifyEmail calls the API with token query param', async () => {
@@ -50,7 +61,7 @@ describe('AuthService - extra branches', () => {
       } as unknown as Response;
     });
 
-    await verifyEmail('abc-token');
+    await run(verifyEmail('abc-token'));
     expect(calledUrl).toContain('?token=abc-token');
   });
 
@@ -61,36 +72,53 @@ describe('AuthService - extra branches', () => {
       json: async () => ({ data: {} }),
     } as unknown as Response);
 
-    const okRes = await (
-      await import('../index')
-    ).requestPasswordReset('a@b.com');
-    expect(okRes.success).toBe(true);
+    const okRes = (await run(
+      (await import('../index')).requestPasswordReset('a@b.com')
+    )) as ApiResponse | undefined;
+    expect(okRes && okRes.success).toBe(true);
 
-    // error with message fallback
-    global.fetch = jest.fn().mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      json: async () => ({ message: 'invalid email' }),
-    } as unknown as Response);
+    // error with message fallback - need retries (initial + 2 retries = 3 mocks)
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: 'invalid email' }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: 'invalid email' }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ message: 'invalid email' }),
+      } as unknown as Response);
 
-    const errRes = await (
-      await import('../index')
-    ).requestPasswordReset('a@b.com');
-    expect(errRes.success).toBe(false);
-    expect(errRes.error).toBe('invalid email');
+    const errRes = (await run(
+      (await import('../index')).requestPasswordReset('a@b.com')
+    )) as ApiResponse | undefined;
+    expect(errRes && errRes.success).toBe(false);
+    expect(errRes && errRes.error).toEqual(
+      expect.stringContaining('invalid email')
+    );
   });
 
   it('apiRequest uses fallback "Request failed" when response has no message/error', async () => {
-    // simulate a failing response with empty object body
-    global.fetch = jest.fn().mockResolvedValueOnce({
+    // simulate a failing response with empty object body - need 3 mocks for retries
+    global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 400,
       json: async () => ({}),
     } as unknown as Response);
 
-    const res = await (await import('../index')).send2FACode('x@x.com', 'p');
-    expect(res.success).toBe(false);
-    expect(res.error).toBe('Request failed');
+    // Use valid password to pass validation
+    const res = (await run(
+      (await import('../index')).send2FACode('x@x.com', 'password123')
+    )) as ApiResponse | undefined;
+    expect(res && res.success).toBe(false);
+    expect(res && res.error).toEqual(expect.stringContaining('Request failed'));
   });
 
   it('apiRequest returns nested data.data when present', async () => {
@@ -99,9 +127,12 @@ describe('AuthService - extra branches', () => {
       json: async () => ({ data: { nested: true } }),
     } as unknown as Response);
 
-    const res = await (await import('../index')).send2FACode('x@x.com', 'p');
-    expect(res.success).toBe(true);
-    expect(res.data).toEqual({ nested: true });
+    // Use valid password to pass validation
+    const res = (await run(
+      (await import('../index')).send2FACode('x@x.com', 'password123')
+    )) as ApiResponse | undefined;
+    expect(res && res.success).toBe(true);
+    expect(res && res.data).toEqual({ nested: true });
   });
 
   it('apiRequest default options param is used when omitted', async () => {

@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import AccountPage, * as AccountModule from '@/app/(auth)/account/page';
 
 // Mock the component
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   AccountPageContent: () => (
     <div data-testid='account-page-content'>Account Page Content</div>
   ),

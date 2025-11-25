@@ -2,10 +2,10 @@ import { notFound } from 'next/navigation';
 
 // Components
 import { PageLayout } from '@/components/layout';
-import { ServiceDetailPageContent } from '@/components/pages';
 
 // Helpers
 import { getAllServices, getServiceBySlug } from '@/helpers';
+import { ServiceDetailPageContent } from '@/features';
 
 interface ServicePageProps {
   params: {

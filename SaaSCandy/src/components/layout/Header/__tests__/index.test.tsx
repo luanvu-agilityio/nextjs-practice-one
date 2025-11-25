@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useSession } from '@/lib/auth-client';
 // Mock UserMenu so authenticated branch is easy to assert
-jest.mock('@/components/UserMenu', () => ({
+jest.mock('@/features/Auth', () => ({
   UserMenu: () => <div data-testid='user-menu'>user-menu</div>,
 }));
 import { Header } from '@/components/layout/Header';
@@ -28,6 +28,7 @@ describe('Header - Interactive Tests', () => {
     return mockUseSession.mockReturnValue({
       data: null,
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');
@@ -99,6 +100,7 @@ describe('Header - Interactive Tests', () => {
         },
       },
       isPending: false,
+      isRefetching: false,
       error: null,
       refetch: function (): void {
         throw new Error('Function not implemented.');

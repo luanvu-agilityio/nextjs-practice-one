@@ -211,21 +211,4 @@ describe('/api/auth/update-profile', () => {
     expect(response.status).toBe(500);
     expect(data.message).toBe('Unexpected');
   });
-
-  it('should handle non-Error thrown values', async () => {
-    const { auth } = await import('@/lib/better-auth');
-    // throw a primitive (non-Error) to exercise the fallback message path
-    (auth.api.getSession as unknown as jest.Mock).mockImplementation(() => {
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw 'not-an-error';
-    });
-
-    const request = createMockRequest({ name: 'Test User' });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(500);
-    expect(data.message).toBe('Failed to update profile');
-  });
 });

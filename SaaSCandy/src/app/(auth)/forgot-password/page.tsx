@@ -1,4 +1,4 @@
-import { ForgotPasswordPageContent } from '@/components';
+import { ForgotPasswordPageContent } from '@/features';
 
 const ForgotPasswordPage = () => {
   return (

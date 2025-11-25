@@ -5,7 +5,7 @@ import PortfolioPage from '@/app/(dashboard)/portfolio/page';
 import PricingPage from '@/app/(dashboard)/pricing/page';
 import ServicePage from '@/app/(dashboard)/services/page';
 
-jest.mock('@/components/layout/PageLayout', () => ({
+jest.mock('@/components/layout', () => ({
   PageLayout: ({
     title,
     subtitle,
@@ -25,7 +25,7 @@ jest.mock('@/components/layout/PageLayout', () => ({
   },
 }));
 
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   ContactPageContent: () => <div data-testid='contact-page'>Contact Form</div>,
   DocsContent: () => <div data-testid='docs-content'>Docs Content</div>,
   PortfolioPageContent: () => (
@@ -56,6 +56,8 @@ describe('Docs Page', () => {
     expect(screen.getByText('Docs')).toBeInTheDocument();
     expect(screen.getByText('Check our intensive docs')).toBeInTheDocument();
     expect(screen.getByTestId('docs-content')).toBeInTheDocument();
+
+    // ensure metadata export is exercised so coverage counts the statement
     expect(DocsModule.metadata).toBeDefined();
   });
 });

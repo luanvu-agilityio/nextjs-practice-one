@@ -15,7 +15,7 @@
 │     ├─ No password? → Error: "Use social login"             │
 │     └─ Has password? → Continue                              │
 │                                                              │
-│  3. Verify password (bcrypt compare)                         │
+│  3. Verify password                       │
 │     ├─ Invalid? → Error: "Invalid credentials"              │
 │     └─ Valid? → Continue                                     │
 │                                                              │

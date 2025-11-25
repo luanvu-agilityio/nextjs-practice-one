@@ -4,7 +4,7 @@ import { useState, JSX, memo } from 'react';
 import Link from 'next/link';
 
 // Components
-import { Button, Heading, IconButton, Typography } from '@/components/common';
+import { Button, Heading, IconButton, Typography } from '@/components/ui';
 
 // Icons
 import { LogoIcon } from '@/icons/Logo';

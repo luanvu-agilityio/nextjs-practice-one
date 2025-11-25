@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Components
-import { Button, Heading, Typography, Section } from '@/components/common';
+import { Button, Heading, Typography, Section } from '@/components/ui';
 
 interface ErrorProps {
   error: Error & { digest?: string };

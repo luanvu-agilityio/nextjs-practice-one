@@ -1,4 +1,4 @@
-import { SignUpPageContent } from '@/components/pages';
+import { SignUpPageContent } from '@/features';
 
 const SignUpPage = () => {
   return (

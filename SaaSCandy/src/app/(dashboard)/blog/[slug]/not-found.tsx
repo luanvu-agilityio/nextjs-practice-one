@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 // Components
-import { Button, Heading, Typography, Section } from '@/components/common';
+import { Button, Heading, Typography, Section } from '@/components/ui';
 
 const BlogPostNotFound = () => {
   return (

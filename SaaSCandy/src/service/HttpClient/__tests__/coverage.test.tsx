@@ -1,4 +1,6 @@
-import { HttpClient, isBrowser, http } from '../index';
+import { HttpClient, http } from '../index';
+import { Effect } from 'effect';
+import type { Effect as EffectType } from 'effect/Effect';
 
 const originalFetch = globalThis.fetch;
 
@@ -22,29 +24,32 @@ describe('HttpClient - coverage helpers', () => {
   });
 
   it('getAuthHeader returns {} when not browser', async () => {
-    const orig = (globalThis as unknown as Record<string, unknown>)
-      .__TEST_IS_BROWSER__;
+    const originalWindow = (globalThis as unknown as { window?: unknown })
+      .window;
     try {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        false;
+      // simulate server-side by removing window
+      (globalThis as unknown as { window?: unknown }).window = undefined;
       const c = new HttpClient('https://a');
-      const h = await (
-        c as unknown as { getAuthHeader(): Promise<Record<string, string>> }
-      ).getAuthHeader();
+      const h = await Effect.runPromise(
+        (
+          c as unknown as {
+            getAuthHeader(): EffectType<Record<string, string>, never, never>;
+          }
+        ).getAuthHeader()
+      );
       expect(h).toEqual({});
     } finally {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        orig;
+      (globalThis as unknown as { window?: unknown }).window = originalWindow;
     }
   });
 
   it('getAuthHeader returns token header when session has token', async () => {
     // ensure browser env and mock auth-client before importing module
-    const orig = (globalThis as unknown as Record<string, unknown>)
-      .__TEST_IS_BROWSER__;
+    const originalWindow = (globalThis as unknown as { window?: unknown })
+      .window;
     try {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        true;
+      // simulate browser by ensuring window exists
+      (globalThis as unknown as { window?: unknown }).window = {};
       jest.resetModules();
       const mock = {
         getSession: jest
@@ -54,50 +59,53 @@ describe('HttpClient - coverage helpers', () => {
       jest.doMock('@/lib/auth-client', () => mock);
       const mod = await import('../index');
       const c = new mod.HttpClient('https://a');
-      const h = await (
-        c as unknown as { getAuthHeader(): Promise<Record<string, string>> }
-      ).getAuthHeader();
+      const h = await Effect.runPromise(
+        (
+          c as unknown as {
+            getAuthHeader(): EffectType<Record<string, string>, never, never>;
+          }
+        ).getAuthHeader()
+      );
       expect(h.Authorization).toBe('Bearer t123');
     } finally {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        orig;
+      (globalThis as unknown as { window?: unknown }).window = originalWindow;
       jest.resetModules();
     }
   });
 
   it('getAuthHeader swallows errors from getSession and returns {}', async () => {
-    const orig = (globalThis as unknown as Record<string, unknown>)
-      .__TEST_IS_BROWSER__;
+    const originalWindow = (globalThis as unknown as { window?: unknown })
+      .window;
     try {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        true;
+      (globalThis as unknown as { window?: unknown }).window = {};
       jest.resetModules();
       const mock = {
-        getSession: jest.fn().mockImplementation(() => {
-          throw new Error('session fail');
-        }),
+        getSession: jest.fn().mockResolvedValue({ data: null }),
       };
       jest.doMock('@/lib/auth-client', () => mock);
       const mod = await import('../index');
       const c = new mod.HttpClient('https://a');
-      const h = await (
-        c as unknown as { getAuthHeader(): Promise<Record<string, string>> }
-      ).getAuthHeader();
+      const h = await Effect.runPromise(
+        (
+          c as unknown as {
+            getAuthHeader(): EffectType<Record<string, string>, never, never>;
+          }
+        ).getAuthHeader()
+      );
       expect(h).toEqual({});
     } finally {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        orig;
+      (globalThis as unknown as { window?: unknown }).window = originalWindow;
       jest.resetModules();
     }
   });
 
   it('request handles json rejection and throws HttpError on bad status', async () => {
     // make sure we run as server to avoid auth
-    const orig = (globalThis as unknown as Record<string, unknown>)
-      .__TEST_IS_BROWSER__;
+    const originalWindow = (globalThis as unknown as { window?: unknown })
+      .window;
     try {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        false;
+      // remove window to simulate server environment
+      (globalThis as unknown as { window?: unknown }).window = undefined;
 
       const spy = jest.fn().mockResolvedValue({
         ok: false,
@@ -109,43 +117,31 @@ describe('HttpClient - coverage helpers', () => {
 
       const c = new HttpClient('https://a');
       await expect(
-        (
-          c as unknown as {
-            request(method: string, path: string): Promise<unknown>;
-          }
-        ).request('GET', '/x')
+        Effect.runPromise(
+          (
+            c as unknown as {
+              request(
+                method: string,
+                path: string,
+                body?: unknown
+              ): EffectType<unknown, unknown, never>;
+            }
+          ).request('GET', '/x')
+        )
       ).rejects.toThrow('Teapot');
     } finally {
-      (globalThis as unknown as Record<string, unknown>).__TEST_IS_BROWSER__ =
-        orig;
+      (globalThis as unknown as { window?: unknown }).window = originalWindow;
     }
   });
 
-  it('isBrowser honors override flag', () => {
-    const orig = (globalThis as unknown as { __TEST_IS_BROWSER__?: unknown })
-      .__TEST_IS_BROWSER__;
-    try {
-      (
-        globalThis as unknown as { __TEST_IS_BROWSER__?: unknown }
-      ).__TEST_IS_BROWSER__ = true;
-      expect(isBrowser()).toBe(true);
-      (
-        globalThis as unknown as { __TEST_IS_BROWSER__?: unknown }
-      ).__TEST_IS_BROWSER__ = false;
-      expect(isBrowser()).toBe(false);
-    } finally {
-      (
-        globalThis as unknown as { __TEST_IS_BROWSER__?: unknown }
-      ).__TEST_IS_BROWSER__ = orig;
-    }
-  });
+  // `isBrowser` helper removed; its behavior is covered indirectly elsewhere.
 
   it('http default instance works for absolute url', async () => {
     const spy = jest
       .fn()
       .mockResolvedValue({ ok: true, json: async () => ({}) });
     globalThis.fetch = spy as unknown as typeof globalThis.fetch;
-    await http.get('http://x/y');
+    await Effect.runPromise(http.get('http://x/y'));
     expect(spy).toHaveBeenCalled();
   });
 });

@@ -1,13 +1,22 @@
+import { AppError } from '@/lib/errors';
 import {
   apiRequest,
   send2FACode,
-  verify2FACode,
   changePassword,
   updateProfile,
   verifyEmail,
   requestPasswordReset,
   resetPassword,
 } from '../index';
+import type { ApiResponse } from '../index';
+import { Effect } from 'effect';
+import { runAuthEffect } from '../helpers';
+
+function run<T>(effect: Effect.Effect<T, unknown, unknown>): Promise<T> {
+  return runAuthEffect(
+    effect as unknown as Effect.Effect<unknown, AppError, unknown>
+  ) as Promise<T>;
+}
 
 const originalFetch = globalThis.fetch;
 
@@ -56,32 +65,29 @@ describe('AuthService - coverage helpers', () => {
     (globalThis.fetch as jest.Mock) = jest.fn().mockImplementationOnce(() => {
       throw new Error('boom');
     });
-    const res1 = await send2FACode('a@b.com', 'p');
-    expect(res1.success).toBe(false);
+    const res1 = (await run(send2FACode('a@b.com', 'p'))) as
+      | ApiResponse
+      | undefined;
+    expect(res1 && res1.success).toBe(false);
   });
 
   it('exports and helper flows: requestPasswordReset and resetPassword', async () => {
     globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ data: {} }),
+      json: async () => ({ success: true, data: {} }),
     } as unknown as Response);
 
-    const ok = await requestPasswordReset('a@b.com');
-    expect(ok.success).toBe(true);
+    const ok = (await run(requestPasswordReset('a@b.com'))) as
+      | ApiResponse
+      | undefined;
+    expect(ok && ok.success).toBe(true);
 
-    // resetPassword with nullish token should send empty token
-    let body: string | undefined;
-    globalThis.fetch = jest.fn().mockImplementation(async (_url, init) => {
-      body = (init as RequestInit).body as string;
-      return {
-        ok: true,
-        json: async () => ({ data: {} }),
-      } as unknown as Response;
-    });
-    await resetPassword(null as unknown as string, 'np');
-    expect(body).toBeDefined();
-    const parsed = JSON.parse(body as string);
-    expect(parsed.token).toBe('');
+    // resetPassword validation prevents null token from reaching API
+    const result = await run(
+      resetPassword(null as unknown as string, 'password123')
+    );
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Token is required');
   });
 
   it('verifyEmail calls with token query', async () => {
@@ -90,10 +96,10 @@ describe('AuthService - coverage helpers', () => {
       url = String(u);
       return {
         ok: true,
-        json: async () => ({ data: {} }),
+        json: async () => ({ success: true, data: {} }),
       } as unknown as Response;
     });
-    await verifyEmail('tok-1');
+    await run(verifyEmail('tok-1'));
     expect(url).toContain('?token=tok-1');
   });
 
@@ -103,10 +109,15 @@ describe('AuthService - coverage helpers', () => {
       json: async () => ({ data: {} }),
     } as unknown as Response);
 
-    const ch = await changePassword('a', 'b');
-    expect(ch.success).toBe(true);
+    // Use valid passwords (6+ chars, and different from each other)
+    const ch = (await run(changePassword('password123', 'newpass456'))) as
+      | ApiResponse
+      | undefined;
+    expect(ch && ch.success).toBe(true);
 
-    const up = await updateProfile({ name: 'x' });
-    expect(up.success).toBe(true);
+    const up = (await run(updateProfile({ name: 'x' }))) as
+      | ApiResponse
+      | undefined;
+    expect(up && up.success).toBe(true);
   });
 });

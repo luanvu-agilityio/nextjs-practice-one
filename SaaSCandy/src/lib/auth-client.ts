@@ -11,10 +11,21 @@
 import { createAuthClient } from 'better-auth/react';
 import { twoFactorClient } from 'better-auth/client/plugins';
 
-export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  plugins: [twoFactorClient()],
-});
+/**
+ * Create an `authClient`. Tests can call `makeAuthClient` with an
+ * `overrideBaseURL` to avoid module-level environment coupling.
+ */
+export function makeAuthClient(overrideBaseURL?: string) {
+  return createAuthClient({
+    baseURL:
+      overrideBaseURL ??
+      process.env.NEXT_PUBLIC_APP_URL ??
+      'http://localhost:3000',
+    plugins: [twoFactorClient()],
+  });
+}
+
+export const authClient = makeAuthClient();
 
 export const {
   signIn,
@@ -25,3 +36,18 @@ export const {
   updateUser,
   twoFactor: { enable: enableTwoFactor, disable: disableTwoFactor, verifyOtp },
 } = authClient;
+
+/**
+ * Helper to return a normalized access token for client code.
+ */
+export async function getAccessToken(): Promise<string | null> {
+  try {
+    const s = await getSession();
+    return (
+      (s as unknown as { data?: { session?: { token?: string } } })?.data
+        ?.session?.token ?? null
+    );
+  } catch {
+    return null;
+  }
+}

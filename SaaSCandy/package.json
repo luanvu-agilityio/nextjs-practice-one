@@ -20,6 +20,7 @@
     "vercel-coverage-build": "pnpm run build-coverage"
   },
   "dependencies": {
+    "@effect/schema": "^0.75.5",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
     "@node-rs/argon2": "^2.0.2",
@@ -40,7 +41,7 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.6",
-    "libphonenumber-js": "^1.12.25",
+    "effect": "^3.19.4",
     "lucide-react": "^0.542.0",
     "next": "15.5.4",
     "postcss": "^8.5.6",
@@ -59,6 +60,7 @@
     "@chromatic-com/storybook": "4.1.1",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@effect/language-service": "^0.56.0",
     "@eslint/eslintrc": "^3.3.1",
     "@storybook/addon-a11y": "9.1.10",
     "@storybook/addon-docs": "9.1.10",

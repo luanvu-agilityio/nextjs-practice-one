@@ -12,38 +12,60 @@
  * Response: { success: boolean, message: string }
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { Effect } from 'effect';
 import sgMail from '@sendgrid/mail';
-import { TwoFactorEmail } from '@/constants/email-template';
-import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
+
+// DB
+import { db } from '@/lib/db';
+
+// Schema
 import * as schema from '@/lib/db/schema';
+
+// Constants
+import { TwoFactorEmail } from '@/constants/email-template';
+
+// Auth
 import { auth } from '@/lib/better-auth';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+// Config
+import { getConfig } from '@/lib/config';
 
 // Generate random 6-digit code
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
+/**
+ * Handles the POST request for sending 2FA code.
+ * Exported for testing purposes.
+ */
+export async function handleSend2FACode(
+  request: NextRequest,
+  config: { SENDGRID_API_KEY?: string; SENDGRID_FROM_EMAIL?: string }
+) {
+  // Initialize SendGrid if API key is provided
+  if (config.SENDGRID_API_KEY) {
+    sgMail.setApiKey(config.SENDGRID_API_KEY);
+  }
+
+  const program = Effect.gen(function* () {
+    const body = yield* Effect.promise(() => request.json());
     const { email, password } = body;
 
     // Validation
     if (!email || !password) {
       return NextResponse.json(
-        { message: 'Email and password are required' },
+        { success: false, message: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    const signInResult = await auth.api.signInEmail({
-      body: { email, password },
-    });
+    const signInResult = yield* Effect.promise(() =>
+      auth.api.signInEmail({ body: { email, password } })
+    );
 
-    // If sign-in fails, return error
+    // If sign-in fails, return error response
     if (!signInResult?.user) {
       return NextResponse.json(
         { success: false, error: 'Invalid email or password' },
@@ -59,44 +81,52 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Delete any existing unverified codes for this user
-    await db
-      .delete(schema.emailVerificationCode)
-      .where(eq(schema.emailVerificationCode.userId, user.id));
+    yield* Effect.promise(() =>
+      db
+        .delete(schema.emailVerificationCode)
+        .where(eq(schema.emailVerificationCode.userId, user.id))
+    );
 
     // Store code in separate table (human-readable)
-    await db.insert(schema.emailVerificationCode).values({
-      id: crypto.randomUUID(),
-      userId: user.id,
-      email: user.email,
-      code,
-      tempPassword: password, // DEMO ONLY - store plain password
-      expiresAt,
-      verified: false,
-      attempts: '0',
-    });
+    yield* Effect.promise(() =>
+      db.insert(schema.emailVerificationCode).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        email: user.email,
+        code,
+        tempPassword: password, // DEMO ONLY - store plain password
+        expiresAt,
+        verified: false,
+        attempts: '0',
+      })
+    );
 
     // Send email with code
-    await sgMail.send({
-      from: process.env.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
-      to: email,
-      subject: 'Your SaaSCandy Login Code',
-      html: TwoFactorEmail({ code, userName: user.name || 'User' }),
-    });
+    yield* Effect.promise(() =>
+      sgMail.send({
+        from: config.SENDGRID_FROM_EMAIL || 'onboarding@sendgrid.dev',
+        to: email,
+        subject: 'Your SaaSCandy Login Code',
+        html: TwoFactorEmail({ code, userName: user.name || 'User' }),
+      })
+    );
 
     return NextResponse.json({
       success: true,
       message: 'Login code sent to your email',
     });
-  } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : 'Unknown error';
+  });
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to send login code',
-        error: errMessage,
-      },
-      { status: 500 }
-    );
+  try {
+    return await Effect.runPromise(program);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
+}
+
+// Load configuration and export POST handler
+export async function POST(request: NextRequest) {
+  const cfg = await getConfig();
+  return handleSend2FACode(request, cfg);
 }

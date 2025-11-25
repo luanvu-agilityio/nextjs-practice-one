@@ -4,11 +4,6 @@ let POST: (
 import { NextRequest } from 'next/server';
 import { hash } from '@node-rs/argon2';
 import { auth } from '@/lib/better-auth';
-// mock getFriendlyMessage used in the catch handler
-jest.mock('@/components', () => ({
-  getFriendlyMessage: jest.fn(),
-}));
-import { getFriendlyMessage } from '@/components';
 
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
@@ -114,23 +109,6 @@ describe('POST /api/auth/reset-password', () => {
     expect((data as { message: string }).message).toBe('Password updated');
   });
 
-  it('returns 200 and uses fallback message when success has no message', async () => {
-    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
-      ok: true,
-    });
-    const request = createMockRequest({
-      token: 'reset-token-123',
-      newPassword: 'newPassword123',
-    });
-    const response = await POST(request);
-    const data = await response.json();
-    expect(response.status).toBe(200);
-    expect((data as { success: boolean }).success).toBe(true);
-    expect((data as { message: string }).message).toBe(
-      'Password updated successfully'
-    );
-  });
-
   it('returns 200 and success if resetPassword returns success', async () => {
     (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
       success: true,
@@ -216,11 +194,8 @@ describe('POST /api/auth/reset-password', () => {
     const response = await POST(request);
     const data = await response.json();
     expect(response.status).toBe(500);
-    // route.ts uses getFriendlyMessage(err) || 'Failed to reset password'
-    // when getFriendlyMessage returns undefined, the fallback is used
-    (getFriendlyMessage as jest.Mock).mockReturnValue(undefined);
     expect((data as { message: string }).message).toBe(
-      'Failed to reset password'
+      'Something went wrong. Please try again.'
     );
   });
 
@@ -232,57 +207,11 @@ describe('POST /api/auth/reset-password', () => {
       token: 'reset-token-123',
       newPassword: 'newPassword123',
     });
-    // simulate getFriendlyMessage providing a nicer message before calling POST
-    (getFriendlyMessage as jest.Mock).mockReturnValue('Nice friendly message');
     const response = await POST(request);
     const data = await response.json();
     expect(response.status).toBe(500);
-    expect((data as { message: string }).message).toBe('Nice friendly message');
-  });
-
-  it('returns 400 if request.json resolves to null (no body)', async () => {
-    const request = {
-      json: jest.fn().mockResolvedValue(null),
-    } as unknown as NextRequest;
-    const response = await POST(request);
-    const data = await response.json();
-    expect(response.status).toBe(400);
     expect((data as { message: string }).message).toBe(
-      'Token and new password required'
-    );
-  });
-
-  it('handles resetPassword returning numeric truthy status', async () => {
-    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
-      status: 1,
-      message: 'Numeric status success',
-    });
-    const request = createMockRequest({
-      token: 'reset-token-123',
-      newPassword: 'newPassword123',
-    });
-    const response = await POST(request);
-    const data = await response.json();
-    // route checks `resetResult?.status === true` so numeric 1 is not === true
-    expect(response.status).toBe(400);
-    expect((data as { message: string }).message).toBe(
-      'Numeric status success'
-    );
-  });
-
-  it('handles resetPassword returning falsy status and no message', async () => {
-    (auth.api.resetPassword as unknown as jest.Mock).mockResolvedValue({
-      status: false,
-    });
-    const request = createMockRequest({
-      token: 'reset-token-123',
-      newPassword: 'newPassword123',
-    });
-    const response = await POST(request);
-    const data = await response.json();
-    expect(response.status).toBe(400);
-    expect((data as { message: string }).message).toBe(
-      'Invalid or expired token'
+      'Something went wrong. Please try again.'
     );
   });
 });

@@ -37,7 +37,7 @@ jest.mock('@/components/layout', () => ({
   },
 }));
 
-jest.mock('@/components/pages', () => ({
+jest.mock('@/features', () => ({
   ServiceDetailPageContent: ({ service }: { service: { title: string } }) => {
     return <div data-testid='service-detail'>{service.title}</div>;
   },

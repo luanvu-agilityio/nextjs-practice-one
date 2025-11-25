@@ -6,8 +6,8 @@ import { BlogPost } from '@/types/blog-post';
  * @param slug - The unique identifier for the blog post.
  * @returns The blog post object if found, otherwise null.
  */
-export const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
-  return await blogService.getPostBySlug(slug);
+export const getPostBySlug = (slug: string): Promise<BlogPost | null> => {
+  return blogService.getPostBySlug(slug);
 };
 
 /**
@@ -19,7 +19,10 @@ export const getAllPosts = async (): Promise<BlogPost[]> => {
   try {
     return await blogService.getAllPosts();
   } catch (error) {
-    console.error('Error fetching all posts:', error);
+    // Log and return empty array on error to keep callers resilient
+    // This matches the original helper contract in the tests.
+    // eslint-disable-next-line no-console
+    console.error('Error fetching posts:', error);
     return [];
   }
 };
@@ -43,6 +46,6 @@ export const getRecentPosts = async (
  * @param tag - The tag to filter blog posts by.
  * @returns An array of blog post objects that contain the specified tag.
  */
-export const getPostsByTag = async (tag: string): Promise<BlogPost[]> => {
-  return await blogService.getPostsByTag(tag);
+export const getPostsByTag = (tag: string): Promise<BlogPost[]> => {
+  return blogService.getPostsByTag(tag);
 };

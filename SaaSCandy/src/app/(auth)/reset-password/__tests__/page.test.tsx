@@ -3,7 +3,7 @@ import ResetPasswordPage from '../page';
 import React from 'react';
 
 // Mock the ResetPasswordPageContent component
-jest.mock('@/components/pages/ResetPasswordPageContent', () => {
+jest.mock('@/features/Auth/ResetPasswordPageContent', () => {
   // Simulate a delayed render to allow Suspense fallback to show
   return function MockResetPasswordPageContent() {
     const [show, setShow] = React.useState(false);

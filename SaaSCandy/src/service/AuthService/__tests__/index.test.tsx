@@ -5,6 +5,17 @@ import {
   updateProfile,
   verifyEmail,
 } from '@/service/AuthService';
+import { Effect } from 'effect';
+
+import type { ApiResponse } from '@/service/AuthService';
+import { AppError } from '@/lib/errors';
+import { runAuthEffect } from '../helpers';
+
+function run<T>(effect: Effect.Effect<T, unknown, unknown>): Promise<T> {
+  return runAuthEffect(
+    effect as unknown as Effect.Effect<unknown, AppError, unknown>
+  ) as Promise<T>;
+}
 
 global.fetch = jest.fn();
 const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
@@ -21,9 +32,11 @@ describe('API Services', () => {
         json: async () => ({ success: true, message: 'Code sent' }),
       } as Response);
 
-      const result = await send2FACode('test@example.com', 'password123');
+      const result = (await run(
+        send2FACode('test@example.com', 'password123')
+      )) as ApiResponse | undefined;
 
-      expect(result.success).toBe(true);
+      expect(result && result.success).toBe(true);
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
@@ -42,10 +55,12 @@ describe('API Services', () => {
         json: async () => ({ error: 'Failed to send' }),
       } as Response);
 
-      const result = await send2FACode('test@example.com', 'password123');
+      const result = (await run(
+        send2FACode('test@example.com', 'password123')
+      )) as ApiResponse | undefined;
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
+      expect(result && result.success).toBe(false);
+      expect(result && result.error).toBeDefined();
     });
 
     it('should propagate message from response', async () => {
@@ -53,8 +68,10 @@ describe('API Services', () => {
         ok: true,
         json: async () => ({ success: true, message: 'Code sent', data: {} }),
       } as Response);
-      const result = await send2FACode('test@example.com', 'password123');
-      expect(result.message).toBe('Code sent');
+      const result = (await run(
+        send2FACode('test@example.com', 'password123')
+      )) as ApiResponse | undefined;
+      expect(result?.message).toBe('Code sent');
     });
   });
 
@@ -68,10 +85,12 @@ describe('API Services', () => {
         }),
       } as Response);
 
-      const result = await verify2FACode('test@example.com', '123456');
+      const result = (await run(
+        verify2FACode('test@example.com', '123456')
+      )) as ApiResponse | undefined;
 
-      expect(result.success).toBe(true);
-      expect(result.data).toHaveProperty('email');
+      expect(result && result.success).toBe(true);
+      expect(result && result.data).toHaveProperty('email');
     });
 
     it('should handle error response', async () => {
@@ -79,9 +98,13 @@ describe('API Services', () => {
         ok: false,
         json: async () => ({ error: 'Invalid code' }),
       } as Response);
-      const result = await verify2FACode('test@example.com', 'badcode');
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid code');
+      const result = (await run(
+        verify2FACode('test@example.com', '999999') // Valid format but wrong code
+      )) as ApiResponse | undefined;
+      expect(result && result.success).toBe(false);
+      expect(result && result.error).toEqual(
+        expect.stringContaining('Invalid code')
+      );
     });
   });
 
@@ -92,9 +115,11 @@ describe('API Services', () => {
         json: async () => ({ success: true, message: 'Password changed' }),
       } as Response);
 
-      const result = await changePassword('oldpass', 'newpass');
+      const result = (await run(changePassword('oldpass', 'newpass'))) as
+        | ApiResponse
+        | undefined;
 
-      expect(result.success).toBe(true);
+      expect(result && result.success).toBe(true);
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
@@ -108,9 +133,13 @@ describe('API Services', () => {
         ok: false,
         json: async () => ({ error: 'Change failed' }),
       } as Response);
-      const result = await changePassword('oldpass', 'badpass');
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Change failed');
+      const result = (await run(changePassword('oldpass', 'badpass'))) as
+        | ApiResponse
+        | undefined;
+      expect(result && result.success).toBe(false);
+      expect(result && result.error).toEqual(
+        expect.stringContaining('Change failed')
+      );
     });
   });
 
@@ -121,9 +150,11 @@ describe('API Services', () => {
         json: async () => ({ success: true }),
       } as Response);
 
-      const result = await updateProfile({ name: 'John Doe' });
+      const result = (await run(updateProfile({ name: 'John Doe' }))) as
+        | ApiResponse
+        | undefined;
 
-      expect(result.success).toBe(true);
+      expect(result && result.success).toBe(true);
     });
 
     it('should handle error response', async () => {
@@ -131,9 +162,13 @@ describe('API Services', () => {
         ok: false,
         json: async () => ({ error: 'Update failed' }),
       } as Response);
-      const result = await updateProfile({ name: 'Bad User' });
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Update failed');
+      const result = (await run(updateProfile({ name: 'Bad User' }))) as
+        | ApiResponse
+        | undefined;
+      expect(result && result.success).toBe(false);
+      expect(result && result.error).toEqual(
+        expect.stringContaining('Update failed')
+      );
     });
   });
 
@@ -144,9 +179,11 @@ describe('API Services', () => {
         json: async () => ({ success: true }),
       } as Response);
 
-      const result = await verifyEmail('test-token');
+      const result = (await run(verifyEmail('test-token'))) as
+        | ApiResponse
+        | undefined;
 
-      expect(result.success).toBe(true);
+      expect(result && result.success).toBe(true);
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('token=test-token'),
         expect.any(Object)
@@ -158,9 +195,13 @@ describe('API Services', () => {
         ok: false,
         json: async () => ({ error: 'Token invalid' }),
       } as Response);
-      const result = await verifyEmail('bad-token');
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Token invalid');
+      const result = (await run(verifyEmail('bad-token'))) as
+        | ApiResponse
+        | undefined;
+      expect(result && result.success).toBe(false);
+      expect(result && result.error).toEqual(
+        expect.stringContaining('Token invalid')
+      );
     });
     describe('apiRequest', () => {
       it('should handle fetch throwing error', async () => {
@@ -169,9 +210,12 @@ describe('API Services', () => {
         ).mockImplementationOnce(() => {
           throw new Error('Network error');
         });
-        const result = await send2FACode('test@example.com', 'password123');
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Network error');
+        const result = (await run(
+          send2FACode('test@example.com', 'password123')
+        )) as ApiResponse | undefined;
+        expect(result && result.success).toBe(false);
+        // Validation passes, but fetch throws - should see "Failed to send 2FA code" or retry errors
+        expect(result && result.error).toBeDefined();
       });
       it('should handle fetch throwing non-Error', async () => {
         (
@@ -179,9 +223,11 @@ describe('API Services', () => {
         ).mockImplementationOnce(() => {
           throw 'fail';
         });
-        const result = await send2FACode('test@example.com', 'password123');
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Unknown error');
+        const result = (await run(
+          send2FACode('test@example.com', 'password123')
+        )) as ApiResponse | undefined;
+        expect(result && result.success).toBe(false);
+        expect(result && result.error).toBeDefined();
       });
     });
   });

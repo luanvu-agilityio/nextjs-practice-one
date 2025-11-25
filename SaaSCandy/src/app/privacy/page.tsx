@@ -1,4 +1,4 @@
-import { PrivacyPageContent } from '@/components';
+import { PrivacyPageContent } from '@/features';
 
 export const metadata = {
   title: 'Privacy Term | SaaSCandy',

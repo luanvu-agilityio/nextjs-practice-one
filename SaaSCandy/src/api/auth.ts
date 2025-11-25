@@ -1,4 +1,5 @@
 import { http } from '@/service';
+import { runHttpEffect } from '@/service/HttpClient/helper';
 import { UpdateUserData, User } from '@/types/user';
 
 export interface AuthResponse {
@@ -34,8 +35,10 @@ export const authApi = {
    */
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     try {
-      const users = await http.get<User[]>(
-        `${USERS_ENDPOINT}?email=${encodeURIComponent(payload.email)}&password=${encodeURIComponent(payload.password)}`
+      const users = await runHttpEffect<User[]>(
+        http.get<User[]>(
+          `${USERS_ENDPOINT}?email=${encodeURIComponent(payload.email)}&password=${encodeURIComponent(payload.password)}`
+        )
       );
 
       const user = Array.isArray(users) ? users[0] : undefined;
@@ -73,7 +76,9 @@ export const authApi = {
         createdAt: new Date().toISOString(),
       };
 
-      const user = await http.post<User>(USERS_ENDPOINT, userData);
+      const user = await runHttpEffect<User>(
+        http.post<User>(USERS_ENDPOINT, userData)
+      );
 
       return {
         token: `mock-token-${Date.now()}-${user.id}`,
@@ -92,8 +97,8 @@ export const authApi = {
    */
   findByEmail: async (email: string): Promise<User | null> => {
     try {
-      const users = await http.get<User[]>(
-        `${USERS_ENDPOINT}?email=${encodeURIComponent(email)}`
+      const users = await runHttpEffect<User[]>(
+        http.get<User[]>(`${USERS_ENDPOINT}?email=${encodeURIComponent(email)}`)
       );
       return Array.isArray(users) && users.length > 0 ? users[0] : null;
     } catch (error) {
@@ -110,7 +115,9 @@ export const authApi = {
    */
   getUser: async (id: string): Promise<User> => {
     try {
-      return await http.get<User>(`${USERS_ENDPOINT}/${id}`);
+      return await runHttpEffect<User>(
+        http.get<User>(`${USERS_ENDPOINT}/${id}`)
+      );
     } catch (error) {
       console.error('Get user API error:', error);
       throw new Error('Failed to fetch user data.');
@@ -132,7 +139,9 @@ export const authApi = {
         delete updateData.newPassword;
       }
 
-      return await http.put<User>(`${USERS_ENDPOINT}/${id}`, updateData);
+      return await runHttpEffect<User>(
+        http.put<User>(`${USERS_ENDPOINT}/${id}`, updateData)
+      );
     } catch (error) {
       console.error('Update user API error:', error);
       throw new Error('Failed to update user data.');
@@ -151,7 +160,9 @@ export const authApi = {
     currentPassword: string
   ): Promise<boolean> => {
     try {
-      const user = await http.get<User>(`${USERS_ENDPOINT}/${id}`);
+      const user = await runHttpEffect<User>(
+        http.get<User>(`${USERS_ENDPOINT}/${id}`)
+      );
       return user.password === currentPassword;
     } catch (error) {
       console.error('Verify password API error:', error);

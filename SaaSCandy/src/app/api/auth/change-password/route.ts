@@ -1,38 +1,45 @@
 /**
- * API route for changing the user's password.
+ * Effect-based API route using Effect.gen syntax.
  *
- * - Requires authentication (session).
- * - Validates current and new password.
- * - Verifies the current password using Argon2.
- * - Updates the password in the database after hashing.
- * - Returns success or error messages.
+ * Effect.gen provides clean, modern syntax similar to async/await,
+ * with built-in error handling, retries, and composition.
  *
  * Method: POST
  * Body: { currentPassword: string, newPassword: string }
- * Response: { success: boolean, message: string }
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { Effect } from 'effect';
 import { auth } from '@/lib/better-auth';
 
+interface ChangePasswordResult {
+  success: boolean;
+  message: string;
+  status?: number;
+}
+
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
+  // Effect returns plain data
+  const program = Effect.gen(function* () {
+    // Step 1: Parse request body
+    const body = yield* Effect.promise(() => request.json());
     const { currentPassword, newPassword } = body ?? {};
 
+    // Step 2: Validate inputs
     if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Current password and new password are required',
-        },
-        { status: 400 }
-      );
+      return {
+        success: false,
+        message: 'Current password and new password are required',
+        status: 400,
+      } as ChangePasswordResult;
     }
 
-    const result = (await auth.api.changePassword({
-      headers: request.headers,
-      body: { currentPassword, newPassword },
-    })) as unknown;
+    // Step 3: Call Better Auth API
+    const result = yield* Effect.promise(() =>
+      auth.api.changePassword({
+        headers: request.headers,
+        body: { currentPassword, newPassword },
+      })
+    );
 
     type ChangePasswordResponse = {
       user?: unknown;
@@ -40,43 +47,49 @@ export async function POST(request: NextRequest) {
       ok?: boolean;
       message?: string;
       error?: string;
-      [key: string]: unknown;
     };
 
     const authResult = result as ChangePasswordResponse;
 
+    // Step 4: Check for success
     if (authResult?.user || authResult?.token || authResult?.ok) {
-      return NextResponse.json({
+      return {
         success: true,
         message:
           typeof authResult.message === 'string'
             ? authResult.message
             : 'Password changed successfully',
-      });
+        status: 200,
+      } as ChangePasswordResult;
     }
 
+    // Step 5: Handle Better Auth errors
+    const errorMessage =
+      (typeof authResult.error === 'string' ? authResult.error : undefined) ||
+      (typeof authResult.message === 'string'
+        ? authResult.message
+        : undefined) ||
+      'Failed to change password';
+
+    return {
+      success: false,
+      message: errorMessage,
+      status: 400,
+    } as ChangePasswordResult;
+  });
+
+  try {
+    // Run Effect and get plain result
+    const result = (await Effect.runPromise(program)) as ChangePasswordResult;
+
+    // Map to NextResponse at boundary
+    const status = result.status || (result.success ? 200 : 400);
     return NextResponse.json(
-      {
-        success: false,
-        message:
-          (typeof authResult.error === 'string'
-            ? authResult.error
-            : undefined) ||
-          (typeof authResult.message === 'string'
-            ? authResult.message
-            : undefined) ||
-          'Failed to change password',
-      },
-      { status: 400 }
+      { success: result.success, message: result.message },
+      { status }
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          error instanceof Error ? error.message : 'Failed to change password',
-      },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
